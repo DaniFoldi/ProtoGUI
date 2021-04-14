@@ -1,0 +1,17 @@
+geciségek:
+  fasztbeléd:
+    targeted: true # kell-e player nevet írni a command után
+    aliases: [dögölj, meg]
+    permission: 'faszt.a.seggedbe'
+    size: 54
+    items:
+      1:
+        type: 'LÓFASZ'
+        count: 69
+        name: '&5lófasz'
+        lore:
+          - 'ide'
+          - 'valami, de nem tommi'
+        commands:
+          - 'fuck %player%'
+          - 'ban %target%'

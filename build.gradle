@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+group 'hu.nugget'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io/' }
+    maven { url 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url 'https://mvn.exceptionflug.de/repository/exceptionflug-public/' }
+}
+
+dependencies {
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.16-R0.4-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-api:1.6.7-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-items:1.6.7-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-inventory:1.6.7-SNAPSHOT'
+
+    implementation'org.jetbrains:annotations:20.1.0'
+    implementation 'javax.inject:javax.inject:1'
+    implementation 'com.google.dagger:dagger:2.34'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.34'
+
+}
+
+processResources {
+    from(sourceSets.main.resources) {
+        expand version: project.version
+    }
+}
+
+shadowJar {
+    minimize()
+    relocate 'org.jetbrains.annotations', 'hu.nugget.bungeegui.reloc.annotations'
+    archiveFileName.set("${project.name}-${project.version}.jar")
+}

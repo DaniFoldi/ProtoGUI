@@ -1,0 +1,6 @@
+name: BungeeGUI
+main: hu.nugget.bungeegui.BungeeGuiPlugin
+version: ${version}
+author: HgeX
+depends:
+  - Protocolize
