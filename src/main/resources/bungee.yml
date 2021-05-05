@@ -1,6 +1,9 @@
 name: BungeeGUI
 main: hu.nugget.bungeegui.BungeeGuiPlugin
+description: Display GUIs to players that can perform commands
 version: ${version}
-author: HgeX
+authors:
+  - HgeX
+  - DaniFoldi
 depends:
-  - Protocolize
+  - protocolize-plugin

@@ -1,17 +1,25 @@
-geciségek:
-  fasztbeléd:
-    targeted: true # kell-e player nevet írni a command után
-    aliases: [dögölj, meg]
-    permission: 'faszt.a.seggedbe'
+messages:
+  playerOnly: 'Ezt a parancsot csak player futtathattja'
+  targetRequired: 'Ennek a parancsnak meg kell adnod egy céljátékost'
+  reloadSuccess: 'Plugin sikeresen újratöltve {time}ms'
+
+guis:
+  punish:
+    targeted: true # do the commands require a target player as an argument
+    aliases: [punish]
+    permission: 'bungeegui.gui.punish' # overrides the permission bungeegui.gui.<guiname>
     size: 54
+    title: 'Punish {target}'
     items:
       1:
-        type: 'LÓFASZ'
-        count: 69
-        name: '&5lófasz'
+        type: 'WHITE_STAINED_GLASS_PANE'
+        count: 10
+        name: '&5próba'
         lore:
           - 'ide'
-          - 'valami, de nem tommi'
+          - 'valami, de nem tomi'
+        enchantments:
+          unbreaking: 1
+        data: 'asd'
         commands:
-          - 'fuck %player%'
-          - 'ban %target%'
+          - 'broadcast {target}'
