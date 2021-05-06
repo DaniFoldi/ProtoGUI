@@ -1,6 +1,6 @@
-package hu.nugget.bungeegui.api;
+package com.danifoldi.bungeegui.api;
 
-import hu.nugget.bungeegui.gui.GuiHandler;
+import com.danifoldi.bungeegui.gui.GuiHandler;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.inject.Inject;

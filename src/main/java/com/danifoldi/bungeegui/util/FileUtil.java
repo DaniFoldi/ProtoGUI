@@ -1,6 +1,6 @@
-package hu.nugget.bungeegui.util;
+package com.danifoldi.bungeegui.util;
 
-import hu.nugget.bungeegui.BungeeGuiPlugin;
+import com.danifoldi.bungeegui.BungeeGuiPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

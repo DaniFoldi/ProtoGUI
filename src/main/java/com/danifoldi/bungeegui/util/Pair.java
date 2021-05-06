@@ -1,4 +1,4 @@
-package hu.nugget.bungeegui.util;
+package com.danifoldi.bungeegui.util;
 
 public class Pair<A, B> {
     private A a;

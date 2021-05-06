@@ -1,4 +1,4 @@
-package hu.nugget.bungeegui.util;
+package com.danifoldi.bungeegui.util;
 
 import java.util.Arrays;
 import java.util.List;

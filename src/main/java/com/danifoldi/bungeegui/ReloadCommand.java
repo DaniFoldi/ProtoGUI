@@ -1,7 +1,7 @@
-package hu.nugget.bungeegui;
+package com.danifoldi.bungeegui;
 
-import hu.nugget.bungeegui.util.Message;
-import hu.nugget.bungeegui.util.Pair;
+import com.danifoldi.bungeegui.util.Message;
+import com.danifoldi.bungeegui.util.Pair;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 

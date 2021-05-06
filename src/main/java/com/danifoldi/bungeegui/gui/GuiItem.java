@@ -1,4 +1,4 @@
-package hu.nugget.bungeegui.gui;
+package com.danifoldi.bungeegui.gui;
 
 import de.exceptionflug.protocolize.items.ItemType;
 import org.jetbrains.annotations.NotNull;

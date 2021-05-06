@@ -1,4 +1,4 @@
-package hu.nugget.bungeegui.util;
+package com.danifoldi.bungeegui.util;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

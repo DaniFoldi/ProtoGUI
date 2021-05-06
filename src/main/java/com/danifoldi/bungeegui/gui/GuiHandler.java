@@ -1,5 +1,10 @@
-package hu.nugget.bungeegui.gui;
+package com.danifoldi.bungeegui.gui;
 
+import com.danifoldi.bungeegui.BungeeGuiCommand;
+import com.danifoldi.bungeegui.BungeeGuiPlugin;
+import com.danifoldi.bungeegui.util.Message;
+import com.danifoldi.bungeegui.util.Pair;
+import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import de.exceptionflug.protocolize.inventory.Inventory;
@@ -7,11 +12,6 @@ import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
-import hu.nugget.bungeegui.BungeeGuiCommand;
-import hu.nugget.bungeegui.BungeeGuiPlugin;
-import hu.nugget.bungeegui.util.Message;
-import hu.nugget.bungeegui.util.Pair;
-import hu.nugget.bungeegui.util.StringUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;

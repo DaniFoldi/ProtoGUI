@@ -1,13 +1,8 @@
-package hu.nugget.bungeegui;
+package com.danifoldi.bungeegui;
 
-import hu.nugget.bungeegui.inject.BungeeGuiComponent;
-import hu.nugget.bungeegui.inject.DaggerBungeeGuiComponent;
-import hu.nugget.bungeegui.util.FileUtil;
+import com.danifoldi.bungeegui.inject.BungeeGuiComponent;
+import com.danifoldi.bungeegui.inject.DaggerBungeeGuiComponent;
 import net.md_5.bungee.api.plugin.Plugin;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
 
 public class BungeeGuiPlugin extends Plugin {
     private BungeeGuiLoader loader;

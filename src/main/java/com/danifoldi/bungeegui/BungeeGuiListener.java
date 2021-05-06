@@ -1,11 +1,11 @@
-package hu.nugget.bungeegui;
+package com.danifoldi.bungeegui;
 
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.inventory.event.InventoryClickEvent;
 import de.exceptionflug.protocolize.inventory.event.InventoryCloseEvent;
-import hu.nugget.bungeegui.gui.GuiGrid;
-import hu.nugget.bungeegui.gui.GuiHandler;
+import com.danifoldi.bungeegui.gui.GuiGrid;
+import com.danifoldi.bungeegui.gui.GuiHandler;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;

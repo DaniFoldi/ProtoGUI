@@ -1,4 +1,4 @@
-package hu.nugget.bungeegui.gui;
+package com.danifoldi.bungeegui.gui;
 
 import org.jetbrains.annotations.NotNull;
 
