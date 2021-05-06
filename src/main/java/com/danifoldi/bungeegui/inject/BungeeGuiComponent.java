@@ -1,9 +1,9 @@
 package com.danifoldi.bungeegui.inject;
 
-import dagger.BindsInstance;
-import dagger.Component;
 import com.danifoldi.bungeegui.main.BungeeGuiLoader;
 import com.danifoldi.bungeegui.main.BungeeGuiPlugin;
+import dagger.BindsInstance;
+import dagger.Component;
 import net.md_5.bungee.api.plugin.PluginManager;
 
 import javax.inject.Singleton;

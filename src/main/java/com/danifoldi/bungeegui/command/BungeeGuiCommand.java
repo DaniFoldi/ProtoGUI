@@ -2,14 +2,13 @@ package com.danifoldi.bungeegui.command;
 
 import com.danifoldi.bungeegui.main.BungeeGuiAPI;
 import com.danifoldi.bungeegui.util.Message;
-import com.danifoldi.bungeegui.main.GuiHandler;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -40,10 +39,10 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         if (!BungeeGuiAPI.getInstance().getGui(name).isTargeted()) {
-            return List.of();
+            return Collections.emptyList();
         }
         if (args.length > 1) {
-            return List.of();
+            return Collections.emptyList();
         }
 
         final String filter = args.length == 0 ? "" : args[args.length - 1];

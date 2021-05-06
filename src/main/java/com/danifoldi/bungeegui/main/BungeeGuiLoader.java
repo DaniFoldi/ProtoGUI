@@ -4,7 +4,6 @@ import com.danifoldi.bungeegui.command.ReloadCommand;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
-import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class BungeeGuiLoader {

@@ -3,12 +3,10 @@ package com.danifoldi.bungeegui.main;
 import com.danifoldi.bungeegui.command.BungeeGuiCommand;
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.gui.GuiItem;
-import com.danifoldi.bungeegui.main.BungeeGuiPlugin;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.file.FileConfig;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.inventory.InventoryType;
@@ -16,12 +14,13 @@ import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,10 +49,6 @@ public class GuiHandler {
 
     @NotNull
     GuiGrid getGui(final @NotNull String name) {
-        if (!this.menus.containsKey(name)) {
-            throw new IllegalArgumentException();
-        }
-
         return this.menus.get(name);
     }
 
@@ -139,6 +134,10 @@ public class GuiHandler {
                 } else if (data.getFirst().equalsIgnoreCase("texture")) {
                     item.setSkullTexture(data.getSecond());
                 }
+            }
+
+            if (guiItem.getValue().isEnchanted()) {
+                ((CompoundTag)item.getNBTTag()).put("ench", new ListTag<>(CompoundTag.class));
             }
 
             inventory.setItem(guiItem.getKey(), item);

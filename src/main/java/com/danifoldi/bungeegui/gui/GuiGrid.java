@@ -1,14 +1,10 @@
 package com.danifoldi.bungeegui.gui;
 
-import de.exceptionflug.protocolize.items.ItemType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-
-import static java.util.Objects.requireNonNull;
 
 public class GuiGrid {
     private final Map<Integer, GuiItem> items;

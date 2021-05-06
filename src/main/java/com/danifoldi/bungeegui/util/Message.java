@@ -49,7 +49,7 @@ public enum Message {
     @SafeVarargs
     public final BaseComponent[] toComponent(Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
-            return new BaseComponent[] {new TextComponent(colorCodes(replace(defaultValue, replacements)))};
+            return toComponent(defaultValue, replacements);
         }
 
         return toComponent(Message.messages.get(messageId), replacements);
