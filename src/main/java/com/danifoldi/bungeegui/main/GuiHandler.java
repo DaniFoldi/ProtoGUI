@@ -1,7 +1,9 @@
-package com.danifoldi.bungeegui.gui;
+package com.danifoldi.bungeegui.main;
 
-import com.danifoldi.bungeegui.BungeeGuiCommand;
-import com.danifoldi.bungeegui.BungeeGuiPlugin;
+import com.danifoldi.bungeegui.command.BungeeGuiCommand;
+import com.danifoldi.bungeegui.gui.GuiGrid;
+import com.danifoldi.bungeegui.gui.GuiItem;
+import com.danifoldi.bungeegui.main.BungeeGuiPlugin;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.StringUtil;
@@ -38,7 +40,7 @@ public class GuiHandler {
     private final BungeeGuiPlugin plugin;
 
     @Inject
-    public GuiHandler(final @NotNull Logger logger,
+    GuiHandler(final @NotNull Logger logger,
                       final @NotNull PluginManager pluginManager,
                       final @NotNull BungeeGuiPlugin plugin) {
         this.logger = logger;
@@ -47,7 +49,7 @@ public class GuiHandler {
     }
 
     @NotNull
-    public GuiGrid getGui(final @NotNull String name) {
+    GuiGrid getGui(final @NotNull String name) {
         if (!this.menus.containsKey(name)) {
             throw new IllegalArgumentException();
         }
@@ -55,11 +57,9 @@ public class GuiHandler {
         return this.menus.get(name);
     }
 
-    public Config load(Path file) {
+    void load(Config config) {
         menus.clear();
 
-        final FileConfig config = FileConfig.of(file);
-        config.load();
         final Config guis = config.get("guis");
 
         for (Config.Entry gui: guis.entrySet()) {
@@ -72,36 +72,30 @@ public class GuiHandler {
                 final int slot = Integer.parseInt(guiItem.getKey());
                 final Config itemData = guiItem.getValue();
 
-                Map<String, Integer> enchantments = new HashMap<>();
-                if (itemData.contains("enchantments")) {
-                    for (Config.Entry enchantment : ((Config) itemData.get("enchantments")).entrySet()) {
-                        enchantments.put(enchantment.getKey(), enchantment.getIntOrElse(1));
-                    }
-                }
-
-                GuiItem item = new GuiItem(ItemType.valueOf(itemData.getOrElse("type", "stone").toUpperCase(Locale.ROOT)),
-                        itemData.getOrElse("count", 1),
-                        itemData.getOrElse("name", ""),
-                        itemData.getOrElse("lore", List.of()),
-                        itemData.getOrElse("data", ""),
-                        itemData.getOrElse("command", Set.of()),
-                        enchantments
-                        );
+                GuiItem item = GuiItem.builder()
+                        .type(ItemType.valueOf(itemData.getOrElse("type", "stone").toUpperCase(Locale.ROOT)))
+                        .amount(itemData.getOrElse("count", 1))
+                        .title(itemData.getOrElse("name", ""))
+                        .lore(itemData.getOrElse("lore", List.of()))
+                        .data(itemData.getOrElse("data", ""))
+                        .commands(itemData.getOrElse("command", Set.of()))
+                        .enchanted(itemData.getOrElse("enchanted", false))
+                        .build();
 
                 itemMap.put(slot, item);
             }
 
-            final GuiGrid grid = new GuiGrid(itemMap,
-                    guiData.getOrElse("targeted", false),
-                    guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()),
-                    guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT)),
-                    guiData.getIntOrElse("size", 54),
-                    guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)));
+            final GuiGrid grid = GuiGrid.builder()
+                    .items(itemMap)
+                    .targeted(guiData.getOrElse("targeted", false))
+                    .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
+                    .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                    .size(guiData.getIntOrElse("size", 54))
+                    .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
+                    .build();
 
             menus.put(name, grid);
         }
-
-        return config;
     }
 
     private InventoryType getInventoryType(int size) {
@@ -120,13 +114,13 @@ public class GuiHandler {
         }
     }
 
-    public void registerCommands() {
+    void registerCommands() {
         for (String name: menus.keySet()) {
-            pluginManager.registerCommand(plugin, new BungeeGuiCommand(name, this));
+            pluginManager.registerCommand(plugin, new BungeeGuiCommand(name));
         }
     }
 
-    public void open(String name, ProxiedPlayer player, @Nullable String target) {
+    void open(String name, ProxiedPlayer player, @Nullable String target) {
         logger.info("Opening gui " + name + " for player " + player.getName() + " (target: " + target + ")");
 
         final GuiGrid gui = menus.get(name);
@@ -154,7 +148,7 @@ public class GuiHandler {
         openGuis.put(player.getUniqueId(), Pair.of(name, target));
     }
 
-    public void runCommand(ProxiedPlayer player, GuiGrid openGui, int slot, String target) {
+    void runCommand(ProxiedPlayer player, GuiGrid openGui, int slot, String target) {
         logger.info("Running commands for player " + player.getName() + " slot " + slot + " with target " + target);
 
         final GuiItem item = openGui.getItems().get(slot);
@@ -168,7 +162,7 @@ public class GuiHandler {
         }
     }
 
-    public void close(ProxiedPlayer player) {
+    void close(ProxiedPlayer player) {
         if (!openGuis.containsKey(player.getUniqueId())) {
             return;
         }
@@ -179,14 +173,14 @@ public class GuiHandler {
         InventoryModule.closeAllInventories(player);
     }
 
-    public GuiGrid getOpenGui(UUID uuid) {
+    GuiGrid getOpenGui(UUID uuid) {
         return menus.get(openGuis.get(uuid).getFirst());
     }
-    public String getGuiTarget(UUID uuid) {
+    String getGuiTarget(UUID uuid) {
         return openGuis.get(uuid).getSecond();
     }
 
-    public String getGuiName(GuiGrid gui) {
+    String getGuiName(GuiGrid gui) {
         for (Map.Entry<String, GuiGrid> menu: menus.entrySet()) {
             if (menu.getValue() != gui) {
                 continue;

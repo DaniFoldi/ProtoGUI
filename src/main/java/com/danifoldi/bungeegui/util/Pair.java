@@ -1,8 +1,8 @@
 package com.danifoldi.bungeegui.util;
 
 public class Pair<A, B> {
-    private A a;
-    private B b;
+    private final A a;
+    private final B b;
 
     private Pair(A a, B b) {
         this.a = a;

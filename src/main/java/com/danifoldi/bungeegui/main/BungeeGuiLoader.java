@@ -1,11 +1,13 @@
-package com.danifoldi.bungeegui;
+package com.danifoldi.bungeegui.main;
 
+import com.danifoldi.bungeegui.command.ReloadCommand;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
-import com.danifoldi.bungeegui.gui.GuiHandler;
+import com.electronwill.nightconfig.core.file.FileConfig;
 import net.md_5.bungee.api.plugin.PluginManager;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -23,7 +25,11 @@ public class BungeeGuiLoader {
     private final Path datafolder;
 
     @Inject
-    public BungeeGuiLoader(GuiHandler guiHandler, BungeeGuiPlugin plugin, Logger logger, PluginManager pluginManager, Path datafolder) {
+    public BungeeGuiLoader(final @NotNull GuiHandler guiHandler,
+                           final @NotNull BungeeGuiPlugin plugin,
+                           final @NotNull Logger logger,
+                           final @NotNull PluginManager pluginManager,
+                           final @NotNull Path datafolder) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
@@ -34,29 +40,29 @@ public class BungeeGuiLoader {
     void load() {
         StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
+        BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this));
+
         try {
-            FileUtil.ensureFile(datafolder, "config.yml");
+            final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
+            config.load();
+
+            guiHandler.load(config);
+            Message.setMessageProvider(config);
+
+            pluginManager.registerCommand(plugin, new ReloadCommand());
+            guiHandler.registerCommands();
+            pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
         } catch (IOException e) {
-            logger.severe("Could not preload config file");
+            StringUtil.blockPrint("Could not enable plugin, please see the error below").forEach(logger::severe);
             logger.severe(e.getMessage());
             e.printStackTrace();
         }
-
-        Config config = guiHandler.load(datafolder.resolve("config.yml"));
-
-        Map<String, String> messages = new HashMap<>();
-        for (Config.Entry message: ((Config)config.get("messages")).entrySet()) {
-            messages.put(message.getKey(), message.getValue());
-        }
-        Message.setMessageProvider(messages);
-
-        pluginManager.registerCommand(plugin, new ReloadCommand(this));
-        guiHandler.registerCommands();
-        pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
     }
 
     void unload() {
         StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
+
+        BungeeGuiAPI.setInstance(null);
         pluginManager.unregisterCommands(plugin);
         pluginManager.unregisterListeners(plugin);
     }

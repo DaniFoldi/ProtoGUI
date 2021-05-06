@@ -1,5 +1,6 @@
 package com.danifoldi.bungeegui.util;
 
+import com.electronwill.nightconfig.core.Config;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -11,10 +12,15 @@ public enum Message {
 
     PLAYER_ONLY("playerOnly", "&cOnly players can execute this command"),
     TARGET_REQUIRED("targetRequired", "&cThis command requires a target player"),
-    RELOAD_SUCCESS("reloadSuccess", "Plugin reloaded succeessfully in {time}ms");
+    RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded succeessfully in &l{time}ms");
 
     private static Map<String, String> messages = new HashMap<>();
-    public static void setMessageProvider(Map<String, String> messages) {
+    public static void setMessageProvider(Config config) {
+        final Map<String, String> messages = new HashMap<>();
+        for (Config.Entry message: ((Config)config.get("messages")).entrySet()) {
+            messages.put(message.getKey(), message.getValue());
+        }
+
         Message.messages = messages;
     }
 
@@ -36,10 +42,14 @@ public enum Message {
         return result;
     }
 
+    private static String colorCodes(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
     @SafeVarargs
     public final BaseComponent[] toComponent(Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
-            return new BaseComponent[] {new TextComponent(ChatColor.translateAlternateColorCodes('&', replace(defaultValue, replacements)))};
+            return new BaseComponent[] {new TextComponent(colorCodes(replace(defaultValue, replacements)))};
         }
 
         return toComponent(Message.messages.get(messageId), replacements);
@@ -47,6 +57,6 @@ public enum Message {
 
     @SafeVarargs
     public static BaseComponent[] toComponent(String value, Pair<String, String>... replacements) {
-        return new BaseComponent[] {new TextComponent(ChatColor.translateAlternateColorCodes('&', replace(value, replacements)))};
+        return new BaseComponent[] {new TextComponent(colorCodes(replace(value, replacements)))};
     }
 }

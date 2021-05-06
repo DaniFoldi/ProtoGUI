@@ -18,22 +18,22 @@ public class GuiItem {
     private final List<String> lore;
     private final String data;
     private final Set<String> commands;
-    private final Map<String, Integer> enchantments;
+    private final boolean enchanted;
 
-    protected GuiItem(final @NotNull ItemType type,
+    private GuiItem(final @NotNull ItemType type,
                     final int amount,
                     final @NotNull String name,
                     final @NotNull List<String> lore,
                     final @NotNull String data,
                     final @NotNull Set<String> commands,
-                    final @NotNull Map<String, Integer> enchantments) {
+                    final boolean enchanted) {
         this.type = type;
         this.amount = amount;
         this.name = name;
         this.lore = lore;
         this.data = data;
         this.commands = commands;
-        this.enchantments = enchantments;
+        this.enchanted = enchanted;
     }
 
     public @NotNull ItemType getType() {
@@ -60,9 +60,8 @@ public class GuiItem {
         return Set.copyOf(this.commands);
     }
 
-    // TODO add enchantments to items
-    public @NotNull Map<String, Integer> getEnchantments() {
-        return this.enchantments;
+    public boolean isEnchanted() {
+        return this.enchanted;
     }
 
     @Override
@@ -73,7 +72,7 @@ public class GuiItem {
                 + ", lore=" + this.lore
                 + ", data=" + this.data
                 + ", commands=" + this.commands
-                + ", enchantments=" + this.enchantments
+                + ", enchanted=" + this.enchanted
                 + '}';
     }
 
@@ -88,15 +87,15 @@ public class GuiItem {
                 && Objects.equals(this.lore, guiItem.lore)
                 && Objects.equals(this.data, guiItem.data)
                 && Objects.equals(this.commands, guiItem.commands)
-                && Objects.equals(this.enchantments, guiItem.enchantments);
+                && this.enchanted == guiItem.enchanted;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchantments);
+        return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchanted);
     }
 
-    public static Builder newBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -107,7 +106,7 @@ public class GuiItem {
         private List<String> lore;
         private String data;
         private Set<String> commands;
-        private Map<String, Integer> enchantments;
+        private boolean enchanted;
 
         private Builder() {}
 
@@ -141,8 +140,8 @@ public class GuiItem {
             return this;
         }
 
-        public @NotNull Builder enchantments(final @NotNull Map<String, Integer> enchantments) {
-            this.enchantments = enchantments;
+        public @NotNull Builder enchanted(final boolean enchanted) {
+            this.enchanted = enchanted;
             return this;
         }
 
@@ -158,7 +157,7 @@ public class GuiItem {
                     requireNonNull(this.lore),
                     requireNonNull(this.data),
                     this.commands == null ? Set.of() : this.commands,
-                    requireNonNull(this.enchantments)
+                    this.enchanted
             );
         }
     }

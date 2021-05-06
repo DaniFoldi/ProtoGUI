@@ -4,8 +4,8 @@ plugins {
 }
 
 group 'hu.nugget'
-version '1.0.0'
-sourceCompatibility = JavaVersion.VERSION_1_10
+version '1.0.1'
+sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
@@ -42,8 +42,8 @@ shadowJar {
         exclude(dependency('com.electronwill.night-config:.*:.*'))
     }
 
-    relocate 'org.jetbrains.annotations', 'com.danifoldi.bungeegui.reloc.annotations'
-    relocate 'javax.inject', 'com.danifoldi.bungeegui.reloc.inject'
-    relocate 'dagger', 'com.danifoldi.bungeegui.reloc.dagger'
+    relocate 'org.jetbrains.annotations', 'com.danifoldi.bungeegui.lib.annotations'
+    relocate 'javax.inject', 'com.danifoldi.bungeegui.lib.inject'
+    relocate 'dagger', 'com.danifoldi.bungeegui.lib.dagger'
     archiveFileName.set("${project.name}-${project.version}.jar")
 }

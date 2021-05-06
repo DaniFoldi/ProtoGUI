@@ -1,4 +1,4 @@
-package com.danifoldi.bungeegui;
+package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.inject.BungeeGuiComponent;
 import com.danifoldi.bungeegui.inject.DaggerBungeeGuiComponent;
