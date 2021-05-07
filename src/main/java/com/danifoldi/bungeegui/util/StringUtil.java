@@ -6,6 +6,10 @@ import java.util.stream.Collectors;
 
 public class StringUtil {
     public static Pair<String, String> get(String value) {
+        if (!value.contains(":")) {
+            return Pair.of("", value);
+        }
+
         final String a = Arrays.stream(value.split(":")).findFirst().orElse("");
         final String b = Arrays.stream(value.split(":")).skip(1L).collect(Collectors.joining(":"));
 

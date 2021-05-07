@@ -2,8 +2,8 @@ name: BungeeGUI
 main: com.danifoldi.bungeegui.main.BungeeGuiPlugin
 description: Create GUIs that perform commands on behalf of the player
 version: ${version}
-authors:
-  - HgeX
-  - DaniFoldi
+author: DaniFoldi, HgeX
 depends:
   - protocolize-plugin
+softdepends:
+  - PremiumVanish

@@ -12,6 +12,7 @@ import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.querz.nbt.tag.CompoundTag;
@@ -21,11 +22,12 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -71,9 +73,9 @@ public class GuiHandler {
                         .type(ItemType.valueOf(itemData.getOrElse("type", "stone").toUpperCase(Locale.ROOT)))
                         .amount(itemData.getOrElse("count", 1))
                         .title(itemData.getOrElse("name", ""))
-                        .lore(itemData.getOrElse("lore", List.of()))
+                        .lore(itemData.getOrElse("lore", Collections.emptyList()))
                         .data(itemData.getOrElse("data", ""))
-                        .commands(itemData.getOrElse("command", Set.of()))
+                        .commands(itemData.getOrElse("commands", Collections.emptyList()))
                         .enchanted(itemData.getOrElse("enchanted", false))
                         .build();
 
@@ -87,6 +89,11 @@ public class GuiHandler {
                     .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
                     .size(guiData.getIntOrElse("size", 54))
                     .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
+                    .selfTarget(guiData.getOrElse("selfTarget", true))
+                    .ignoreVanished(guiData.getOrElse("ignoreVanished", true))
+                    .requireOnlineTarget(guiData.getOrElse("requireOnlineTarget", false))
+                    .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
+                    .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
                     .build();
 
             menus.put(name, grid);
@@ -137,7 +144,7 @@ public class GuiHandler {
             }
 
             if (guiItem.getValue().isEnchanted()) {
-                ((CompoundTag)item.getNBTTag()).put("ench", new ListTag<>(CompoundTag.class));
+                ((CompoundTag)item.getNBTTag()).put("Enchantments", new ListTag<>(CompoundTag.class));
             }
 
             inventory.setItem(guiItem.getKey(), item);
@@ -155,9 +162,17 @@ public class GuiHandler {
             return;
         }
 
-        final Set<String> commands = item.getCommands();
-        for (String command: commands) {
-            player.chat(Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
+        for (String command: item.getCommands()) {
+            if (command.equals("")) {
+                continue;
+            }
+
+            Pair<String, String> commandData = StringUtil.get(command);
+            if (commandData.getFirst().equalsIgnoreCase("console")) {
+                pluginManager.dispatchCommand(ProxyServer.getInstance().getConsole(), Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
+            }
+
+            pluginManager.dispatchCommand(player, Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
         }
     }
 
@@ -180,6 +195,7 @@ public class GuiHandler {
     }
 
     String getGuiName(GuiGrid gui) {
+        // TODO this needs to be improved
         for (Map.Entry<String, GuiGrid> menu: menus.entrySet()) {
             if (menu.getValue() != gui) {
                 continue;
@@ -189,5 +205,9 @@ public class GuiHandler {
         }
 
         return "";
+    }
+
+    List<String> getGuis() {
+        return new ArrayList<>(menus.keySet());
     }
 }

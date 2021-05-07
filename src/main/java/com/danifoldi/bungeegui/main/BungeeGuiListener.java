@@ -40,6 +40,14 @@ public class BungeeGuiListener implements Listener {
             return;
         }
 
+        if (inventory.getItem(slot) == null) {
+            return;
+        }
+
+        if (openGui.getItems().get(slot).getCommands().isEmpty()) {
+            return;
+        }
+
         final String target = guiHandler.getGuiTarget(player.getUniqueId());
 
         guiHandler.runCommand(player,openGui, slot, target);

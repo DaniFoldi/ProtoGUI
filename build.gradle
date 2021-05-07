@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'hu.nugget'
-version '1.0.1'
+version '1.0.3'
 sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -19,6 +19,8 @@ dependencies {
     compileOnly 'de.exceptionflug:protocolize-api:1.6.7-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-items:1.6.7-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-inventory:1.6.7-SNAPSHOT'
+
+    compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.6.3'
 
     implementation ('com.electronwill.night-config:yaml:3.6.0') {
         exclude module: 'snakeyaml'

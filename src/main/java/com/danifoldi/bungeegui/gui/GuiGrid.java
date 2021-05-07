@@ -13,43 +13,79 @@ public class GuiGrid {
     private final String permission;
     private final int guiSize;
     private final String title;
+    private final boolean selfTarget;
+    private final boolean ignoreVanished;
+    private final boolean requireOnlineTarget;
+    private final List<String> whitelistServers;
+    private final List<String> blacklistServers;
 
     private GuiGrid(final @NotNull Map<Integer, GuiItem> items,
-                   final boolean isTargeted,
-                   final @NotNull List<String> commandAliases,
-                   final @NotNull String permission,
-                   final int guiSize,
-                   final @NotNull String title) {
-        this.items = items;
+                    final boolean isTargeted,
+                    final @NotNull List<String> commandAliases,
+                    final @NotNull String permission,
+                    final int guiSize,
+                    final @NotNull String title,
+                    final boolean selfTarget,
+                    final boolean ignoreVanished,
+                    final boolean requireOnlineTarget,
+                    final @NotNull List<String> whitelistServers,
+                    final @NotNull List<String> blacklistServers) {
+        // TODO copy items individually
+        this.items = Map.copyOf(items);
         this.isTargeted = isTargeted;
-        this.commandAliases = commandAliases;
+        this.commandAliases = List.copyOf(commandAliases);
         this.permission = permission;
         this.guiSize = guiSize;
         this.title = title;
+        this.selfTarget = selfTarget;
+        this.ignoreVanished = ignoreVanished;
+        this.requireOnlineTarget = requireOnlineTarget;
+        this.whitelistServers = List.copyOf(whitelistServers);
+        this.blacklistServers = List.copyOf(blacklistServers);
     }
 
     public Map<Integer, GuiItem> getItems() {
-        return Map.copyOf(items);
+        return Map.copyOf(this.items);
     }
 
     public boolean isTargeted() {
-        return isTargeted;
+        return this.isTargeted;
     }
 
     public List<String> getCommandAliases() {
-        return commandAliases;
+        return List.copyOf(this.commandAliases);
     }
 
     public String getPermission() {
-        return permission;
+        return this.permission;
     }
 
     public int getGuiSize() {
-        return guiSize;
+        return this.guiSize;
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
+    }
+
+    public boolean isSelfTarget() {
+        return this.selfTarget;
+    }
+
+    public boolean isIgnoreVanished() {
+        return this.ignoreVanished;
+    }
+
+    public boolean isRequireOnlineTarget() {
+        return this.requireOnlineTarget;
+    }
+
+    public List<String> getWhitelistServers() {
+        return List.copyOf(this.whitelistServers);
+    }
+
+    public List<String> getBlacklistServers() {
+        return List.copyOf(this.blacklistServers);
     }
 
     public static Builder builder() {
@@ -63,6 +99,11 @@ public class GuiGrid {
         private String permission;
         private int guiSize;
         private String title;
+        private boolean selfTarget;
+        private boolean ignoreVanished;
+        private boolean requireOnlineTarget;
+        private List<String> whitelistServers;
+        private List<String> blacklistServers;
 
         private Builder() {}
 
@@ -96,13 +137,43 @@ public class GuiGrid {
             return this;
         }
 
+        public @NotNull Builder selfTarget(final boolean selfTarget) {
+            this.selfTarget = selfTarget;
+            return this;
+        }
+
+        public @NotNull Builder ignoreVanished(final boolean ignoreVanished) {
+            this.ignoreVanished = ignoreVanished;
+            return this;
+        }
+
+        public @NotNull Builder requireOnlineTarget(final boolean requireOnlineTarget) {
+            this.requireOnlineTarget = requireOnlineTarget;
+            return this;
+        }
+
+        public @NotNull Builder whitelistServers(final @NotNull List<String> whitelistServers) {
+            this.whitelistServers = whitelistServers;
+            return this;
+        }
+
+        public @NotNull Builder blacklistServers(final @NotNull List<String> blacklistServers) {
+            this.blacklistServers = blacklistServers;
+            return this;
+        }
+
         public @NotNull GuiGrid build() {
             return new GuiGrid(Objects.requireNonNull(items),
-                                isTargeted,
-                                Objects.requireNonNull(commandAliases),
-                                Objects.requireNonNull(permission),
-                                guiSize,
-                                Objects.requireNonNull(title)
+                               isTargeted,
+                               Objects.requireNonNull(commandAliases),
+                               Objects.requireNonNull(permission),
+                               guiSize,
+                               Objects.requireNonNull(title),
+                               selfTarget,
+                               ignoreVanished,
+                               requireOnlineTarget,
+                               Objects.requireNonNull(whitelistServers),
+                               Objects.requireNonNull(blacklistServers)
             );
         }
     }

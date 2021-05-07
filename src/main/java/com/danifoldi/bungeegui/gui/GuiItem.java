@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,7 +15,7 @@ public class GuiItem {
     private final String name;
     private final List<String> lore;
     private final String data;
-    private final Set<String> commands;
+    private final List<String> commands;
     private final boolean enchanted;
 
     private GuiItem(final @NotNull ItemType type,
@@ -24,7 +23,7 @@ public class GuiItem {
                     final @NotNull String name,
                     final @NotNull List<String> lore,
                     final @NotNull String data,
-                    final @NotNull Set<String> commands,
+                    final @NotNull List<String> commands,
                     final boolean enchanted) {
         this.type = type;
         this.amount = amount;
@@ -55,8 +54,8 @@ public class GuiItem {
         return this.data;
     }
 
-    public @NotNull Set<String> getCommands() {
-        return Set.copyOf(this.commands);
+    public @NotNull List<String> getCommands() {
+        return List.copyOf(this.commands);
     }
 
     public boolean isEnchanted() {
@@ -104,7 +103,7 @@ public class GuiItem {
         private String name;
         private List<String> lore;
         private String data;
-        private Set<String> commands;
+        private List<String> commands;
         private boolean enchanted;
 
         private Builder() {}
@@ -134,7 +133,7 @@ public class GuiItem {
             return this;
         }
 
-        public @NotNull Builder commands(final @NotNull Set<String> commands) {
+        public @NotNull Builder commands(final @NotNull List<String> commands) {
             this.commands = commands;
             return this;
         }
@@ -155,7 +154,7 @@ public class GuiItem {
                     requireNonNull(this.name),
                     requireNonNull(this.lore),
                     requireNonNull(this.data),
-                    this.commands == null ? Set.of() : this.commands,
+                    requireNonNull(this.commands),
                     this.enchanted
             );
         }

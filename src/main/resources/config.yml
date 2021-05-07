@@ -1,7 +1,9 @@
 messages:
-  playerOnly: 'Ezt a parancsot csak player futtathattja'
-  targetRequired: 'Ennek a parancsnak meg kell adnod egy céljátékost'
-  reloadSuccess: 'Plugin sikeresen újratöltve {time}ms'
+  playerOnly: '&cOnly players can execute this command'
+  targetRequired: '&cThis command requires a target player'
+  noSelfTarget: '&cYou can''t target yourself with this command'
+  reloadSuccess: '&bPlugin reloaded successfully in &l{time}ms'
+  serverDisabled: '&cYou can''t use this command on this server'
 
 guis:
   punish:
@@ -23,3 +25,5 @@ guis:
         data: 'asd'
         commands:
           - 'broadcast {target}'
+
+configVersion: 1
