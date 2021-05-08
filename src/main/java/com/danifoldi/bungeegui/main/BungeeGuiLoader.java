@@ -37,6 +37,7 @@ public class BungeeGuiLoader {
     void load() {
         StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
+        pluginManager.registerCommand(plugin, new ReloadCommand());
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this));
 
         try {
@@ -45,11 +46,10 @@ public class BungeeGuiLoader {
 
             guiHandler.load(config);
             Message.setMessageProvider(config);
-            if (!plugin.getDescription().getVersion().equals("1")) {
+            if (config.getIntOrElse("configVersion", 0) != 1) {
                 StringUtil.blockPrint("BungeeGUI config.yml is built with a different version. Please see the plugin page on how to update.").forEach(logger::warning);
             }
 
-            pluginManager.registerCommand(plugin, new ReloadCommand());
             guiHandler.registerCommands();
             pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
         } catch (IOException e) {

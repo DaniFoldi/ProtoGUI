@@ -9,7 +9,7 @@ import net.md_5.bungee.api.plugin.Command;
 public class ReloadCommand extends Command {
 
     public ReloadCommand() {
-        super("bguireload", "bungeegui.reload");
+        super("bguireload", "bungeegui.command.reload");
     }
 
     @Override

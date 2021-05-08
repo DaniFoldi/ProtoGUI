@@ -24,12 +24,13 @@ public class BungeeGuiListener implements Listener {
     @EventHandler
     @SuppressWarnings("unused")
     public void onInventoryClick(final @NotNull InventoryClickEvent event) {
+        final ProxiedPlayer player = event.getPlayer();
+
         final GuiGrid openGui = guiHandler.getOpenGui(event.getPlayer().getUniqueId());
         if (openGui == null) {
             return;
         }
 
-        final ProxiedPlayer player = event.getPlayer();
         final Inventory inventory = event.getInventory();
         final int slot = event.getSlot();
 

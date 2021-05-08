@@ -144,7 +144,8 @@ public class GuiHandler {
             }
 
             if (guiItem.getValue().isEnchanted()) {
-                ((CompoundTag)item.getNBTTag()).put("Enchantments", new ListTag<>(CompoundTag.class));
+                ((CompoundTag)item.getNBTTag()).put("ench", new ListTag<>(CompoundTag.class));
+                //((CompoundTag)item.getNBTTag()).put("Enchantments", new ListTag<>(CompoundTag.class));
             }
 
             inventory.setItem(guiItem.getKey(), item);
