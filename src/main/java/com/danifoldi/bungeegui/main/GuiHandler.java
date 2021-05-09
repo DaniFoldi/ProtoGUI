@@ -147,16 +147,19 @@ public class GuiHandler {
                 }
             }
 
+            CompoundTag tag = (CompoundTag)item.getNBTTag();
+
             if (guiItem.getValue().isEnchanted()) {
                 ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
                 CompoundTag enchantment = new CompoundTag();
                 enchantment.put("id", new StringTag("minecraft:unbreaking"));
                 enchantment.put("lvl", new ShortTag((short)1));
                 enchantments.add(enchantment);
-                ((CompoundTag)item.getNBTTag()).put("Enchantments", enchantments);
-                ((CompoundTag)item.getNBTTag()).put("HideFlags", new IntTag(99));
-                ((CompoundTag)item.getNBTTag()).put("overrideMeta", new ByteTag((byte)1));
+                tag.put("Enchantments", enchantments);
             }
+
+            tag.put("HideFlags", new IntTag(99));
+            tag.put("overrideMeta", new ByteTag((byte)1));
 
             inventory.setItem(guiItem.getKey(), item);
         }
