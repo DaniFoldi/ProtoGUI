@@ -87,3 +87,14 @@ All available methods have JavaDocs provided in `BungeeGuiAPI.java`. [Click here
 I developed this plugin in my free time. Please use the Issues page on GitHub (linked above) if you believe you found a bug, or would like a new feature added. I cannot guarantee any form of support, or any updates.
 
 What I can guarantee however, is that leaving a 1* review won't get you far. Please be kind, and I will do my best to help you.
+
+## License, terms
+
+The plugin is licensed under the GNU GPL v3.0 license. [check here](https://github.com/DaniFoldi/BungeeGUI/blob/main/LICENSE)
+
+For non-coders:
+- don't claim the plugin as yours
+- don't sell the plugin
+- decompile the plugin, I don't care, it's opensource
+
+You can view the source code at the link above, contributions and pull requests are welcome.
