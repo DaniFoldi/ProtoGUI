@@ -15,8 +15,12 @@ import de.exceptionflug.protocolize.items.ItemType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.ShortTag;
+import net.querz.nbt.tag.StringTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -144,8 +148,14 @@ public class GuiHandler {
             }
 
             if (guiItem.getValue().isEnchanted()) {
-                ((CompoundTag)item.getNBTTag()).put("ench", new ListTag<>(CompoundTag.class));
-                //((CompoundTag)item.getNBTTag()).put("Enchantments", new ListTag<>(CompoundTag.class));
+                ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
+                CompoundTag enchantment = new CompoundTag();
+                enchantment.put("id", new StringTag("minecraft:unbreaking"));
+                enchantment.put("lvl", new ShortTag((short)1));
+                enchantments.add(enchantment);
+                ((CompoundTag)item.getNBTTag()).put("Enchantments", enchantments);
+                ((CompoundTag)item.getNBTTag()).put("HideFlags", new IntTag(99));
+                ((CompoundTag)item.getNBTTag()).put("overrideMeta", new ByteTag((byte)1));
             }
 
             inventory.setItem(guiItem.getKey(), item);
