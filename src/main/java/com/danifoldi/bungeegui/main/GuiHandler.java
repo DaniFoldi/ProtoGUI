@@ -202,6 +202,10 @@ public class GuiHandler {
     }
 
     GuiGrid getOpenGui(UUID uuid) {
+        if (!openGuis.containsKey(uuid)) {
+            return null;
+        }
+
         return menus.get(openGuis.get(uuid).getFirst());
     }
     String getGuiTarget(UUID uuid) {

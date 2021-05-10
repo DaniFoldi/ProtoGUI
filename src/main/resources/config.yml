@@ -124,9 +124,6 @@ guis:
     size: 45
     title: '&6BungeeGui Authors'
     items:
-      '10':
-        type: cobblestone
-        enchanted: true
       '0':
         type: nether_star
       '8':
