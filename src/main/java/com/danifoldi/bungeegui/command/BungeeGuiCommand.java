@@ -60,6 +60,11 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
 
         if (ProxyServer.getInstance().getPlayer(target) != null) {
             target = ProxyServer.getInstance().getPlayer(target).getName();
+
+            if (ProxyServer.getInstance().getPlayer(target).hasPermission(BungeeGuiAPI.getInstance().getGui(name).getPermission() + ".bypass")) {
+                sender.sendMessage(Message.TARGET_BYPASS.toComponent());
+                return;
+            }
         }
 
         if (sender.getName().equals(target)) {

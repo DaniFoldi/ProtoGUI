@@ -19,6 +19,7 @@ public enum Message {
     TARGET_REQUIRED("targetRequired", "&cThis command requires a target player"),
     NO_SELF_TARGET("noSelfTarget", "&cYou can't target yourself with this command"),
     SERVER_DISABLED("serverDisabled", "&cYou can't use this command on this server"),
+    TARGET_BYPASS("targetBypass", "&cThis player can't be targeted with this command"),
     TARGET_NOT_FOUND("targetNotFound", "&cTarget {target} could not be found"),
     RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms");
 

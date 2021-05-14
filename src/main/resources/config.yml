@@ -2,6 +2,7 @@ messages:
   playerOnly: '&cOnly players can execute this command'
   targetRequired: '&cThis command requires a target player'
   noSelfTarget: '&cYou can''t target yourself with this command'
+  targetBypass: '&cThis player can''t be targeted with this command'
   reloadSuccess: '&9Plugin reloaded successfully in &l{time}ms'
   serverDisabled: '&cYou can''t use this command on this server'
 
@@ -145,4 +146,4 @@ guis:
         lore:
         - '&4Plugin developer'
     
-configVersion: 1
+configVersion: 2
