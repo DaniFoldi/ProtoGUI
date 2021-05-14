@@ -32,9 +32,11 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
 
         String server = ((ProxiedPlayer)sender).getServer().getInfo().getName();
         if (BungeeGuiAPI.getInstance().getGui(name).getBlacklistServers().contains(server)) {
+            sender.sendMessage(Message.SERVER_DISABLED.toComponent());
             return;
         }
         if (BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().isEmpty() || (!BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().get(0).equals("*")) && !BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().contains(server)) {
+            sender.sendMessage(Message.SERVER_DISABLED.toComponent());
             return;
         }
 
