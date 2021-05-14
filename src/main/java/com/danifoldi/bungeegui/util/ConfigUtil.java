@@ -13,7 +13,7 @@ public class ConfigUtil {
 
     public static String backupAndUpgrade(FileConfig config) throws IOException {
         Path folder = config.getFile().toPath().getParent();
-        String backup = getNextFileName(folder);
+        String backup = getBackupFilename(folder);
 
         Files.copy(folder.resolve(config.getFile().getName()), folder.resolve(backup));
 
@@ -23,7 +23,7 @@ public class ConfigUtil {
         return backup;
     }
 
-    private static void upgrade(Config config, int oldVersion, int newVersion) {
+    private static void upgrade(FileConfig config, int oldVersion, int newVersion) {
         if (oldVersion >= newVersion) {
             return;
         }
@@ -45,6 +45,7 @@ public class ConfigUtil {
         }
 
         config.set("configVersion", newVersion);
+        config.save();
     }
 
     private static void ensureValue(Config config, String path, Object value) {
@@ -53,7 +54,7 @@ public class ConfigUtil {
         }
     }
 
-    private static String getNextFileName(Path folder) {
+    private static String getBackupFilename(Path folder) {
         if (!Files.exists(folder.resolve("config_backup.yml"))) {
             return "config_backup.yml";
         }
