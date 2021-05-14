@@ -1,6 +1,7 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.command.ReloadCommand;
+import com.danifoldi.bungeegui.util.ConfigUtil;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
@@ -46,8 +47,12 @@ public class BungeeGuiLoader {
 
             guiHandler.load(config);
             Message.setMessageProvider(config);
-            if (config.getIntOrElse("configVersion", 0) != 1) {
-                StringUtil.blockPrint("BungeeGUI config.yml is built with a different version. Please see the plugin page on how to update.").forEach(logger::warning);
+            if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
+                StringUtil.blockPrint("BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as {file})".replace("{file}", ConfigUtil.backupAndUpgrade(config))).forEach(logger::warning);
+            }
+
+            if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
+                StringUtil.blockPrint("BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.").forEach(logger::warning);
             }
 
             guiHandler.registerCommands();
