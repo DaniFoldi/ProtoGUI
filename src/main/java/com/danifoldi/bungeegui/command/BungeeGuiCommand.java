@@ -26,22 +26,24 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
-            sender.sendMessage(Message.PLAYER_ONLY.toComponent());
+            sender.sendMessage(Message.PLAYER_ONLY.toComponent(null));
             return;
         }
 
+        ProxiedPlayer player = (ProxiedPlayer)sender;
+
         String server = ((ProxiedPlayer)sender).getServer().getInfo().getName();
         if (BungeeGuiAPI.getInstance().getGui(name).getBlacklistServers().contains(server)) {
-            sender.sendMessage(Message.SERVER_DISABLED.toComponent());
+            Message.SERVER_DISABLED.send(player);
             return;
         }
         if (BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().isEmpty() || (!BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().get(0).equals("*")) && !BungeeGuiAPI.getInstance().getGui(name).getWhitelistServers().contains(server)) {
-            sender.sendMessage(Message.SERVER_DISABLED.toComponent());
+            Message.SERVER_DISABLED.send(player);
             return;
         }
 
         if (args.length == 0 && BungeeGuiAPI.getInstance().getGui(name).isTargeted()) {
-            sender.sendMessage(Message.TARGET_REQUIRED.toComponent());
+            Message.TARGET_REQUIRED.send(player);
             return;
         }
 
@@ -49,11 +51,11 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
         if (BungeeGuiAPI.getInstance().getGui(name).isRequireOnlineTarget()) {
             ProxiedPlayer targetPlayer = ProxyServer.getInstance().getPlayer(target);
             if (targetPlayer == null) {
-                sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(Pair.of("target", target)));
+                Message.TARGET_NOT_FOUND.send(player, Pair.of("target", target));
                 return;
             }
             if (BungeeGuiAPI.getInstance().getGui("name").isIgnoreVanished() && VanishUtil.isVanished(targetPlayer)) {
-                sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(Pair.of("target", target)));
+                Message.TARGET_NOT_FOUND.send(player, Pair.of("target", target));
                 return;
             }
         }
@@ -62,17 +64,17 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
             target = ProxyServer.getInstance().getPlayer(target).getName();
 
             if (ProxyServer.getInstance().getPlayer(target).hasPermission(BungeeGuiAPI.getInstance().getGui(name).getPermission() + ".bypass")) {
-                sender.sendMessage(Message.TARGET_BYPASS.toComponent());
+                Message.TARGET_BYPASS.send(player);
                 return;
             }
         }
 
         if (sender.getName().equals(target)) {
-            sender.sendMessage(Message.NO_SELF_TARGET.toComponent());
+            Message.NO_SELF_TARGET.send(player);
             return;
         }
 
-        BungeeGuiAPI.getInstance().openGui((ProxiedPlayer)sender, name, target);
+        BungeeGuiAPI.getInstance().openGui(player, name, target);
     }
 
     @Override

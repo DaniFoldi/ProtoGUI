@@ -1,9 +1,11 @@
 package com.danifoldi.bungeegui.util;
 
+import com.danifoldi.bungeegui.main.BungeeGuiAPI;
 import com.electronwill.nightconfig.core.Config;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +35,8 @@ public enum Message {
         Message.messages = messages;
     }
 
+    private static final Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
+
     private final String messageId;
     private final String defaultValue;
 
@@ -51,7 +55,6 @@ public enum Message {
         return result;
     }
 
-    private static final Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
     private static String colorCodes(String text) {
         String colorized = text;
         Matcher matcher = HEX.matcher(colorized);
@@ -65,16 +68,26 @@ public enum Message {
     }
 
     @SafeVarargs
-    public final BaseComponent[] toComponent(Pair<String, String>... replacements) {
+    public final void send(ProxiedPlayer player, Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
-            return toComponent(defaultValue, replacements);
+            send(player, defaultValue, replacements);
         }
 
-        return toComponent(Message.messages.get(messageId), replacements);
+        send(player, Message.messages.get(messageId), replacements);
     }
 
     @SafeVarargs
-    public static BaseComponent[] toComponent(String value, Pair<String, String>... replacements) {
-        return new BaseComponent[] {new TextComponent(colorCodes(replace(value, replacements)))};
+    public static void send(ProxiedPlayer player, String value, Pair<String, String>... replacements) {
+        player.sendMessage(toComponent(player, value, replacements));
+    }
+
+    @SafeVarargs
+    public final BaseComponent[] toComponent(ProxiedPlayer player, Pair<String, String>... replacements) {
+        return toComponent(player, Message.messages.get(messageId), replacements);
+    }
+
+    @SafeVarargs
+    public static BaseComponent[] toComponent(ProxiedPlayer player, String value, Pair<String, String>... replacements) {
+        return new BaseComponent[] {new TextComponent(colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(player, replace(value, replacements))))};
     }
 }

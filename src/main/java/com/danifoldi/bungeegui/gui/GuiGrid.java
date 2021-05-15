@@ -19,6 +19,7 @@ public class GuiGrid {
     private final boolean requireOnlineTarget;
     private final List<String> whitelistServers;
     private final List<String> blacklistServers;
+    private final boolean placeholdersTarget;
 
     private GuiGrid(final @NotNull Map<Integer, GuiItem> items,
                     final boolean isTargeted,
@@ -43,6 +44,7 @@ public class GuiGrid {
         this.requireOnlineTarget = requireOnlineTarget;
         this.whitelistServers = List.copyOf(whitelistServers);
         this.blacklistServers = List.copyOf(blacklistServers);
+        this.placeholdersTarget = placeholdersTarget;
     }
 
     public Map<Integer, GuiItem> getItems() {
@@ -89,6 +91,10 @@ public class GuiGrid {
         return List.copyOf(this.blacklistServers);
     }
 
+    public boolean isPlaceholdersTarget() {
+        return this.placeholdersTarget;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -105,6 +111,7 @@ public class GuiGrid {
         private boolean requireOnlineTarget;
         private List<String> whitelistServers;
         private List<String> blacklistServers;
+        private boolean placeholdersTarget;
 
         private Builder() {}
 
@@ -163,6 +170,11 @@ public class GuiGrid {
             return this;
         }
 
+        public @NotNull Builder placeholdersTarget(final boolean placeholdersTarget) {
+            this.placeholdersTarget = placeholdersTarget;
+            return this;
+        }
+
         public @NotNull GuiGrid build() {
             return new GuiGrid(Objects.requireNonNull(items),
                                isTargeted,
@@ -174,7 +186,8 @@ public class GuiGrid {
                                ignoreVanished,
                                requireOnlineTarget,
                                Objects.requireNonNull(whitelistServers),
-                               Objects.requireNonNull(blacklistServers)
+                               Objects.requireNonNull(blacklistServers),
+                               placeholdersTarget
             );
         }
     }

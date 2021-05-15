@@ -98,6 +98,7 @@ public class GuiHandler {
                     .requireOnlineTarget(guiData.getOrElse("requireOnlineTarget", false))
                     .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
                     .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
+                    .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
                     .build();
 
             menus.put(name, grid);
@@ -129,14 +130,15 @@ public class GuiHandler {
     void open(String name, ProxiedPlayer player, @Nullable String target) {
         logger.info("Opening gui " + name + " for player " + player.getName() + " (target: " + target + ")");
 
+        final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
         final GuiGrid gui = menus.get(name);
-        final Inventory inventory = new Inventory(getInventoryType(gui.getGuiSize()), Message.toComponent(gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
+        final Inventory inventory = new Inventory(getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
 
         for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
             final ItemStack item = new ItemStack(guiItem.getValue().getType());
             item.setAmount((byte)guiItem.getValue().getAmount());
-            item.setDisplayName(Message.toComponent(guiItem.getValue().getName(), Pair.of("player", player.getName()), Pair.of("target", target)));
-            item.setLoreComponents(guiItem.getValue().getLore().stream().map(l -> Message.toComponent(l, Pair.of("player", player.getName()), Pair.of("target", target))).collect(Collectors.toList()));
+            item.setDisplayName(Message.toComponent(placeholderTarget, guiItem.getValue().getName(), Pair.of("player", player.getName()), Pair.of("target", target)));
+            item.setLoreComponents(guiItem.getValue().getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player.getName()), Pair.of("target", target))).collect(Collectors.toList()));
 
             if (item.isPlayerSkull()) {
                 final Pair<String, String> data = StringUtil.get(guiItem.getValue().getData());

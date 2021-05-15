@@ -38,6 +38,7 @@ test: # the name of the gui, used internally and in the API
     blacklistServers: # default: []; the commands will not work on the servers specified below. NOTE: overrides whitelisted servers.
       - server3
       - server4
+    placeholdersTarget: true # default: false; if the placeholders should target the {target} or the {player}. NOTE: only works with requireOnlineTarget: true
     items: # default: []; the items in the GUI
       '13': # the slot this item will be displayed in. NOTE: has to be a 'string', eg. '1'. The first slot is indexed 0.
         type: 'cobblestone' # default: stone; the material of the item

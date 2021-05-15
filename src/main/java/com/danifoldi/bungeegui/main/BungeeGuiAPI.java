@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Function;
 
 @Singleton
 @SuppressWarnings("unused")
@@ -25,13 +26,17 @@ public class BungeeGuiAPI {
 
     private final GuiHandler guiHandler;
     private final BungeeGuiLoader loader;
+    private final PlaceholderHandler placeholderHandler;
 
     @Inject
     BungeeGuiAPI(final @NotNull GuiHandler guiHandler,
-                 final @NotNull BungeeGuiLoader loader) {
+                 final @NotNull BungeeGuiLoader loader,
+                 final @NotNull PlaceholderHandler placeholderHandler) {
         this.guiHandler = guiHandler;
         this.loader = loader;
+        this.placeholderHandler = placeholderHandler;
     }
+
 
 
     /**
@@ -100,5 +105,32 @@ public class BungeeGuiAPI {
 
         final Instant loadEnd = Instant.now();
         return Duration.between(loadStart, loadEnd).toMillis();
+    }
+
+    /**
+     * Register a custom placeholder for use later
+     * @param name - the name of the placeholder without % symbols
+     * @param placeholder - the function to be called on the player when the placeholder is requested
+     */
+    public void registerPlaceholder(String name, Function<ProxiedPlayer, String> placeholder) {
+        placeholderHandler.register(name, placeholder);
+    }
+
+    /**
+     * Unregister a custom placeholder
+     * @param name - the name of the placeholder to unregister
+     */
+    public void unregisterPlaceholder(String name) {
+        placeholderHandler.unregister(name);
+    }
+
+    /**
+     * Replace placeholders with their values
+     * @param player - the player to look up placeholders for
+     * @param text - the text to replace placeholders in
+     * @return the text with the placeholders replaced
+     */
+    public String parsePlaceholders(ProxiedPlayer player, String text) {
+        return placeholderHandler.parse(player, text);
     }
 }

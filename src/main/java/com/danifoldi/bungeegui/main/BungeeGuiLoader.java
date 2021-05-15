@@ -1,6 +1,6 @@
 package com.danifoldi.bungeegui.main;
 
-import com.danifoldi.bungeegui.command.ReloadCommand;
+import com.danifoldi.bungeegui.command.PluginCommand;
 import com.danifoldi.bungeegui.util.ConfigUtil;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
@@ -21,25 +21,29 @@ public class BungeeGuiLoader {
     private final Logger logger;
     private final PluginManager pluginManager;
     private final Path datafolder;
+    private final PlaceholderHandler placeholderHandler;
 
     @Inject
     public BungeeGuiLoader(final @NotNull GuiHandler guiHandler,
                            final @NotNull BungeeGuiPlugin plugin,
                            final @NotNull Logger logger,
                            final @NotNull PluginManager pluginManager,
-                           final @NotNull Path datafolder) {
+                           final @NotNull Path datafolder,
+                           final @NotNull PlaceholderHandler placeholderHandler) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.datafolder = datafolder;
+        this.placeholderHandler = placeholderHandler;
     }
 
     void load() {
         StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
         pluginManager.registerCommand(plugin, new ReloadCommand());
-        BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this));
+        BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
+        placeholderHandler.registerBuiltins();
 
         try {
             final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
@@ -67,6 +71,7 @@ public class BungeeGuiLoader {
     void unload() {
         StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
+        placeholderHandler.unregisterAll();
         BungeeGuiAPI.setInstance(null);
         pluginManager.unregisterCommands(plugin);
         pluginManager.unregisterListeners(plugin);
