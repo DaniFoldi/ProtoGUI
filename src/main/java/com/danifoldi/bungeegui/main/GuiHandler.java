@@ -6,12 +6,12 @@ import com.danifoldi.bungeegui.gui.GuiItem;
 import com.danifoldi.bungeegui.gui.GuiSound;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
+import com.danifoldi.bungeegui.util.SlotUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryModule;
-import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
 import de.exceptionflug.protocolize.world.Sound;
@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -73,14 +74,43 @@ public class GuiHandler {
             final Config guiItems = guiData.getOrElse("items", Config.inMemory());
             final Map<Integer, GuiItem> itemMap = new HashMap<>();
 
-            for (Config.Entry guiItem: guiItems.entrySet()) {
-                final int slot = Integer.parseInt(guiItem.getKey());
-                final Config itemData = guiItem.getValue();
+            try {
 
-                GuiSound clickSound = null;
+                for (Config.Entry guiItem : guiItems.entrySet()) {
+                    final Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey());
+                    final Config itemData = guiItem.getValue();
 
-                if (guiData.contains("clickSound")) {
-                    clickSound = GuiSound.builder()
+                    GuiSound clickSound = null;
+
+                    if (guiData.contains("clickSound")) {
+                        clickSound = GuiSound.builder()
+                                .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                                .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                                .volume(guiData.getOrElse("openSound.volume", 1.0f))
+                                .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
+                                .build();
+                    }
+
+                    GuiItem item = GuiItem.builder()
+                            .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
+                            .amount(itemData.getOrElse("count", 1))
+                            .title(itemData.getOrElse("name", ""))
+                            .lore(itemData.getOrElse("lore", Collections.emptyList()))
+                            .data(itemData.getOrElse("data", ""))
+                            .commands(itemData.getOrElse("commands", Collections.emptyList()))
+                            .enchanted(itemData.getOrElse("enchanted", false))
+                            .clickSound(clickSound)
+                            .build();
+
+                    for (int slot : slots) {
+                        itemMap.put(slot, item.copy());
+                    }
+                }
+
+                GuiSound openSound = null;
+
+                if (guiData.contains("openSound")) {
+                    openSound = GuiSound.builder()
                             .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
                             .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
                             .volume(guiData.getOrElse("openSound.volume", 1.0f))
@@ -88,64 +118,27 @@ public class GuiHandler {
                             .build();
                 }
 
-                GuiItem item = GuiItem.builder()
-                        .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
-                        .amount(itemData.getOrElse("count", 1))
-                        .title(itemData.getOrElse("name", ""))
-                        .lore(itemData.getOrElse("lore", Collections.emptyList()))
-                        .data(itemData.getOrElse("data", ""))
-                        .commands(itemData.getOrElse("commands", Collections.emptyList()))
-                        .enchanted(itemData.getOrElse("enchanted", false))
-                        .clickSound(clickSound)
+                final GuiGrid grid = GuiGrid.builder()
+                        .items(itemMap)
+                        .targeted(guiData.getOrElse("targeted", false))
+                        .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
+                        .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                        .size(guiData.getIntOrElse("size", 54))
+                        .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
+                        .selfTarget(guiData.getOrElse("selfTarget", true))
+                        .ignoreVanished(guiData.getOrElse("ignoreVanished", true))
+                        .requireOnlineTarget(guiData.getOrElse("requireOnlineTarget", false))
+                        .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
+                        .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
+                        .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
+                        .openSound(openSound)
                         .build();
 
-                itemMap.put(slot, item);
+                menus.put(name, grid);
+            } catch (Exception e) {
+                logger.warning("Could not load gui " + name);
+                logger.warning(e.getClass().getName() + ":  " + e.getMessage());
             }
-
-            GuiSound openSound = null;
-
-            if (guiData.contains("openSound")) {
-                openSound = GuiSound.builder()
-                        .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
-                        .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                        .volume(guiData.getOrElse("openSound.volume", 1.0f))
-                        .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
-                        .build();
-            }
-
-            final GuiGrid grid = GuiGrid.builder()
-                    .items(itemMap)
-                    .targeted(guiData.getOrElse("targeted", false))
-                    .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
-                    .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
-                    .size(guiData.getIntOrElse("size", 54))
-                    .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
-                    .selfTarget(guiData.getOrElse("selfTarget", true))
-                    .ignoreVanished(guiData.getOrElse("ignoreVanished", true))
-                    .requireOnlineTarget(guiData.getOrElse("requireOnlineTarget", false))
-                    .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
-                    .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
-                    .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
-                    .openSound(openSound)
-                    .build();
-
-            menus.put(name, grid);
-        }
-    }
-
-    private InventoryType getInventoryType(int size) {
-        if (size <= 9) {
-            return InventoryType.GENERIC_9X1;
-        } else if (size <= 2 * 9) {
-            return InventoryType.GENERIC_9X2;
-        } else if (size <= 3 * 9) {
-            return InventoryType.GENERIC_9X3;
-        } else if (size <= 4 * 9) {
-            return InventoryType.GENERIC_9X4;
-        } else if (size <= 5 * 9) {
-            return InventoryType.GENERIC_9X5;
-        } else {
-            return InventoryType.GENERIC_9X6;
         }
     }
 
@@ -160,7 +153,7 @@ public class GuiHandler {
 
         final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
         final GuiGrid gui = menus.get(name);
-        final Inventory inventory = new Inventory(getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
+        final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
 
         if (gui.getOpenSound() != null) {
             gui.getOpenSound().playFor(player);
