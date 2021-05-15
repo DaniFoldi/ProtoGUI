@@ -2,6 +2,8 @@ package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.util.NumberUtil;
 import com.danifoldi.bungeegui.util.ProxyversionUtil;
+import com.danifoldi.bungeegui.util.StringUtil;
+import de.exceptionflug.protocolize.world.WorldModule;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
 import net.md_5.bungee.api.ProxyServer;
@@ -111,6 +113,7 @@ public class PlaceholderHandler {
         registerBuiltin("name", ProxiedPlayer::getName);
         registerBuiltin("locale", player -> player.getLocale().getDisplayName());
         registerBuiltin("ping", player -> String.valueOf(player.getPing()));
+        registerBuiltin("gamemode", player -> StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).name()));
         registerBuiltin("vanished", player -> {
             if (pluginManager.getPlugin("PremiumVanish") != null) {
                 return BungeeVanishAPI.isInvisible(player) ? "Yes" : "No";
@@ -120,6 +123,7 @@ public class PlaceholderHandler {
         });
         registerBuiltin("servername", player -> player.getServer().getInfo().getName());
         registerBuiltin("servermotd", player -> player.getServer().getInfo().getMotd());
+
         registerBuiltin("luckperms_prefix", player -> {
             try {
                 return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix();
@@ -183,12 +187,12 @@ public class PlaceholderHandler {
 
         for (Plugin plugin: pluginManager.getPlugins()) {
             final String name = plugin.getDescription().getName();
-            registerBuiltin("plugindescription@" + name, player -> plugin.getDescription().getDescription());
-            registerBuiltin("pluginmain@" + name, player -> plugin.getDescription().getMain());
-            registerBuiltin("pluginversion@" + name, player -> plugin.getDescription().getVersion());
-            registerBuiltin("pluginauthor@" + name, player -> plugin.getDescription().getAuthor());
-            registerBuiltin("plugindepends@" + name, player -> String.join(", ", plugin.getDescription().getDepends()));
-            registerBuiltin("pluginsoftdepends@" + name, player -> String.join(", ", plugin.getDescription().getSoftDepends()));
+            registerBuiltin("plugin_description@" + name, player -> plugin.getDescription().getDescription());
+            registerBuiltin("plugin_main@" + name, player -> plugin.getDescription().getMain());
+            registerBuiltin("plugin_version@" + name, player -> plugin.getDescription().getVersion());
+            registerBuiltin("plugin_author@" + name, player -> plugin.getDescription().getAuthor());
+            registerBuiltin("plugin_depends@" + name, player -> String.join(", ", plugin.getDescription().getDepends()));
+            registerBuiltin("plugin_softdepends@" + name, player -> String.join(", ", plugin.getDescription().getSoftDepends()));
         }
     }
 }

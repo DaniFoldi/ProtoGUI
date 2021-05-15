@@ -3,15 +3,19 @@ package com.danifoldi.bungeegui.main;
 import com.danifoldi.bungeegui.command.BungeeGuiCommand;
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.gui.GuiItem;
+import com.danifoldi.bungeegui.gui.GuiSound;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.EnumGetMethod;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
+import de.exceptionflug.protocolize.world.Sound;
+import de.exceptionflug.protocolize.world.SoundCategory;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -73,17 +77,40 @@ public class GuiHandler {
                 final int slot = Integer.parseInt(guiItem.getKey());
                 final Config itemData = guiItem.getValue();
 
+                GuiSound clickSound = null;
+
+                if (guiData.contains("clickSound")) {
+                    clickSound = GuiSound.builder()
+                            .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                            .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                            .volume(guiData.getOrElse("openSound.volume", 1.0f))
+                            .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
+                            .build();
+                }
+
                 GuiItem item = GuiItem.builder()
-                        .type(ItemType.valueOf(itemData.getOrElse("type", "stone").toUpperCase(Locale.ROOT)))
+                        .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
                         .amount(itemData.getOrElse("count", 1))
                         .title(itemData.getOrElse("name", ""))
                         .lore(itemData.getOrElse("lore", Collections.emptyList()))
                         .data(itemData.getOrElse("data", ""))
                         .commands(itemData.getOrElse("commands", Collections.emptyList()))
                         .enchanted(itemData.getOrElse("enchanted", false))
+                        .clickSound(clickSound)
                         .build();
 
                 itemMap.put(slot, item);
+            }
+
+            GuiSound openSound = null;
+
+            if (guiData.contains("openSound")) {
+                openSound = GuiSound.builder()
+                        .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                        .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                        .volume(guiData.getOrElse("openSound.volume", 1.0f))
+                        .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
+                        .build();
             }
 
             final GuiGrid grid = GuiGrid.builder()
@@ -99,6 +126,7 @@ public class GuiHandler {
                     .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
                     .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
                     .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
+                    .openSound(openSound)
                     .build();
 
             menus.put(name, grid);
@@ -133,6 +161,10 @@ public class GuiHandler {
         final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
         final GuiGrid gui = menus.get(name);
         final Inventory inventory = new Inventory(getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
+
+        if (gui.getOpenSound() != null) {
+            gui.getOpenSound().playFor(player);
+        }
 
         for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
             final ItemStack item = new ItemStack(guiItem.getValue().getType());

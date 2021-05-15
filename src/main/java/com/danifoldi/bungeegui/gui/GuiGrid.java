@@ -1,6 +1,7 @@
 package com.danifoldi.bungeegui.gui;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class GuiGrid {
     private final List<String> whitelistServers;
     private final List<String> blacklistServers;
     private final boolean placeholdersTarget;
+    private final GuiSound openSound;
 
     private GuiGrid(final @NotNull Map<Integer, GuiItem> items,
                     final boolean isTargeted,
@@ -32,7 +34,8 @@ public class GuiGrid {
                     final boolean requireOnlineTarget,
                     final @NotNull List<String> whitelistServers,
                     final @NotNull List<String> blacklistServers,
-                    final boolean placeholdersTarget) {
+                    final boolean placeholdersTarget,
+                    final @Nullable GuiSound openSound) {
         this.items = items.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         this.isTargeted = isTargeted;
         this.commandAliases = List.copyOf(commandAliases);
@@ -45,6 +48,7 @@ public class GuiGrid {
         this.whitelistServers = List.copyOf(whitelistServers);
         this.blacklistServers = List.copyOf(blacklistServers);
         this.placeholdersTarget = placeholdersTarget;
+        this.openSound = openSound;
     }
 
     public Map<Integer, GuiItem> getItems() {
@@ -95,6 +99,10 @@ public class GuiGrid {
         return this.placeholdersTarget;
     }
 
+    public GuiSound getOpenSound() {
+        return this.openSound;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -112,6 +120,7 @@ public class GuiGrid {
         private List<String> whitelistServers;
         private List<String> blacklistServers;
         private boolean placeholdersTarget;
+        private GuiSound openSound;
 
         private Builder() {}
 
@@ -175,19 +184,25 @@ public class GuiGrid {
             return this;
         }
 
+        public @NotNull Builder openSound(final @Nullable GuiSound openSound) {
+            this.openSound = openSound;
+            return this;
+        }
+
         public @NotNull GuiGrid build() {
             return new GuiGrid(Objects.requireNonNull(items),
-                               isTargeted,
-                               Objects.requireNonNull(commandAliases),
-                               Objects.requireNonNull(permission),
-                               guiSize,
-                               Objects.requireNonNull(title),
-                               selfTarget,
-                               ignoreVanished,
-                               requireOnlineTarget,
-                               Objects.requireNonNull(whitelistServers),
-                               Objects.requireNonNull(blacklistServers),
-                               placeholdersTarget
+                    isTargeted,
+                    Objects.requireNonNull(commandAliases),
+                    Objects.requireNonNull(permission),
+                    guiSize,
+                    Objects.requireNonNull(title),
+                    selfTarget,
+                    ignoreVanished,
+                    requireOnlineTarget,
+                    Objects.requireNonNull(whitelistServers),
+                    Objects.requireNonNull(blacklistServers),
+                    placeholdersTarget,
+                    openSound
             );
         }
     }

@@ -17,6 +17,7 @@ public class GuiItem {
     private final String data;
     private final List<String> commands;
     private final boolean enchanted;
+    private final GuiSound clickSound;
 
     private GuiItem(final @NotNull ItemType type,
                     final int amount,
@@ -24,7 +25,8 @@ public class GuiItem {
                     final @NotNull List<String> lore,
                     final @NotNull String data,
                     final @NotNull List<String> commands,
-                    final boolean enchanted) {
+                    final boolean enchanted,
+                    final @Nullable GuiSound clickSound) {
         this.type = type;
         this.amount = amount;
         this.name = name;
@@ -32,6 +34,7 @@ public class GuiItem {
         this.data = data;
         this.commands = commands;
         this.enchanted = enchanted;
+        this.clickSound = clickSound;
     }
 
     public @NotNull ItemType getType() {
@@ -62,6 +65,10 @@ public class GuiItem {
         return this.enchanted;
     }
 
+    public GuiSound getClickSound() {
+        return this.clickSound;
+    }
+
     @Override
     public String toString() {
         return "GuiItem{type=" + this.type
@@ -71,6 +78,7 @@ public class GuiItem {
                 + ", data=" + this.data
                 + ", commands=" + this.commands
                 + ", enchanted=" + this.enchanted
+                + ", clickSound=" + this.clickSound
                 + '}';
     }
 
@@ -85,12 +93,13 @@ public class GuiItem {
                 && Objects.equals(this.lore, guiItem.lore)
                 && Objects.equals(this.data, guiItem.data)
                 && Objects.equals(this.commands, guiItem.commands)
-                && this.enchanted == guiItem.enchanted;
+                && this.enchanted == guiItem.enchanted
+                && Objects.equals(this.clickSound, guiItem.clickSound);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchanted);
+        return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchanted, this.clickSound);
     }
 
     public static Builder builder() {
@@ -105,6 +114,7 @@ public class GuiItem {
         private String data;
         private List<String> commands;
         private boolean enchanted;
+        private GuiSound clickSound;
 
         private Builder() {}
 
@@ -143,6 +153,11 @@ public class GuiItem {
             return this;
         }
 
+        public @NotNull Builder clickSound(final @Nullable GuiSound clickSound) {
+            this.clickSound = clickSound;
+            return this;
+        }
+
         public @NotNull GuiItem build() {
             if (this.amount < 0) {
                 throw new IllegalArgumentException("Item amount must be greater than or equal to 0");
@@ -155,7 +170,8 @@ public class GuiItem {
                     requireNonNull(this.lore),
                     requireNonNull(this.data),
                     requireNonNull(this.commands),
-                    this.enchanted
+                    this.enchanted,
+                    clickSound
             );
         }
     }
@@ -167,6 +183,7 @@ public class GuiItem {
                 List.copyOf(lore),
                 data,
                 List.copyOf(commands),
-                enchanted);
+                enchanted,
+                clickSound);
     }
 }
