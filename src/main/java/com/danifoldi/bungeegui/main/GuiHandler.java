@@ -184,6 +184,7 @@ public class GuiHandler {
             Pair<String, String> commandData = StringUtil.get(command);
             if (commandData.getFirst().equalsIgnoreCase("console")) {
                 pluginManager.dispatchCommand(ProxyServer.getInstance().getConsole(), Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
+                continue;
             }
 
             pluginManager.dispatchCommand(player, Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
