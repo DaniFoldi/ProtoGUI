@@ -172,9 +172,9 @@ public class GuiHandler {
             if (item.isPlayerSkull()) {
                 final Pair<String, String> data = StringUtil.get(guiItem.getValue().getData());
                 if (data.getFirst().equalsIgnoreCase("owner")) {
-                    item.setSkullOwner(data.getSecond());
+                    item.setSkullOwner(Message.replace(data.getSecond(), Pair.of("player", player.getName()), Pair.of("target", target)));
                 } else if (data.getFirst().equalsIgnoreCase("texture")) {
-                    item.setSkullTexture(data.getSecond());
+                    item.setSkullTexture(Message.replace(data.getSecond(), Pair.of("player", player.getName()), Pair.of("target", target)));
                 }
             }
 
