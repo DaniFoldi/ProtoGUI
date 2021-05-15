@@ -45,6 +45,10 @@ public class BungeeGuiListener implements Listener {
             return;
         }
 
+        if (openGui.getItems().get(slot).getClickSound() != null) {
+            openGui.getItems().get(slot).getClickSound().playFor(player);
+        }
+
         if (openGui.getItems().get(slot).getCommands().isEmpty()) {
             return;
         }
