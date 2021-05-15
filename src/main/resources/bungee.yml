@@ -6,4 +6,5 @@ author: DaniFoldi, HgeX
 depends:
   - protocolize-plugin
 softdepends:
+  - LuckPerms
   - PremiumVanish
