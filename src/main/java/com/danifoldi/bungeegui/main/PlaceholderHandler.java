@@ -16,12 +16,15 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.security.spec.ECField;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 @Singleton
 public class PlaceholderHandler {
@@ -31,14 +34,17 @@ public class PlaceholderHandler {
     private final ProxyServer proxyServer;
     private final PluginManager pluginManager;
     private final BungeeGuiPlugin plugin;
+    private final Logger logger;
 
     @Inject
     public PlaceholderHandler(final @NotNull ProxyServer proxyServer,
                               final @NotNull PluginManager pluginManager,
-                              final @NotNull BungeeGuiPlugin plugin) {
+                              final @NotNull BungeeGuiPlugin plugin,
+                              final @NotNull Logger logger) {
         this.proxyServer = proxyServer;
         this.pluginManager = pluginManager;
         this.plugin = plugin;
+        this.logger = logger;
     }
 
     void register(String name, Function<ProxiedPlayer, String> placeholder) {
@@ -61,13 +67,21 @@ public class PlaceholderHandler {
         String result = text;
 
         for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder: builtinPlaceholders.entrySet()) {
-            final String value = placeholder.getValue().apply(player);
-            result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
+            try {
+                final String value = placeholder.getValue().apply(player);
+                result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
+            } catch (Exception e) {
+                // ok thanks
+            }
         }
 
         for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder: placeholders.entrySet()) {
-            final String value = placeholder.getValue().apply(player);
-            result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
+            try {
+                final String value = placeholder.getValue().apply(player);
+                result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
+            } catch (Exception e) {
+                logger.warning("Placeholder " + placeholder.getKey() + " couldn't be parsed");
+            }
         }
 
         return result;
@@ -79,14 +93,22 @@ public class PlaceholderHandler {
     }
 
     void registerBuiltins() {
+        ConcurrentMap<ServerInfo, Boolean> lastStatus = new ConcurrentHashMap<>();
         proxyServer.getScheduler().schedule(plugin, () -> {
             for (ServerInfo server: proxyServer.getServersCopy().values()) {
                 server.ping((ping, error) -> {
-                    if (error != null) {
-                        plugin.getLogger().info("Could not ping server " + server.getName());
-                        return;
+                    if (lastStatus.containsKey(server) && lastStatus.get(server) != (boolean)(error != null)) {
+                        if (error != null) {
+                            logger.info("Server " + server.getName() + " no longer available");
+                        } else {
+                            logger.info("Server " + server.getName() + " now available");
+                        }
                     }
-                    latestPing.put(server, ping);
+
+                    lastStatus.put(server, error != null);
+                    if (error == null) {
+                        latestPing.put(server, ping);
+                    }
                 });
             }
         }, 1, 5, TimeUnit.SECONDS);
@@ -98,7 +120,12 @@ public class PlaceholderHandler {
 
         registerBuiltin("proxyname", player -> proxyServer.getName());
         registerBuiltin("bungeegui", player -> plugin.getDescription().getName() + " " + plugin.getDescription().getVersion());
-        registerBuiltin("version", player -> ProxyversionUtil.find(player.getPendingConnection().getVersion()).getVersion());
+        registerBuiltin("version", player -> {
+            if (player == null) {
+                return "";
+            }
+            return ProxyversionUtil.find(player.getPendingConnection().getVersion()).getVersion();
+        });
         registerBuiltin("max", player -> String.valueOf(proxyServer.getConfig().getPlayerLimit()));
         registerBuiltin("online", player -> String.valueOf(proxyServer.getOnlineCount()));
         registerBuiltin("online_visible", player -> {
@@ -108,23 +135,60 @@ public class PlaceholderHandler {
             }
             return String.valueOf(count);
         });
+        registerBuiltin("guicount", player -> String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()));
         registerBuiltin("plugincount", player -> String.valueOf(pluginManager.getPlugins().size()));
-        registerBuiltin("displayname", ProxiedPlayer::getDisplayName);
-        registerBuiltin("name", ProxiedPlayer::getName);
-        registerBuiltin("locale", player -> player.getLocale().getDisplayName());
+        registerBuiltin("displayname", player -> {
+            if (player == null) {
+                return "";
+            }
+            return player.getDisplayName();
+        });
+        registerBuiltin("name", player -> {
+            if (player == null) {
+                return "";
+            }
+            return player.getName();
+        });
+        registerBuiltin("locale", player -> {
+            if (player == null) {
+                return "No";
+            }
+            return player.getLocale().getDisplayName();
+        });
         registerBuiltin("ping", player -> String.valueOf(player.getPing()));
-        registerBuiltin("gamemode", player -> StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).name()));
+        registerBuiltin("gamemode", player -> {
+            if (player == null) {
+                return "No";
+            }
+            return StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).name());
+        });
         registerBuiltin("vanished", player -> {
+            if (player == null) {
+                return "No";
+            }
             if (pluginManager.getPlugin("PremiumVanish") != null) {
                 return BungeeVanishAPI.isInvisible(player) ? "Yes" : "No";
             } else {
                 return "No";
             }
         });
-        registerBuiltin("servername", player -> player.getServer().getInfo().getName());
-        registerBuiltin("servermotd", player -> player.getServer().getInfo().getMotd());
+        registerBuiltin("servername", player -> {
+            if (player == null) {
+                return "";
+            }
+            return player.getServer().getInfo().getName();
+        });
+        registerBuiltin("servermotd", player -> {
+            if (player == null) {
+                return "No";
+            }
+            return player.getServer().getInfo().getMotd();
+        });
 
         registerBuiltin("luckperms_prefix", player -> {
+            if (player == null) {
+                return "";
+            }
             try {
                 return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix();
             } catch (IllegalStateException | NullPointerException e) {
@@ -132,6 +196,9 @@ public class PlaceholderHandler {
             }
         });
         registerBuiltin("luckperms_suffix", player -> {
+            if (player == null) {
+                return "";
+            }
             try {
                 return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getSuffix();
             } catch (IllegalStateException | NullPointerException e) {
@@ -139,6 +206,9 @@ public class PlaceholderHandler {
             }
         });
         registerBuiltin("luckperms_group", player -> {
+            if (player == null) {
+                return "";
+            }
             try {
                 return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrimaryGroup();
             } catch (IllegalStateException | NullPointerException e) {
@@ -179,7 +249,12 @@ public class PlaceholderHandler {
                 }
                 return String.valueOf(ping.getVersion().getName());
             });
-            registerBuiltin("canaccess@" + server.getKey(), player -> server.getValue().canAccess(player) ? "Yes" : "No");
+            registerBuiltin("canaccess@" + server.getKey(), player -> {
+                if (player == null) {
+                    return "No";
+                }
+                return server.getValue().canAccess(player) ? "Yes" : "No";
+            });
             registerBuiltin("restricted@" + server.getKey(), player -> server.getValue().isRestricted() ? "Yes" : "No");
             registerBuiltin("name@" + server.getKey(), player -> server.getValue().getName());
             registerBuiltin("motd@" + server.getKey(), player -> server.getValue().getMotd());
