@@ -32,16 +32,16 @@ public class ConfigUtil {
             ensureValue(config, "messages", Collections.emptyList());
             ensureValue(config, "guis", Collections.emptyList());
 
-            ensureValue(config, "messages.playerOnly", Message.PLAYER_ONLY);
-            ensureValue(config, "messages.targetRequired", Message.TARGET_REQUIRED);
-            ensureValue(config, "messages.noSelfTarget", Message.NO_SELF_TARGET);
-            ensureValue(config, "messages.serverDisabled", Message.SERVER_DISABLED);
-            ensureValue(config, "messages.targetNotFound", Message.TARGET_NOT_FOUND);
-            ensureValue(config, "messages.reloadSuccess", Message.RELOAD_SUCCESS);
+            ensureValue(config, "messages.playerOnly", Message.PLAYER_ONLY.getDefaultValue());
+            ensureValue(config, "messages.targetRequired", Message.TARGET_REQUIRED.getDefaultValue());
+            ensureValue(config, "messages.noSelfTarget", Message.NO_SELF_TARGET.getDefaultValue());
+            ensureValue(config, "messages.serverDisabled", Message.SERVER_DISABLED.getDefaultValue());
+            ensureValue(config, "messages.targetNotFound", Message.TARGET_NOT_FOUND.getDefaultValue());
+            ensureValue(config, "messages.reloadSuccess", Message.RELOAD_SUCCESS.getDefaultValue());
         }
 
         if (oldVersion <= 1 && newVersion >= 2) {
-            ensureValue(config, "messages.targetBypass", Message.TARGET_BYPASS);
+            ensureValue(config, "messages.targetBypass", Message.TARGET_BYPASS.getDefaultValue());
         }
 
         config.set("configVersion", newVersion);

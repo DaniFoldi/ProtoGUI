@@ -45,6 +45,10 @@ public enum Message {
         this.defaultValue = defaultValue;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
     @SafeVarargs
     public static String replace(String text, Pair<String, String>... replacements) {
         String result = text;
