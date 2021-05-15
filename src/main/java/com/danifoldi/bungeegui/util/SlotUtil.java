@@ -97,6 +97,25 @@ public class SlotUtil {
         }
     }
 
+    public static int getInventorySize(InventoryType inventoryType) {
+        switch (inventoryType) {
+            case GENERIC_9X1:
+                return 9;
+            case GENERIC_9X2:
+                return 18;
+            case GENERIC_9X3:
+                return 27;
+            case GENERIC_9X4:
+                return 36;
+            case GENERIC_9X5:
+                return 45;
+            case GENERIC_9X6:
+                return 54;
+        }
+
+        return 0;
+    }
+
     private SlotUtil() {
         throw new UnsupportedOperationException();
     }

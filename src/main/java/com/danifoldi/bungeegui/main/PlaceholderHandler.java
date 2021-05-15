@@ -158,9 +158,9 @@ public class PlaceholderHandler {
         registerBuiltin("ping", player -> String.valueOf(player.getPing()));
         registerBuiltin("gamemode", player -> {
             if (player == null) {
-                return "No";
+                return "";
             }
-            return StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).name());
+            return StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).toString());
         });
         registerBuiltin("vanished", player -> {
             if (player == null) {
