@@ -12,6 +12,8 @@ public class BungeeGuiPlugin extends Plugin {
         final BungeeGuiComponent component = DaggerBungeeGuiComponent.builder()
                 .plugin(this)
                 .logger(getLogger())
+                .proxyServer(getProxy())
+                .scheduler(getProxy().getScheduler())
                 .pluginManager(getProxy().getPluginManager())
                 .datafolder(getDataFolder().toPath())
                 .build();
