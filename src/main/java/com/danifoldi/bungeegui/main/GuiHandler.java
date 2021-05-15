@@ -82,12 +82,12 @@ public class GuiHandler {
 
                     GuiSound clickSound = null;
 
-                    if (guiData.contains("clickSound")) {
+                    if (itemData.contains("clickSound")) {
                         clickSound = GuiSound.builder()
-                                .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
-                                .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                                .volume(guiData.getOrElse("openSound.volume", 1.0f))
-                                .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
+                                .sound(itemData.getEnumOrElse("clickSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                                .soundCategory(itemData.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                                .volume(itemData.getOrElse("clickSound.volume", 1.0f))
+                                .pitch(itemData.getOrElse("clickSound.pitch", 1.0f))
                                 .build();
                     }
 
