@@ -41,7 +41,7 @@ public class BungeeGuiLoader {
     void load() {
         StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
-        pluginManager.registerCommand(plugin, new ReloadCommand());
+        pluginManager.registerCommand(plugin, new PluginCommand());
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
         placeholderHandler.registerBuiltins();
 

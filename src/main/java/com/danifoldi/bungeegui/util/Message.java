@@ -23,7 +23,13 @@ public enum Message {
     SERVER_DISABLED("serverDisabled", "&cYou can't use this command on this server"),
     TARGET_BYPASS("targetBypass", "&cThis player can't be targeted with this command"),
     TARGET_NOT_FOUND("targetNotFound", "&cTarget {target} could not be found"),
-    RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms");
+    RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms"),
+    COMMAND_HELP("comandHelp", "'&7---- &6&l{name} {version} help &7----"),
+    COMMAND_RELOAD("commandReload", "/{command} reload &7- Reload the plugin"),
+    COMMAND_GUIS("commandGuis", "/{command} guis &7 - List the loaded GUIs"),
+    NO_PERMISSION("noPermission", "&cYou don't have permission to execute that command"),
+    GUI_LIST_TOP("guiListTop", "&6{count} GUIs are loaded:"),
+    GUI_LIST_ITEM("guiListItem", "&7- &6&l{name}");
 
     private static Map<String, String> messages = new HashMap<>();
     public static void setMessageProvider(Config config) {

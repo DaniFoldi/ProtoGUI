@@ -5,6 +5,12 @@ messages:
   targetBypass: '&cThis player can''t be targeted with this command'
   reloadSuccess: '&9Plugin reloaded successfully in &l{time}ms'
   serverDisabled: '&cYou can''t use this command on this server'
+  commandHelp: '&7---- &6&l{name} {version} Command help &7----'
+  commandReload: '/bungeegui reload &7- Reload the plugin'
+  commandGuis: '/bungeegui guis &7 - List the loaded GUIs'
+  noPermission: '&cYou don''t have permission to execute that command'
+  guiListTop: '&6{count} GUIs are loaded:'
+  guiListItem: '&7- &6&l{name}'
 
 guis:
   servermenu:
@@ -146,4 +152,4 @@ guis:
         lore:
         - '&4Plugin developer'
     
-configVersion: 2
+configVersion: 3
