@@ -160,6 +160,10 @@ public class GuiHandler {
         }
 
         for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
+            if (guiItem.getKey() < 0 || guiItem.getKey() >= SlotUtil.getInventorySize(SlotUtil.getInventoryType(gui.getGuiSize()))) {
+                continue;
+            }
+
             final ItemStack item = new ItemStack(guiItem.getValue().getType());
             item.setAmount((byte)guiItem.getValue().getAmount());
             item.setDisplayName(Message.toComponent(placeholderTarget, guiItem.getValue().getName(), Pair.of("player", player.getName()), Pair.of("target", target)));
