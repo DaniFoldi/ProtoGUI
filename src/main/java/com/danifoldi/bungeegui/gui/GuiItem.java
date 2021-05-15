@@ -159,4 +159,14 @@ public class GuiItem {
             );
         }
     }
+
+    public GuiItem copy() {
+        return new GuiItem(type,
+                amount,
+                name,
+                List.copyOf(lore),
+                data,
+                List.copyOf(commands),
+                enchanted);
+    }
 }

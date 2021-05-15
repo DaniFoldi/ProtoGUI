@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class GuiGrid {
     private final Map<Integer, GuiItem> items;
@@ -29,9 +30,9 @@ public class GuiGrid {
                     final boolean ignoreVanished,
                     final boolean requireOnlineTarget,
                     final @NotNull List<String> whitelistServers,
-                    final @NotNull List<String> blacklistServers) {
-        // TODO copy items individually
-        this.items = Map.copyOf(items);
+                    final @NotNull List<String> blacklistServers,
+                    final boolean placeholdersTarget) {
+        this.items = items.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         this.isTargeted = isTargeted;
         this.commandAliases = List.copyOf(commandAliases);
         this.permission = permission;
