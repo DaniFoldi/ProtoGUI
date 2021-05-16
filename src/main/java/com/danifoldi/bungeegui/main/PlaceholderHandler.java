@@ -2,6 +2,9 @@ package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.util.NumberUtil;
 import com.danifoldi.bungeegui.util.ProxyversionUtil;
+import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
+import de.exceptionflug.protocolize.api.traffic.TrafficData;
+import de.exceptionflug.protocolize.api.traffic.TrafficManager;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
 import net.md_5.bungee.api.ProxyServer;
@@ -203,6 +206,62 @@ public class PlaceholderHandler {
                 return "No";
             }
             return player.getServer().getInfo().getMotd();
+        });
+
+        registerBuiltin("traffic_downstream_input", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getDownstreamInput());
+        });
+
+        registerBuiltin("traffic_downstream_output", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getDownstreamOutput());
+        });
+
+        registerBuiltin("traffic_upstream_input", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getUpstreamInput());
+        });
+
+        registerBuiltin("traffic_upstream_output", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getUpstreamOutput());
+        });
+
+        registerBuiltin("traffic_downstream_input_last_minute", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getDownstreamInputLastMinute());
+        });
+
+        registerBuiltin("traffic_downstream_output_last_minute", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getDownstreamOutputLastMinute());
+        });
+
+        registerBuiltin("traffic_upstream_input_last_minute", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getUpstreamInputLastMinute());
+        });
+
+        registerBuiltin("traffic_upstream_output_last_minute", player -> {
+            if (player == null) {
+                return "0";
+            }
+            return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getUpstreamOutputLastMinute());
         });
 
         registerBuiltin("luckperms_prefix", player -> {
