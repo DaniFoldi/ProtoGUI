@@ -56,18 +56,18 @@ public class BungeeGuiListener implements Listener {
         final String target = guiHandler.getGuiTarget(player.getUniqueId());
 
         guiHandler.runCommand(player,openGui, slot, target);
-        guiHandler.close(player);
+        guiHandler.close(player, true);
     }
 
     @EventHandler
     @SuppressWarnings("unused")
     public void onInventoryClose(final @NotNull InventoryCloseEvent event) {
-        guiHandler.close(event.getPlayer());
+        guiHandler.close(event.getPlayer(), false);
     }
 
     @EventHandler
     @SuppressWarnings("unused")
     public void onDisconnect(final @NotNull PlayerDisconnectEvent event) {
-        guiHandler.close(event.getPlayer());
+        guiHandler.close(event.getPlayer(), true);
     }
 }

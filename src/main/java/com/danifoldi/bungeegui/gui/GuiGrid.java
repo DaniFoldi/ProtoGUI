@@ -22,6 +22,8 @@ public class GuiGrid {
     private final List<String> blacklistServers;
     private final boolean placeholdersTarget;
     private final GuiSound openSound;
+    private final boolean targetBypass;
+    private final boolean closeable;
 
     private GuiGrid(final @NotNull Map<Integer, GuiItem> items,
                     final boolean isTargeted,
@@ -35,7 +37,9 @@ public class GuiGrid {
                     final @NotNull List<String> whitelistServers,
                     final @NotNull List<String> blacklistServers,
                     final boolean placeholdersTarget,
-                    final @Nullable GuiSound openSound) {
+                    final @Nullable GuiSound openSound,
+                    final boolean targetBypass,
+                    final boolean closeable) {
         this.items = items.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         this.isTargeted = isTargeted;
         this.commandAliases = List.copyOf(commandAliases);
@@ -49,6 +53,8 @@ public class GuiGrid {
         this.blacklistServers = List.copyOf(blacklistServers);
         this.placeholdersTarget = placeholdersTarget;
         this.openSound = openSound;
+        this.targetBypass = targetBypass;
+        this.closeable = closeable;
     }
 
     public Map<Integer, GuiItem> getItems() {
@@ -103,6 +109,14 @@ public class GuiGrid {
         return this.openSound;
     }
 
+    public boolean isTargetBypass() {
+        return this.targetBypass;
+    }
+
+    public boolean isCloseable() {
+        return this.closeable;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -121,6 +135,8 @@ public class GuiGrid {
         private List<String> blacklistServers;
         private boolean placeholdersTarget;
         private GuiSound openSound;
+        private boolean targetBypass;
+        private boolean closeable;
 
         private Builder() {}
 
@@ -189,6 +205,16 @@ public class GuiGrid {
             return this;
         }
 
+        public @NotNull Builder targetBypass(final boolean targetBypass) {
+            this.targetBypass = targetBypass;
+            return this;
+        }
+
+        public @NotNull Builder closeable(final boolean closeable) {
+            this.closeable = closeable;
+            return this;
+        }
+
         public @NotNull GuiGrid build() {
             return new GuiGrid(Objects.requireNonNull(items),
                     isTargeted,
@@ -202,7 +228,9 @@ public class GuiGrid {
                     Objects.requireNonNull(whitelistServers),
                     Objects.requireNonNull(blacklistServers),
                     placeholdersTarget,
-                    openSound
+                    openSound,
+                    targetBypass,
+                    closeable
             );
         }
     }

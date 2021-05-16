@@ -131,6 +131,8 @@ public class GuiHandler {
                         .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
                         .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
                         .openSound(openSound)
+                        .targetBypass(guiData.getOrElse("targetBypass", false))
+                        .closeable(guiData.getOrElse("closeable", true))
                         .build();
 
                 menus.put(name, grid);
@@ -221,8 +223,12 @@ public class GuiHandler {
         }
     }
 
-    void close(ProxiedPlayer player) {
+    void close(ProxiedPlayer player, boolean didClick) {
         if (!openGuis.containsKey(player.getUniqueId())) {
+            return;
+        }
+
+        if (!menus.get(openGuis.get(player.getUniqueId()).getFirst()).isCloseable() && !didClick) {
             return;
         }
 

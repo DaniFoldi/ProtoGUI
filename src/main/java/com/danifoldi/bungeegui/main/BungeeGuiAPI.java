@@ -55,7 +55,7 @@ public class BungeeGuiAPI {
      * @param player - the player to force close the GUI for
      */
     public void closeGui(ProxiedPlayer player) {
-        guiHandler.close(player);
+        guiHandler.close(player, true);
     }
 
     /**

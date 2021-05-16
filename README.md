@@ -54,9 +54,11 @@ test: # the name of the gui, used internally and in the API
     placeholdersTarget: true # default: false; if the placeholders should target the {target} or the {player}. NOTE: only works with requireOnlineTarget: true
     openSound: # omit to play no sound
       sound: entity_piglin_jealous # default: ENTITY_VILLAGER_NO; the sound to play when opening the gui NOTE: see link below for valid sounds
-      soundCategory: blocks # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcatetories
+      soundCategory: blocks # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcategories
       volume: 0.6 # default: 1.0; the volume to play the sound at
       pitch: 1.2 # default 1.0; the pitch to play the sound at
+    targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
+    closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
     items: # default: []; the items in the GUI
       '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0.
         type: 'cobblestone' # default: stone; the material of the item
@@ -96,6 +98,9 @@ You can specify multiple slots with one item, and they will be cloned.
 - You can select a row, a column, or a slot.
     - You can select only odd or only even slots from a row/column, or all.
 - You can add or remove a slot from the list.
+
+Valid sound list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/Sound.java)
+Valid soundcategory list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/SoundCategory.java)
 
 ___Expressions are evaluated in order___
 
