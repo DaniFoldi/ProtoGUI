@@ -117,4 +117,7 @@ public class GuiSound {
         }
     }
 
+    public GuiSound copy() {
+        return new GuiSound(sound, soundCategory, volume, pitch);
+    }
 }

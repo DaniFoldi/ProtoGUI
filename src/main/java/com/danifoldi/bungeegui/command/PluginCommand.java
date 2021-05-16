@@ -41,7 +41,7 @@ public class PluginCommand extends Command implements TabExecutor {
                 break;
             case "guis":
                 sender.sendMessage(Message.GUI_LIST_TOP.toComponent(null, Pair.of("count", String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()))));
-                for (String name: BungeeGuiAPI.getInstance().getAvailableGuis()) {
+                for (String name: BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
                     sender.sendMessage(Message.GUI_LIST_ITEM.toComponent(null, Pair.of("name", name)));
                 }
                 break;

@@ -184,6 +184,6 @@ public class GuiItem {
                 data,
                 List.copyOf(commands),
                 enchanted,
-                clickSound);
+                clickSound == null ? null : clickSound.copy());
     }
 }

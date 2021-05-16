@@ -115,8 +115,10 @@ All messages support the placeholders in the table below. The API can be used to
 |`%guicount%`|Number of loaded GUIs in BungeeGUI|
 |`%ram_used%`|Amount of RAM used by the proxy|
 |`%ram_total%`|Total RAM allocated by the proxy|
-|`%proxyname%`|The name of the server|
+|`%proxyname%`|The name of the proxy|
+|`%proxyversion%`|The version of the proxy|
 |`%plugincount%`|Number of plugins loaded|
+|`%servercount%`|Number of servers proxied|
 |`%online%`|Total number of players online|
 |`%online_visible%`|Number of players online that are not vanished _(PV required)_|
 |`%max%`|Maximum number of online players|
@@ -126,7 +128,6 @@ All messages support the placeholders in the table below. The API can be used to
 |`%version%`|The game version used by the player|
 |`%ping%`|Latest ping measurement of the player|
 |`%vanished%`|Whether the player is vanished or not|
-|`%gamemode%`|The gamemode of the player|
 |`%servername%`|The name of the server the player is connected to|
 |`%servermotd%`|The MOTD of the server the player is connected to|
 |`%luckperms_prefix%`|The prefix of the player _(LP required)_|
@@ -140,12 +141,12 @@ All messages support the placeholders in the table below. The API can be used to
 |`%motd@<servername>%`|MOTD of a server  _(Updates every 5 seconds)_|
 |`%restricted@<servername>%`|Whether a server is restricted or not|
 |`%canaccess@<servername>%`|Whether the player can connect to a server|
-|`%plugin_description#<pluginname>%`|The description of a plugin|
-|`%plugin_version#<pluginname>%`|The version of a plugin|
-|`%plugin_main#<pluginname>%`|The main class of a plugin|
-|`%plugin_author#<pluginname>%`|The author of a plugin|
-|`%plugin_depends#<pluginname>%`|The dependencies of a plugin|
-|`%plugin_softdepends#<pluginname>%`|The soft-dependencies of a plugin|
+|`%plugin_description@<pluginname>%`|The description of a plugin|
+|`%plugin_version@<pluginname>%`|The version of a plugin|
+|`%plugin_main@<pluginname>%`|The main class of a plugin|
+|`%plugin_author@<pluginname>%`|The author of a plugin|
+|`%plugin_depends@<pluginname>%`|The dependencies of a plugin|
+|`%plugin_softdepends@<pluginname>%`|The soft-dependencies of a plugin|
 
 
 ## Permissions

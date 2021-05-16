@@ -2,8 +2,6 @@ package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.util.NumberUtil;
 import com.danifoldi.bungeegui.util.ProxyversionUtil;
-import com.danifoldi.bungeegui.util.StringUtil;
-import de.exceptionflug.protocolize.world.WorldModule;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
 import net.md_5.bungee.api.ProxyServer;
@@ -12,16 +10,15 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.security.spec.ECField;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -35,6 +32,8 @@ public class PlaceholderHandler {
     private final PluginManager pluginManager;
     private final BungeeGuiPlugin plugin;
     private final Logger logger;
+
+    private ScheduledTask refreshData;
 
     @Inject
     public PlaceholderHandler(final @NotNull ProxyServer proxyServer,
@@ -65,23 +64,44 @@ public class PlaceholderHandler {
 
     String parse(ProxiedPlayer player, String text) {
         String result = text;
+        int iter = 0;
+        boolean changed = true;
 
-        for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder: builtinPlaceholders.entrySet()) {
-            try {
-                final String value = placeholder.getValue().apply(player);
-                result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
-            } catch (Exception e) {
-                // ok thanks
-            }
-        }
+        while (changed && iter < 16) {
+            changed = false;
 
-        for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder: placeholders.entrySet()) {
-            try {
-                final String value = placeholder.getValue().apply(player);
-                result = result.replace("%" + placeholder.getKey() + "%", value == null ? "" : value);
-            } catch (Exception e) {
-                logger.warning("Placeholder " + placeholder.getKey() + " couldn't be parsed");
+            for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : builtinPlaceholders.entrySet()) {
+                try {
+                    if (result.contains("%" + placeholder.getKey() + "%")) {
+                        final String value = placeholder.getValue().apply(player);
+                        if (value == null) {
+                            continue;
+                        }
+                        result = result.replace("%" + placeholder.getKey() + "%", value);
+                        changed = true;
+                    }
+                } catch (Exception e) {
+                    logger.warning("Placeholder " + placeholder.getKey() + " couldn't be processed");
+                    e.printStackTrace();
+                }
             }
+
+            for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : placeholders.entrySet()) {
+                try {
+                    if (result.contains("%" + placeholder.getKey() + "%")) {
+                        final String value = placeholder.getValue().apply(player);
+                        if (value == null) {
+                            continue;
+                        }
+                        result = result.replace("%" + placeholder.getKey() + "%", value);
+                        changed = true;
+                    }
+                } catch (Exception e) {
+                    logger.warning("Placeholder " + placeholder.getKey() + " couldn't be processed");
+                    e.printStackTrace();
+                }
+            }
+            iter++;
         }
 
         return result;
@@ -90,11 +110,15 @@ public class PlaceholderHandler {
     void unregisterAll() {
         builtinPlaceholders.clear();
         placeholders.clear();
+        if (refreshData != null) {
+            refreshData.cancel();
+            refreshData = null;
+        }
     }
 
     void registerBuiltins() {
         ConcurrentMap<ServerInfo, Boolean> lastStatus = new ConcurrentHashMap<>();
-        proxyServer.getScheduler().schedule(plugin, () -> {
+        refreshData = proxyServer.getScheduler().schedule(plugin, () -> {
             for (ServerInfo server: proxyServer.getServersCopy().values()) {
                 server.ping((ping, error) -> {
                     if (lastStatus.containsKey(server) && lastStatus.get(server) != (boolean)(error != null)) {
@@ -113,12 +137,13 @@ public class PlaceholderHandler {
             }
         }, 1, 5, TimeUnit.SECONDS);
 
-        registerBuiltin("", player -> "%");
+        //registerBuiltin("", player -> "%");
 
         registerBuiltin("ram_used", player -> NumberUtil.formatDecimal((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024d * 1024d)));
         registerBuiltin("ram_total", player -> NumberUtil.formatDecimal((Runtime.getRuntime().totalMemory()) / (1024d * 1024d)));
 
         registerBuiltin("proxyname", player -> proxyServer.getName());
+        registerBuiltin("proxyversion", player -> proxyServer.getVersion());
         registerBuiltin("bungeegui", player -> plugin.getDescription().getName() + " " + plugin.getDescription().getVersion());
         registerBuiltin("version", player -> {
             if (player == null) {
@@ -136,6 +161,7 @@ public class PlaceholderHandler {
             return String.valueOf(count);
         });
         registerBuiltin("guicount", player -> String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()));
+        registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServersCopy().size()));
         registerBuiltin("plugincount", player -> String.valueOf(pluginManager.getPlugins().size()));
         registerBuiltin("displayname", player -> {
             if (player == null) {
@@ -156,12 +182,6 @@ public class PlaceholderHandler {
             return player.getLocale().getDisplayName();
         });
         registerBuiltin("ping", player -> String.valueOf(player.getPing()));
-        registerBuiltin("gamemode", player -> {
-            if (player == null) {
-                return "";
-            }
-            return StringUtil.capitalize(WorldModule.getGamemode(player.getUniqueId()).toString());
-        });
         registerBuiltin("vanished", player -> {
             if (player == null) {
                 return "No";
@@ -218,7 +238,7 @@ public class PlaceholderHandler {
 
         for (Map.Entry<String, ServerInfo> server: proxyServer.getServersCopy().entrySet()) {
             registerBuiltin("online_visible@" + server.getKey(), player -> {
-                ServerPing ping = latestPing.get(server.getValue());
+                ServerPing ping = latestPing.getOrDefault(server.getValue(), null);
                 if (ping == null) {
                     return "0";
                 }
@@ -229,21 +249,21 @@ public class PlaceholderHandler {
                 return String.valueOf(count);
             });
             registerBuiltin("online@" + server.getKey(), player -> {
-                ServerPing ping = latestPing.get(server.getValue());
+                ServerPing ping = latestPing.getOrDefault(server.getValue(), null);
                 if (ping == null) {
                     return "0";
                 }
                 return String.valueOf(ping.getPlayers().getOnline());
             });
             registerBuiltin("max@" + server.getKey(), player -> {
-                ServerPing ping = latestPing.get(server.getValue());
+                ServerPing ping = latestPing.getOrDefault(server.getValue(), null);
                 if (ping == null) {
                     return "0";
                 }
                 return String.valueOf(ping.getPlayers().getMax());
             });
             registerBuiltin("version@" + server.getKey(), player -> {
-                ServerPing ping = latestPing.get(server.getValue());
+                ServerPing ping = latestPing.getOrDefault(server.getValue(), null);
                 if (ping == null) {
                     return "-";
                 }

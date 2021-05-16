@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 public class ConfigUtil {
-    public static final int LATEST = 2;
+    public static final int LATEST = 3;
 
     public static String backupAndUpgrade(FileConfig config) throws IOException {
         Path folder = config.getFile().toPath().getParent();

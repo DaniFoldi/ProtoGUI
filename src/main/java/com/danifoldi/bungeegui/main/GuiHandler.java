@@ -75,7 +75,6 @@ public class GuiHandler {
             final Map<Integer, GuiItem> itemMap = new HashMap<>();
 
             try {
-
                 for (Config.Entry guiItem : guiItems.entrySet()) {
                     final Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey());
                     final Config itemData = guiItem.getValue();
@@ -86,8 +85,8 @@ public class GuiHandler {
                         clickSound = GuiSound.builder()
                                 .sound(itemData.getEnumOrElse("clickSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
                                 .soundCategory(itemData.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                                .volume(itemData.getOrElse("clickSound.volume", 1.0f))
-                                .pitch(itemData.getOrElse("clickSound.pitch", 1.0f))
+                                .volume(itemData.getOrElse("clickSound.volume", 1.0d).floatValue())
+                                .pitch(itemData.getOrElse("clickSound.pitch", 1.0d).floatValue())
                                 .build();
                     }
 
@@ -113,8 +112,8 @@ public class GuiHandler {
                     openSound = GuiSound.builder()
                             .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
                             .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                            .volume(guiData.getOrElse("openSound.volume", 1.0f))
-                            .pitch(guiData.getOrElse("openSound.pitch", 1.0f))
+                            .volume(guiData.getOrElse("openSound.volume", 1.0d).floatValue())
+                            .pitch(guiData.getOrElse("openSound.pitch", 1.0d).floatValue())
                             .build();
                 }
 

@@ -24,7 +24,7 @@ public enum Message {
     TARGET_BYPASS("targetBypass", "&cThis player can't be targeted with this command"),
     TARGET_NOT_FOUND("targetNotFound", "&cTarget {target} could not be found"),
     RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms"),
-    COMMAND_HELP("comandHelp", "'&7---- &6&l{name} {version} help &7----"),
+    COMMAND_HELP("commandHelp", "&7---- &6&l%bungeegui% help &7----"),
     COMMAND_RELOAD("commandReload", "/{command} reload &7- Reload the plugin"),
     COMMAND_GUIS("commandGuis", "/{command} guis &7 - List the loaded GUIs"),
     NO_PERMISSION("noPermission", "&cYou don't have permission to execute that command"),
@@ -93,6 +93,10 @@ public enum Message {
 
     @SafeVarargs
     public final BaseComponent[] toComponent(ProxiedPlayer player, Pair<String, String>... replacements) {
+        if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
+            toComponent(player, defaultValue, replacements);
+        }
+
         return toComponent(player, Message.messages.get(messageId), replacements);
     }
 

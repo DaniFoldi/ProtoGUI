@@ -6,6 +6,9 @@ import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.file.FileConfig;
+import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +25,7 @@ public class BungeeGuiLoader {
     private final PluginManager pluginManager;
     private final Path datafolder;
     private final PlaceholderHandler placeholderHandler;
+    private final ProtocolSoundFixer soundFixer;
 
     @Inject
     public BungeeGuiLoader(final @NotNull GuiHandler guiHandler,
@@ -29,13 +33,15 @@ public class BungeeGuiLoader {
                            final @NotNull Logger logger,
                            final @NotNull PluginManager pluginManager,
                            final @NotNull Path datafolder,
-                           final @NotNull PlaceholderHandler placeholderHandler) {
+                           final @NotNull PlaceholderHandler placeholderHandler,
+                           final @NotNull ProtocolSoundFixer soundFixer) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.datafolder = datafolder;
         this.placeholderHandler = placeholderHandler;
+        this.soundFixer = soundFixer;
     }
 
     void load() {
@@ -61,6 +67,12 @@ public class BungeeGuiLoader {
 
             guiHandler.registerCommands();
             pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
+            try {
+                ProtocolAPI.getEventManager().registerListener(soundFixer);
+            } catch (IllegalStateException e) {
+                // TODO remove once there is a way to unregister it
+            }
+            soundFixer.enable();
         } catch (IOException e) {
             StringUtil.blockPrint("Could not enable plugin, please see the error below").forEach(logger::severe);
             logger.severe(e.getMessage());
@@ -71,6 +83,7 @@ public class BungeeGuiLoader {
     void unload() {
         StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
+        soundFixer.disable();
         placeholderHandler.unregisterAll();
         BungeeGuiAPI.setInstance(null);
         pluginManager.unregisterCommands(plugin);
