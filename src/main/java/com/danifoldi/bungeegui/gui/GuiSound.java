@@ -1,5 +1,6 @@
 package com.danifoldi.bungeegui.gui;
 
+import com.danifoldi.bungeegui.util.SoundUtil;
 import de.exceptionflug.protocolize.world.Sound;
 import de.exceptionflug.protocolize.world.SoundCategory;
 import de.exceptionflug.protocolize.world.WorldModule;
@@ -10,23 +11,23 @@ import java.util.Objects;
 
 public class GuiSound {
 
-    private final Sound sound;
+    private final String soundName;
     private final SoundCategory soundCategory;
     private final float volume;
     private final float pitch;
 
-    private GuiSound(final @NotNull Sound sound,
+    private GuiSound(final @NotNull String soundName,
                      final @NotNull SoundCategory soundCategory,
                      final float volume,
                      final float pitch) {
-        this.sound = sound;
+        this.soundName = soundName;
         this.soundCategory = soundCategory;
         this.volume = volume;
         this.pitch = pitch;
     }
 
-    public Sound getSound() {
-        return this.sound;
+    public String getSoundName() {
+        return this.soundName;
     }
 
     public SoundCategory getSoundCategory() {
@@ -46,13 +47,13 @@ public class GuiSound {
             return;
         }
 
-        WorldModule.playSound(player, sound, soundCategory, volume, pitch);
+        SoundUtil.playSound(player, soundName, soundCategory, volume, pitch);
     }
 
     @Override
     public String toString() {
         return "GuiSound{" +
-                "sound=" + sound +
+                "soundName=" + soundName +
                 ", soundCategory=" + soundCategory +
                 ", volume=" + volume +
                 ", pitch=" + pitch +
@@ -64,12 +65,12 @@ public class GuiSound {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GuiSound guiSound = (GuiSound) o;
-        return Float.compare(guiSound.volume, volume) == 0 && Float.compare(guiSound.pitch, pitch) == 0 && sound == guiSound.sound && soundCategory == guiSound.soundCategory;
+        return Float.compare(guiSound.volume, volume) == 0 && Float.compare(guiSound.pitch, pitch) == 0 && soundName.equals(guiSound.soundName) && soundCategory == guiSound.soundCategory;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sound, soundCategory, volume, pitch);
+        return Objects.hash(soundName, soundCategory, volume, pitch);
     }
 
     public static Builder builder() {
@@ -77,7 +78,7 @@ public class GuiSound {
     }
 
     public static final class Builder {
-        private Sound sound;
+        private String soundName;
         private SoundCategory soundCategory;
         private float volume;
         private float pitch;
@@ -86,8 +87,8 @@ public class GuiSound {
 
         }
 
-        public @NotNull Builder sound(final @NotNull Sound sound) {
-            this.sound = sound;
+        public @NotNull Builder soundName(final @NotNull String soundName) {
+            this.soundName = soundName;
             return this;
         }
 
@@ -109,7 +110,7 @@ public class GuiSound {
 
         public @NotNull GuiSound build() {
             return new GuiSound(
-                    sound,
+                    soundName,
                     soundCategory,
                     volume,
                     pitch
@@ -118,6 +119,6 @@ public class GuiSound {
     }
 
     public GuiSound copy() {
-        return new GuiSound(sound, soundCategory, volume, pitch);
+        return new GuiSound(soundName, soundCategory, volume, pitch);
     }
 }

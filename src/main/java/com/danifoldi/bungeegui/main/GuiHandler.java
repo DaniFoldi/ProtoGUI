@@ -7,6 +7,7 @@ import com.danifoldi.bungeegui.gui.GuiSound;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.SlotUtil;
+import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
@@ -83,7 +84,7 @@ public class GuiHandler {
 
                     if (itemData.contains("clickSound")) {
                         clickSound = GuiSound.builder()
-                                .sound(itemData.getEnumOrElse("clickSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                                .soundName(itemData.getOrElse("clickSound.sound", "entity_villager_no"))
                                 .soundCategory(itemData.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
                                 .volume(itemData.getOrElse("clickSound.volume", 1.0d).floatValue())
                                 .pitch(itemData.getOrElse("clickSound.pitch", 1.0d).floatValue())
@@ -110,7 +111,7 @@ public class GuiHandler {
 
                 if (guiData.contains("openSound")) {
                     openSound = GuiSound.builder()
-                            .sound(guiData.getEnumOrElse("openSound.sound", Sound.ENTITY_VILLAGER_NO, EnumGetMethod.NAME_IGNORECASE))
+                            .soundName(guiData.getOrElse("openSound.sound", "entity_villager_no"))
                             .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
                             .volume(guiData.getOrElse("openSound.volume", 1.0d).floatValue())
                             .pitch(guiData.getOrElse("openSound.pitch", 1.0d).floatValue())
@@ -169,6 +170,9 @@ public class GuiHandler {
         final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
 
         if (gui.getOpenSound() != null) {
+            if (SoundUtil.isValidSound(gui.getOpenSound().getSoundName())) {
+                logger.warning("Sound " + gui.getOpenSound().getSoundName() + " is probably invalid");
+            }
             gui.getOpenSound().playFor(player);
         }
 

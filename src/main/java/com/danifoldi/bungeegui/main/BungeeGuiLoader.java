@@ -30,8 +30,8 @@ public class BungeeGuiLoader {
     private final PluginManager pluginManager;
     private final Path datafolder;
     private final PlaceholderHandler placeholderHandler;
-    private final ProtocolSoundFixer soundFixer;
     private final PluginCommand command;
+    private final BungeeGuiListener listener;
 
     private enum LogLevel {
         OFF(Level.OFF), SEVERE(Level.SEVERE), WARNING(Level.WARNING), INFO(Level.INFO), CONFIG(Level.CONFIG), FINE(Level.FINE), FINER(Level.FINER), FINEST(Level.FINEST), ALL(Level.ALL);
@@ -50,16 +50,16 @@ public class BungeeGuiLoader {
                            final @NotNull PluginManager pluginManager,
                            final @NotNull Path datafolder,
                            final @NotNull PlaceholderHandler placeholderHandler,
-                           final @NotNull ProtocolSoundFixer soundFixer,
-                           final @NotNull PluginCommand command) {
+                           final @NotNull PluginCommand command,
+                           final @NotNull BungeeGuiListener listener) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.datafolder = datafolder;
         this.placeholderHandler = placeholderHandler;
-        this.soundFixer = soundFixer;
         this.command = command;
+        this.listener = listener;
     }
 
     void load() {
@@ -73,7 +73,7 @@ public class BungeeGuiLoader {
             final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
 
-            //logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
+            logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             guiHandler.load(config);
             Message.setMessageProvider(config);
@@ -85,13 +85,7 @@ public class BungeeGuiLoader {
                 StringUtil.blockPrint("BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.").forEach(logger::warning);
             }
 
-            pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
-            try {
-                ProtocolAPI.getEventManager().registerListener(soundFixer);
-            } catch (IllegalStateException e) {
-                // TODO remove once there is a way to unregister it
-            }
-            soundFixer.enable();
+            pluginManager.registerListener(plugin, listener);
         } catch (IOException e) {
             StringUtil.blockPrint("Could not enable plugin, please see the error below").forEach(logger::severe);
             logger.severe(e.getMessage());
@@ -112,7 +106,6 @@ public class BungeeGuiLoader {
         StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
         guiHandler.getGuis().forEach(guiHandler::removeGui);
-        soundFixer.disable();
         placeholderHandler.unregisterAll();
         BungeeGuiAPI.setInstance(null);
         pluginManager.unregisterCommands(plugin);

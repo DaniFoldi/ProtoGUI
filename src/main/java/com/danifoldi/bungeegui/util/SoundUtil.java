@@ -13,7 +13,7 @@ public class SoundUtil {
         soundEffect.setCategory(category);
         soundEffect.setPitch(pitch);
         soundEffect.setVolume(volume);
-        soundEffect.setSound(soundName);
+        soundEffect.setSound(StringUtil.get(soundName).getSecond());
         Location location = WorldModule.getLocation(player.getUniqueId());
         soundEffect.setX(location.getX());
         soundEffect.setY(location.getY());

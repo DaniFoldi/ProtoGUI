@@ -1,6 +1,7 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.gui.GuiGrid;
+import com.danifoldi.bungeegui.util.SoundUtil;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.inventory.event.InventoryClickEvent;
@@ -12,13 +13,17 @@ import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
+import java.util.logging.Logger;
 
 public class BungeeGuiListener implements Listener {
     private final GuiHandler guiHandler;
+    private final Logger logger;
 
     @Inject
-    public BungeeGuiListener(final @NotNull GuiHandler guiHandler) {
+    public BungeeGuiListener(final @NotNull GuiHandler guiHandler,
+                             final @NotNull Logger logger) {
         this.guiHandler = guiHandler;
+        this.logger = logger;
     }
 
     @EventHandler
@@ -46,6 +51,9 @@ public class BungeeGuiListener implements Listener {
         }
 
         if (openGui.getItems().get(slot).getClickSound() != null) {
+            if (SoundUtil.isValidSound(openGui.getItems().get(slot).getClickSound().getSoundName())) {
+                logger.warning("Sound " + openGui.getItems().get(slot).getClickSound().getSoundName() + " is probably invalid");
+            }
             openGui.getItems().get(slot).getClickSound().playFor(player);
         }
 
