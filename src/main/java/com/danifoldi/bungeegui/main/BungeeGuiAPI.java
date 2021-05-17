@@ -96,8 +96,8 @@ public class BungeeGuiAPI {
     /**
      * Adds a GUI to the handler
      * @implNote if a GUI with this name exists, no operation is performed
-     * @param name
-     * @param gui
+     * @param name - the name of the GUI to be added
+     * @param gui - the GUI to be added
      */
     public void addGui(String name, GuiGrid gui) {
         guiHandler.addGui(name, gui);

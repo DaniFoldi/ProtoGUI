@@ -6,6 +6,7 @@ import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.danifoldi.bungeegui.util.UpdateUtil;
+import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
 import net.md_5.bungee.api.ProxyServer;
@@ -16,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Filter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class BungeeGuiLoader {
@@ -27,6 +31,16 @@ public class BungeeGuiLoader {
     private final Path datafolder;
     private final PlaceholderHandler placeholderHandler;
     private final ProtocolSoundFixer soundFixer;
+
+    private enum LogLevel {
+        OFF(Level.OFF), SEVERE(Level.SEVERE), WARNING(Level.WARNING), INFO(Level.INFO), CONFIG(Level.CONFIG), FINE(Level.FINE), FINER(Level.FINER), FINEST(Level.FINEST), ALL(Level.ALL);
+
+        private Level level;
+
+        LogLevel(Level level) {
+            this.level = level;
+        }
+    }
 
     @Inject
     public BungeeGuiLoader(final @NotNull GuiHandler guiHandler,
@@ -55,6 +69,8 @@ public class BungeeGuiLoader {
         try {
             final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
+
+            logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             guiHandler.load(config);
             Message.setMessageProvider(config);
