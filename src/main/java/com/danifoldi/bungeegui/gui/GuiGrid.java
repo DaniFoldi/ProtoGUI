@@ -24,7 +24,7 @@ public class GuiGrid {
     private final @Nullable GuiSound openSound;
     private final boolean targetBypass;
     private final boolean closeable;
-    private final @Nullable String notifyTarget;
+    private final @NotNull String notifyTarget;
 
     private GuiGrid(final @NotNull Map<Integer, GuiItem> items,
                     final boolean isTargeted,
@@ -41,7 +41,7 @@ public class GuiGrid {
                     final @Nullable GuiSound openSound,
                     final boolean targetBypass,
                     final boolean closeable,
-                    final @Nullable String notifyTarget) {
+                    final @NotNull String notifyTarget) {
         this.items = items.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
         this.isTargeted = isTargeted;
         this.commandAliases = List.copyOf(commandAliases);
@@ -120,7 +120,7 @@ public class GuiGrid {
         return this.closeable;
     }
 
-    public @Nullable String getNotifyTarget() {
+    public @NotNull String getNotifyTarget() {
         return this.notifyTarget;
     }
 
@@ -223,7 +223,7 @@ public class GuiGrid {
             return this;
         }
 
-        public @NotNull Builder notifyTarget(final @Nullable String notifyTarget) {
+        public @NotNull Builder notifyTarget(final @NotNull String notifyTarget) {
             this.notifyTarget = notifyTarget;
             return this;
         }
@@ -244,7 +244,7 @@ public class GuiGrid {
                     openSound,
                     targetBypass,
                     closeable,
-                    notifyTarget
+                    Objects.requireNonNull(notifyTarget)
             );
         }
     }

@@ -59,7 +59,7 @@ test: # the name of the gui, used internally and in the API
       pitch: 1.2 # default 1.0; the pitch to play the sound at
     targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
     closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
-    notifyTarget: '{player} targeted you with a GUI' # default: null; the message that will sent to the target, if they are online. NOTE: omit to send no message
+    notifyTarget: '{player} targeted you with a GUI' # default: ''; the message that will sent to the target, if they are online. NOTE: omit to send no message
     items: # default: []; the items in the GUI
       '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0
         type: 'cobblestone' # default: stone; the material of the item

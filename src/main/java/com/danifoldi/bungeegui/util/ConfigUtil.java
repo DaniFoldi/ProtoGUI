@@ -51,6 +51,7 @@ public class ConfigUtil {
             ensureValue(config, "messages.noPermission", Message.NO_PERMISSION.getDefaultValue());
             ensureValue(config, "messages.guiListTop", Message.GUI_LIST_TOP.getDefaultValue());
             ensureValue(config, "messages.guiListItem", Message.GUI_LIST_ITEM.getDefaultValue());
+            ensureValue(config, "debugLevel", "ALL");
         }
 
         config.set("configVersion", newVersion);

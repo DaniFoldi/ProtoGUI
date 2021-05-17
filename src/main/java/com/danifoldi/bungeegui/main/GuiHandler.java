@@ -65,8 +65,6 @@ public class GuiHandler {
     }
 
     void load(Config config) {
-        menus.clear();
-
         final Config guis = config.get("guis");
 
         for (Config.Entry gui: guis.entrySet()) {
@@ -74,10 +72,11 @@ public class GuiHandler {
             final Config guiData = gui.getValue();
             final Config guiItems = guiData.getOrElse("items", Config.inMemory());
             final Map<Integer, GuiItem> itemMap = new HashMap<>();
+            final int size = guiData.getIntOrElse("size", 54);
 
             try {
                 for (Config.Entry guiItem : guiItems.entrySet()) {
-                    final Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey());
+                    final Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
                     final Config itemData = guiItem.getValue();
 
                     GuiSound clickSound = null;
@@ -123,7 +122,7 @@ public class GuiHandler {
                         .targeted(guiData.getOrElse("targeted", false))
                         .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
                         .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
-                        .size(guiData.getIntOrElse("size", 54))
+                        .size(size)
                         .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
                         .selfTarget(guiData.getOrElse("selfTarget", true))
                         .ignoreVanished(guiData.getOrElse("ignoreVanished", true))
@@ -134,13 +133,14 @@ public class GuiHandler {
                         .openSound(openSound)
                         .targetBypass(guiData.getOrElse("targetBypass", false))
                         .closeable(guiData.getOrElse("closeable", true))
-                        .notifyTarget(guiData.getOrElse("notifyTarget", null))
+                        .notifyTarget(guiData.getOrElse("notifyTarget", ""))
                         .build();
 
                 addGui(name, grid);
             } catch (Exception e) {
                 logger.warning("Could not load gui " + name);
                 logger.warning(e.getClass().getName() + ":  " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -155,7 +155,7 @@ public class GuiHandler {
     }
 
     void removeGui(String name) {
-        openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).forEach(v -> close(ProxyServer.getInstance().getPlayer(v.getKey()), true));
+        openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).map(Map.Entry::getKey).collect(Collectors.toList()).forEach(p -> close(ProxyServer.getInstance().getPlayer(p), true));
         pluginManager.unregisterCommand(commandHandlers.get(name));
         commandHandlers.remove(name);
         menus.remove(name);
@@ -172,7 +172,7 @@ public class GuiHandler {
             gui.getOpenSound().playFor(player);
         }
 
-        if (ProxyServer.getInstance().getPlayer(target) != null && gui.getNotifyTarget() != null) {
+        if (ProxyServer.getInstance().getPlayer(target) != null && !gui.getNotifyTarget().equals("")) {
             ProxyServer.getInstance().getPlayer(target).sendMessage(Message.toComponent(ProxyServer.getInstance().getPlayer(target), gui.getNotifyTarget(), Pair.of("player", player.getName()), Pair.of("target", target)));
         }
 

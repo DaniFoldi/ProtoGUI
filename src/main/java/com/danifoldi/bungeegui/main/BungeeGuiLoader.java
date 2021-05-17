@@ -31,6 +31,7 @@ public class BungeeGuiLoader {
     private final Path datafolder;
     private final PlaceholderHandler placeholderHandler;
     private final ProtocolSoundFixer soundFixer;
+    private final PluginCommand command;
 
     private enum LogLevel {
         OFF(Level.OFF), SEVERE(Level.SEVERE), WARNING(Level.WARNING), INFO(Level.INFO), CONFIG(Level.CONFIG), FINE(Level.FINE), FINER(Level.FINER), FINEST(Level.FINEST), ALL(Level.ALL);
@@ -49,7 +50,8 @@ public class BungeeGuiLoader {
                            final @NotNull PluginManager pluginManager,
                            final @NotNull Path datafolder,
                            final @NotNull PlaceholderHandler placeholderHandler,
-                           final @NotNull ProtocolSoundFixer soundFixer) {
+                           final @NotNull ProtocolSoundFixer soundFixer,
+                           final @NotNull PluginCommand command) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
@@ -57,12 +59,13 @@ public class BungeeGuiLoader {
         this.datafolder = datafolder;
         this.placeholderHandler = placeholderHandler;
         this.soundFixer = soundFixer;
+        this.command = command;
     }
 
     void load() {
         StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
-        pluginManager.registerCommand(plugin, new PluginCommand());
+        pluginManager.registerCommand(plugin, command);
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
         placeholderHandler.registerBuiltins();
 
@@ -70,7 +73,7 @@ public class BungeeGuiLoader {
             final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
 
-            logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
+            //logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             guiHandler.load(config);
             Message.setMessageProvider(config);

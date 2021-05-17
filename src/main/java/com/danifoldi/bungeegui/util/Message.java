@@ -25,8 +25,23 @@ public enum Message {
     TARGET_NOT_FOUND("targetNotFound", "&cTarget {target} could not be found"),
     RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms"),
     COMMAND_HELP("commandHelp", "&7---- &6&l%bungeegui% help &7----"),
-    COMMAND_RELOAD("commandReload", "/{command} reload &7- Reload the plugin"),
-    COMMAND_GUIS("commandGuis", "/{command} guis &7 - List the loaded GUIs"),
+    COMMAND_RELOAD("commandReload", "/bungeegui reload &7- Reload the plugin"),
+    COMMAND_GUIS("commandGuis", "/bungeegui guis &7- List the loaded GUIs"),
+    COMMAND_BROADCAST("commandBroadcast", "/bungeegui broadcast all|s:<server>|p:<player> <message> &7- Send a message to one or more players"),
+    COMMAND_LOG("commandLog", "/bungeegui log <message> &7- Log a message into the console"),
+    COMMAND_SEND("commandSend", "/bungeegui send all|s:<server>|p:<player> <send> &7- Send a player to a server"),
+    COMMAND_CHAT("commandChat", "/bungeegui chat <player> <message> &7- Send a message to chat as a player"),
+    COMMAND_ACTIONBAR("commandActionbar", "/bungeegui actionbar all|s:<server>|p:<player> <actionbar> &7- Show a player a message in their action bar"),
+    COMMAND_TITLE("commandTitle", "/bungeegui title all|s:<server>|p:<player> title|subtitle fadeIn stay fadeOut <message>"),
+    COMMAND_SOUND("commandSound", "/bungeegui sound all|s:<server>|p:<player> <sound> [soundcategory] [volume] [pitch]"),
+    COMMAND_OPEN("commandOpen", "/bungeegui open all|s:<server>|p:<player> <gui> [target]"),
+    COMMAND_CLOSE("commandClose", "/bungeegui close <player>"),
+    ACTION_COMPLETE("actionComplete", "&bAction completed for {count} players"),
+    GUI_NOT_FOUND("guiNotFound", "&cGUI {name} not found"),
+    GUI_TARGET_REQUIRED("guiTargetRequired", "&cThis GUI requires a target player"),
+    INVALID_PROPERTY("invalidProperty", "&cA property is invalid"),
+    SERVER_NOT_FOUND("serverNotFound", "&cServer {name} not found"),
+    EMPTY_MESSAGE("emptyMessage", "&cMessage can't be empty"),
     NO_PERMISSION("noPermission", "&cYou don't have permission to execute that command"),
     GUI_LIST_TOP("guiListTop", "&6{count} GUIs are loaded:"),
     GUI_LIST_ITEM("guiListItem", "&7- &6&l{name}");
@@ -65,7 +80,7 @@ public enum Message {
         return result;
     }
 
-    private static String colorCodes(String text) {
+    public static String colorCodes(String text) {
         String colorized = text;
         Matcher matcher = HEX.matcher(colorized);
 

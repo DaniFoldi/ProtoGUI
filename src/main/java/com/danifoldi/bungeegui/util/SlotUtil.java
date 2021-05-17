@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class SlotUtil {
 
-    public static Set<Integer> getSlots(String slots) {
+    public static Set<Integer> getSlots(String slots, int size) {
         Set<Integer> slotList = new HashSet<>();
 
         for (String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList())) {
@@ -78,7 +78,7 @@ public class SlotUtil {
             action.accept(slot);
         }
 
-        return slotList;
+        return slotList.stream().filter(s -> s >= 0 && s < size).collect(Collectors.toSet());
     }
 
     public static InventoryType getInventoryType(int size) {

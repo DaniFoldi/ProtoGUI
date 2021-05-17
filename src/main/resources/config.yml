@@ -8,6 +8,21 @@ messages:
   commandHelp: '&7---- &6&l%bungeegui% help &7----'
   commandReload: '/bungeegui reload &7- Reload the plugin'
   commandGuis: '/bungeegui guis &7 - List the loaded GUIs'
+  commandBroadcast: '/bungeegui broadcast all|s:<server>|p:<player> <message> &7- Send a message to one or more players'
+  commandLog: '/bungeegui log <message> &7- Log a message into the console'
+  commandSend: '/bungeegui send all|s:<server>|p:<player> <send> &7- Send a player to a server'
+  commandChat: '/bungeegui chat <player> <message> &7- Send a message to chat as a player'
+  commandActionbar: '/bungeegui actionbar all|s:<server>|p:<player> <actionbar> &7- Show a player a message in their action bar'
+  commandTitle: '/bungeegui title all|s:<server>|p:<player> title|subtitle fadeIn stay fadeOut <message>'
+  commandSound: '/bungeegui sound all|s:<server>|p:<player> <sound> [soundcategory] [volume] [pitch]'
+  commandOpen: '/bungeegui open all|s:<server>|p:<player> <gui> [target]'
+  commandClose: '/bungeegui close <player>'
+  actionComplete: '&bAction completed for {count} players'
+  guiNotFound: '&cGUI {name} not found'
+  guiTargetRequired: '&cThis GUI requires a target player'
+  invalidProperty: '&cA property is invalid'
+  serverNotFound: '&cServer {name} not found'
+  emptyMessage: '&cMessage can''t be empty'
   noPermission: '&cYou don''t have permission to execute that command'
   guiListTop: '&6{count} GUIs are loaded:'
   guiListItem: '&7- &6&l{name}'
@@ -153,3 +168,4 @@ guis:
         - '&4Plugin developer'
     
 configVersion: 3
+debugLevel: all
