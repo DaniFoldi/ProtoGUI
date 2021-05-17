@@ -48,7 +48,7 @@ test: # the name of the gui, used internally and in the API
     whitelistServers: # default: [*]; the commands will only work on the servers specified below. NOTE: omit or set the first element to `*` to enable on all servers
       - server1
       - server2
-    blacklistServers: # default: []; the commands will not work on the servers specified below. NOTE: overrides whitelisted servers.
+    blacklistServers: # default: []; the commands will not work on the servers specified below. NOTE: overrides whitelisted servers
       - server3
       - server4
     placeholdersTarget: true # default: false; if the placeholders should target the {target} or the {player}. NOTE: only works with requireOnlineTarget: true
@@ -59,8 +59,9 @@ test: # the name of the gui, used internally and in the API
       pitch: 1.2 # default 1.0; the pitch to play the sound at
     targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
     closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
+    notifyTarget: '{player} targeted you with a GUI' # default: null; the message that will sent to the target, if they are online. NOTE: omit to send no message
     items: # default: []; the items in the GUI
-      '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0.
+      '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0
         type: 'cobblestone' # default: stone; the material of the item
         count: 10 # default: 1; the amount of the item
         name: '&5some item' # default: <item name>; the name of the item
@@ -118,6 +119,7 @@ All messages support the placeholders in the table below. The API can be used to
 | ----------- | ----------- |
 |`%bungeegui%`|BungeeGUI information|
 |`%guicount%`|Number of loaded GUIs in BungeeGUI|
+|`%placeholdercount%`|Number of placeholders registered in BungeeGUI|
 |`%ram_used%`|Amount of RAM used by the proxy|
 |`%ram_total%`|Total RAM allocated by the proxy|
 |`%proxyname%`|The name of the proxy|

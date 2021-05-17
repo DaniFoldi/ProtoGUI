@@ -47,7 +47,7 @@ public class ConfigUtil {
         if (oldVersion <= 2 && newVersion >= 3) {
             ensureValue(config, "messages.commandHelp", Message.COMMAND_HELP.getDefaultValue());
             ensureValue(config, "messages.commandReload", Message.COMMAND_RELOAD.getDefaultValue());
-            ensureValue(config, "messages.commandGUis", Message.COMMAND_GUIS.getDefaultValue());
+            ensureValue(config, "messages.commandGuis", Message.COMMAND_GUIS.getDefaultValue());
             ensureValue(config, "messages.noPermission", Message.NO_PERMISSION.getDefaultValue());
             ensureValue(config, "messages.guiListTop", Message.GUI_LIST_TOP.getDefaultValue());
             ensureValue(config, "messages.guiListItem", Message.GUI_LIST_ITEM.getDefaultValue());

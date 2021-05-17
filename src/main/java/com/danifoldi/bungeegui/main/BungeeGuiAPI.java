@@ -94,7 +94,27 @@ public class BungeeGuiAPI {
     }
 
     /**
+     * Adds a GUI to the handler
+     * @implNote if a GUI with this name exists, no operation is performed
+     * @param name
+     * @param gui
+     */
+    public void addGui(String name, GuiGrid gui) {
+        guiHandler.addGui(name, gui);
+    }
+
+    /**
+     * Removes a GUI from the handler
+     * @implNote the GUI is closed for all players immediately
+     * @param name - the GUI to be removed
+     */
+    public void removeGui(String name) {
+        guiHandler.removeGui(name);
+    }
+
+    /**
      * Reload the plugin and all GUIs
+     * @apiNote all GUIs added via the API are lost
      * @return the time the reload took in ms
      */
     public long reloadGuis() {

@@ -166,6 +166,7 @@ public class PlaceholderHandler {
         registerBuiltin("guicount", player -> String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()));
         registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServersCopy().size()));
         registerBuiltin("plugincount", player -> String.valueOf(pluginManager.getPlugins().size()));
+        registerBuiltin("placeholdercount", player -> String.valueOf(placeholders.size() + builtinPlaceholders.size()));
         registerBuiltin("displayname", player -> {
             if (player == null) {
                 return "";

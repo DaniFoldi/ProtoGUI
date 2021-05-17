@@ -133,9 +133,10 @@ public class GuiHandler {
                         .openSound(openSound)
                         .targetBypass(guiData.getOrElse("targetBypass", false))
                         .closeable(guiData.getOrElse("closeable", true))
+                        .notifyTarget(guiData.getOrElse("notifyTarget", null))
                         .build();
 
-                menus.put(name, grid);
+                addGui(name, grid);
             } catch (Exception e) {
                 logger.warning("Could not load gui " + name);
                 logger.warning(e.getClass().getName() + ":  " + e.getMessage());
@@ -143,10 +144,14 @@ public class GuiHandler {
         }
     }
 
-    void registerCommands() {
-        for (String name: menus.keySet()) {
-            pluginManager.registerCommand(plugin, new BungeeGuiCommand(name));
-        }
+    void addGui(String name, GuiGrid gui) {
+        menus.put(name, gui);
+        pluginManager.registerCommand(plugin, new BungeeGuiCommand(name));
+    }
+
+    void removeGui(String name) {
+        openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).forEach(v -> close(ProxyServer.getInstance().getPlayer(v.getKey()), true));
+        menus.remove(name);
     }
 
     void open(String name, ProxiedPlayer player, @Nullable String target) {
@@ -158,6 +163,10 @@ public class GuiHandler {
 
         if (gui.getOpenSound() != null) {
             gui.getOpenSound().playFor(player);
+        }
+
+        if (ProxyServer.getInstance().getPlayer(target) != null && gui.getNotifyTarget() != null) {
+            ProxyServer.getInstance().getPlayer(target).sendMessage(Message.toComponent(ProxyServer.getInstance().getPlayer(target), gui.getNotifyTarget(), Pair.of("player", player.getName()), Pair.of("target", target)));
         }
 
         for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {

@@ -65,7 +65,6 @@ public class BungeeGuiLoader {
                 StringUtil.blockPrint("BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.").forEach(logger::warning);
             }
 
-            guiHandler.registerCommands();
             pluginManager.registerListener(plugin, new BungeeGuiListener(guiHandler));
             try {
                 ProtocolAPI.getEventManager().registerListener(soundFixer);
@@ -83,6 +82,7 @@ public class BungeeGuiLoader {
     void unload() {
         StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
 
+        guiHandler.getGuis().forEach(guiHandler::removeGui);
         soundFixer.disable();
         placeholderHandler.unregisterAll();
         BungeeGuiAPI.setInstance(null);
