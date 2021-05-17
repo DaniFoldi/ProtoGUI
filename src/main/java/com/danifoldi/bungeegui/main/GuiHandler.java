@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 public class GuiHandler {
     private final Map<String, GuiGrid> menus = new HashMap<>();
     private final Map<UUID, Pair<String, String>> openGuis = new HashMap<>();
+    private final Map<String, BungeeGuiCommand> commandHandlers = new HashMap<>();
     private final Logger logger;
     private final PluginManager pluginManager;
     private final BungeeGuiPlugin plugin;
@@ -145,12 +146,18 @@ public class GuiHandler {
     }
 
     void addGui(String name, GuiGrid gui) {
+        if (menus.containsKey(name)) {
+            return;
+        }
         menus.put(name, gui);
-        pluginManager.registerCommand(plugin, new BungeeGuiCommand(name));
+        commandHandlers.put(name, new BungeeGuiCommand(name));
+        pluginManager.registerCommand(plugin, commandHandlers.get(name));
     }
 
     void removeGui(String name) {
         openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).forEach(v -> close(ProxyServer.getInstance().getPlayer(v.getKey()), true));
+        pluginManager.unregisterCommand(commandHandlers.get(name));
+        commandHandlers.remove(name);
         menus.remove(name);
     }
 
