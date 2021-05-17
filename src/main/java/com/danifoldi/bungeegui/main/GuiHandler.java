@@ -171,6 +171,7 @@ public class GuiHandler {
 
         for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
             if (guiItem.getKey() < 0 || guiItem.getKey() >= SlotUtil.getInventorySize(SlotUtil.getInventoryType(gui.getGuiSize()))) {
+                logger.warning("GUI " + name + " contains an item at slot " + guiItem.getKey() + " which is outside of the Inventory");
                 continue;
             }
 

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+// TODO remove once Protocolize has this correctly
 public class ProtocolSoundFixer extends PacketAdapter<NamedSoundEffect> {
     @Inject
     public ProtocolSoundFixer() {

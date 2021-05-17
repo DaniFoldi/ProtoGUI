@@ -5,6 +5,7 @@ import com.danifoldi.bungeegui.util.ConfigUtil;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.StringUtil;
+import com.danifoldi.bungeegui.util.UpdateUtil;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
 import net.md_5.bungee.api.ProxyServer;
@@ -77,6 +78,15 @@ public class BungeeGuiLoader {
             logger.severe(e.getMessage());
             e.printStackTrace();
         }
+
+        UpdateUtil.getNewest().thenAccept(newest -> {
+           if (newest.equals("")) {
+               logger.warning("Could not check for updates");
+           }
+           if (!newest.equals(plugin.getDescription().getVersion())) {
+               StringUtil.blockPrint("You are not running the latest version of BungeeGUI. Please update for bugfixes and new features.").forEach(logger::warning);
+           }
+        });
     }
 
     void unload() {
