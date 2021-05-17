@@ -250,6 +250,7 @@ public class GuiHandler {
         }
 
         if (!menus.get(openGuis.get(player.getUniqueId()).getFirst()).isCloseable() && !didClick) {
+            open(openGuis.get(player.getUniqueId()).getFirst(), player, openGuis.get(player.getUniqueId()).getSecond());
             return;
         }
 
