@@ -76,6 +76,7 @@ public class PlaceholderHandler {
             for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : builtinPlaceholders.entrySet()) {
                 try {
                     if (result.contains("%" + placeholder.getKey() + "%")) {
+                        System.out.println(placeholder.getKey());
                         final String value = placeholder.getValue().apply(player);
                         if (value == null) {
                             continue;
@@ -270,7 +271,8 @@ public class PlaceholderHandler {
                 return "";
             }
             try {
-                return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix();
+                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix();
+                return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
@@ -280,7 +282,8 @@ public class PlaceholderHandler {
                 return "";
             }
             try {
-                return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getSuffix();
+                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getSuffix();
+                return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
@@ -290,7 +293,8 @@ public class PlaceholderHandler {
                 return "";
             }
             try {
-                return LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrimaryGroup();
+                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrimaryGroup();
+                return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
