@@ -3,8 +3,6 @@ package com.danifoldi.bungeegui.main;
 import com.danifoldi.bungeegui.util.NumberUtil;
 import com.danifoldi.bungeegui.util.ProxyversionUtil;
 import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
-import de.exceptionflug.protocolize.api.traffic.TrafficData;
-import de.exceptionflug.protocolize.api.traffic.TrafficManager;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
 import net.md_5.bungee.api.ProxyServer;
