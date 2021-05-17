@@ -1,9 +1,7 @@
 package com.danifoldi.bungeegui.gui;
 
 import com.danifoldi.bungeegui.util.SoundUtil;
-import de.exceptionflug.protocolize.world.Sound;
 import de.exceptionflug.protocolize.world.SoundCategory;
-import de.exceptionflug.protocolize.world.WorldModule;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 

@@ -6,18 +6,15 @@ import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import de.exceptionflug.protocolize.world.SoundCategory;
-import de.exceptionflug.protocolize.world.WorldModule;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
