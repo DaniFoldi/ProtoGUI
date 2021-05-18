@@ -271,16 +271,7 @@ public class GuiHandler {
     }
 
     String getGuiName(GuiGrid gui) {
-        // TODO this needs to be improved
-        for (Map.Entry<String, GuiGrid> menu: menus.entrySet()) {
-            if (menu.getValue() != gui) {
-                continue;
-            }
-
-            return menu.getKey();
-        }
-
-        return "";
+        return menus.entrySet().stream().filter(m -> m.getValue().equals(gui)).map(Map.Entry::getKey).findFirst().orElse("");
     }
 
     List<String> getGuis() {

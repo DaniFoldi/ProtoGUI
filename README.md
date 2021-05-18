@@ -10,6 +10,7 @@
 - Full color support (with RGB where applicable) in all content
 - Many placeholders
 - Targeted GUIs
+- Utility commands that can be used as click actions or separately
 
 ## Setup tutorial
 
@@ -24,7 +25,7 @@ Optional dependencies: *PremiumVanish*, *LuckPerms*.
 
 ## Plugin configuration
 
-All data of the plugin is saved in the `config.yml` file of the plugin's folder. You can apply any changes and then `/bguireload` for the plugin to reload the config.
+All data of the plugin is saved in the `config.yml` file of the plugin's folder. You can apply any changes and then `/bgui reload` for the plugin to reload the config.
 
 
 **messages**
@@ -90,6 +91,8 @@ If a player does not have the permission to run the commands, you can still use 
 
 Setting many `owner:<UUID/name>` playerheads will delay the GUI opening, so unless you need it to be dynamic, `texture:<texture>` is recommended.
 
+Show the player their own head by setting the data to `owner:{player}`.
+
 See the example `config.yml` that is auto-generated or in the repository for some GUI ideas.
 
 You can specify multiple slots with one item, and they will be cloned.
@@ -103,6 +106,8 @@ You can specify multiple slots with one item, and they will be cloned.
 Valid sound list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/Sound.java)
 Valid soundcategory list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/SoundCategory.java)
 
+You can send custom sounds with `custom:<soundName>`.
+
 ___Expressions are evaluated in order___
 
 **configVersion**
@@ -110,6 +115,11 @@ ___Expressions are evaluated in order___
 This should say `3`. If there are any config changes, the value will be incremented. The conversion process should be automatic, unless the release notes say otherwise.
 
 ---
+
+## Commands
+
+The plugin registers the command `/bungeegui` with many subcommands that contain useful utility functions.
+A list of these will be added here shortly. You can view them in-game with instructions on how to use each.
 
 ## Placeholders
 
@@ -167,13 +177,15 @@ All messages support the placeholders in the table below. The API can be used to
 ## Permissions
 
 The default permission to open a GUI is `bungeegui.gui.<guiname>`. You can override this in the config of each GUI.
-The permission to reload the plugin is `bungeegui.command.reload`.
+The permission for each of the utility commands is `bungeegui.command.<command>`. You can see the complete list in-game by typing `/bgui`.
 
 ## API Usage
 
 BungeeGUI provides an API which you can use to open and close GUIs for players and more. You can obtain the API instance with `BungeeGuiAPI.getInstance()`.
 
 All available methods have JavaDocs provided in `BungeeGuiAPI.java`. [Click here](https://github.com/DaniFoldi/BungeeGUI/blob/main/src/main/java/com/danifoldi/bungeegui/main/BungeeGuiAPI.java) to see the available methods and how to use them.
+
+NOTE: the placeholder registry is currently in beta, and the API will likely be changed.
 
 ## Notes
 

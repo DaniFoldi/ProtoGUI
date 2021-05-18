@@ -21,28 +21,28 @@ public enum Message {
     SERVER_DISABLED("serverDisabled", "&cYou can't use this command on this server"),
     TARGET_BYPASS("targetBypass", "&cThis player can't be targeted with this command"),
     TARGET_NOT_FOUND("targetNotFound", "&cTarget {target} could not be found"),
-    RELOAD_SUCCESS("reloadSuccess", "&bPlugin reloaded successfully in &l{time}ms"),
-    COMMAND_HELP("commandHelp", "&7---- &6&l%bungeegui% help &7----"),
-    COMMAND_RELOAD("commandReload", "/bungeegui reload &7- Reload the plugin"),
-    COMMAND_GUIS("commandGuis", "/bungeegui guis &7- List the loaded GUIs"),
-    COMMAND_BROADCAST("commandBroadcast", "/bungeegui broadcast all|s:<server>|p:<player> <message> &7- Send a message to one or more players"),
-    COMMAND_LOG("commandLog", "/bungeegui log <message> &7- Log a message into the console"),
-    COMMAND_SEND("commandSend", "/bungeegui send all|s:<server>|p:<player> <send> &7- Send a player to a server"),
-    COMMAND_CHAT("commandChat", "/bungeegui chat <player> <message> &7- Send a message to chat as a player"),
-    COMMAND_ACTIONBAR("commandActionbar", "/bungeegui actionbar all|s:<server>|p:<player> <actionbar> &7- Show a player a message in their action bar"),
-    COMMAND_TITLE("commandTitle", "/bungeegui title all|s:<server>|p:<player> title|subtitle fadeIn stay fadeOut <message>"),
-    COMMAND_SOUND("commandSound", "/bungeegui sound all|s:<server>|p:<player> <sound> [soundcategory] [volume] [pitch]"),
-    COMMAND_OPEN("commandOpen", "/bungeegui open all|s:<server>|p:<player> <gui> [target]"),
-    COMMAND_CLOSE("commandClose", "/bungeegui close <player>"),
-    ACTION_COMPLETE("actionComplete", "&bAction completed for {count} players"),
+    RELOAD_SUCCESS("reloadSuccess", "&aPlugin reloaded successfully in &l{time}ms"),
+    COMMAND_HELP("commandHelp", "&0------------ &e&l%bungeegui% commands &0------------"),
+    COMMAND_RELOAD("commandReload", "&0- &6/bgui &lreload&r &0- &7Reload the plugin"),
+    COMMAND_GUIS("commandGuis", "&0- &6/bgui &lguis&r &0- &7List the loaded GUIs"),
+    COMMAND_BROADCAST("commandBroadcast", "&0- &6/bgui &lbroadcast&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<message> &0- &7Send a message to one or more players"),
+    COMMAND_LOG("commandLog", "&0- &6/bgui &llog&r &6<message> &0- &7Log a message into the console"),
+    COMMAND_SEND("commandSend", "&0- &6/bgui &lsend&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<server> &0- &7Send a player to a server"),
+    COMMAND_CHAT("commandChat", "&0- &6/bgui &lchat&r &6<player> &6<message> &0- &7Send a message to chat as a player"),
+    COMMAND_ACTIONBAR("commandActionbar", "&0- &6/bgui &lactionbar&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<text> &0- &7Show a player a message in their action bar"),
+    COMMAND_TITLE("commandTitle", "&0- &6/bgui &ltitle&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &7title&f|&7subtitle &6<fadeIn> &6<stay> &6<fadeOut> &6<message> &0- &7Send title to players"),
+    COMMAND_SOUND("commandSound", "&0- &6/bgui &lsound&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<sound> &6[category] &6[volume] &6[pitch] &0- &7Play a sound for players"),
+    COMMAND_OPEN("commandOpen", "&0- &6/bgui &lopen&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<gui> &6[target] &0- &7Open a GUI for players"),
+    COMMAND_CLOSE("commandClose", "&0- &6/bgui &lclose&r &6<player> &0- &7Close the GUI for players"),
+    ACTION_COMPLETE("actionComplete", "&aAction completed for {count} players"),
     GUI_NOT_FOUND("guiNotFound", "&cGUI {name} not found"),
     GUI_TARGET_REQUIRED("guiTargetRequired", "&cThis GUI requires a target player"),
     INVALID_PROPERTY("invalidProperty", "&cA property is invalid"),
     SERVER_NOT_FOUND("serverNotFound", "&cServer {name} not found"),
     EMPTY_MESSAGE("emptyMessage", "&cMessage can't be empty"),
     NO_PERMISSION("noPermission", "&cYou don't have permission to execute that command"),
-    GUI_LIST_TOP("guiListTop", "&6{count} GUIs are loaded:"),
-    GUI_LIST_ITEM("guiListItem", "&7- &6&l{name}");
+    GUI_LIST_TOP("guiListTop", "&a{count} GUIs are loaded:"),
+    GUI_LIST_ITEM("guiListItem", "&0- &6{name}");
 
     private static Map<String, String> messages = new HashMap<>();
     public static void setMessageProvider(Config config) {
@@ -72,6 +72,9 @@ public enum Message {
     public static String replace(String text, Pair<String, String>... replacements) {
         String result = text;
         for (Pair<String, String> replacement: replacements) {
+            if (replacement.getFirst() == null || replacement.getSecond() == null) {
+                continue;
+            }
             result = result.replace("{" + replacement.getFirst() + "}", replacement.getSecond());
         }
 
@@ -106,7 +109,7 @@ public enum Message {
 
     @SafeVarargs
     public final BaseComponent[] toComponent(ProxiedPlayer player, Pair<String, String>... replacements) {
-        if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
+        if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId) == null || Message.messages.get(messageId).equals("")) {
             toComponent(player, defaultValue, replacements);
         }
 

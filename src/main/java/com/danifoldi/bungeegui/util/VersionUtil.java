@@ -2,7 +2,7 @@ package com.danifoldi.bungeegui.util;
 
 import java.util.Arrays;
 
-public enum ProxyversionUtil {
+public enum VersionUtil {
     UNKNOWN	(999),
     v1_16_5 (754),
     v1_16_4	(754),
@@ -55,16 +55,16 @@ public enum ProxyversionUtil {
 
     private final int protocolVersion;
 
-    ProxyversionUtil(int protocolVersion) {
+    VersionUtil(int protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
 
-    public static ProxyversionUtil find(int protocolVersion) {
-        return Arrays.stream(ProxyversionUtil.values()).filter(p -> p.protocolVersion == protocolVersion).findFirst().orElse(UNKNOWN);
+    public static VersionUtil find(int protocolVersion) {
+        return Arrays.stream(VersionUtil.values()).filter(p -> p.protocolVersion == protocolVersion).findFirst().orElse(UNKNOWN);
     }
 
     public String getVersion() {
-        for (ProxyversionUtil version: ProxyversionUtil.values()) {
+        for (VersionUtil version: VersionUtil.values()) {
             if (version.protocolVersion == protocolVersion) {
                 return version.toString().replace("v", "").replace("_", ".");
             }

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class PluginCommand extends Command implements TabExecutor {
 
-    private final List<String> commands = List.of("actionbar", "broadcast", "chat", "close", "guis", "info", "log", "open", "reload", "send", "sound", "title");
+    private final List<String> commands = List.of("actionbar", "broadcast", "chat", "close", "guis", "log", "open", "reload", "send", "sound", "title");
     private final Logger logger;
 
     @Inject
@@ -98,7 +98,7 @@ public class PluginCommand extends Command implements TabExecutor {
 
                 ProxiedPlayer player = ProxyServer.getInstance().getPlayer(args[1]);
                 if (player == null) {
-                    sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(null));
+                    sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(null, Pair.of("target", args[1])));
                     return;
                 }
                 player.chat(Message.colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(player, skip(args, 2))));

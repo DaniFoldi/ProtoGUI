@@ -1,7 +1,7 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.util.NumberUtil;
-import com.danifoldi.bungeegui.util.ProxyversionUtil;
+import com.danifoldi.bungeegui.util.VersionUtil;
 import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
@@ -68,13 +68,12 @@ public class PlaceholderHandler {
         int iter = 0;
         boolean changed = true;
 
-        while (changed && iter < 16) {
+        while (changed && iter < 8) {
             changed = false;
 
             for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : builtinPlaceholders.entrySet()) {
                 try {
                     if (result.contains("%" + placeholder.getKey() + "%")) {
-                        System.out.println(placeholder.getKey());
                         final String value = placeholder.getValue().apply(player);
                         if (value == null) {
                             continue;
@@ -151,7 +150,7 @@ public class PlaceholderHandler {
             if (player == null) {
                 return "";
             }
-            return ProxyversionUtil.find(player.getPendingConnection().getVersion()).getVersion();
+            return VersionUtil.find(player.getPendingConnection().getVersion()).getVersion();
         });
         registerBuiltin("max", player -> String.valueOf(proxyServer.getConfig().getPlayerLimit()));
         registerBuiltin("online", player -> String.valueOf(proxyServer.getOnlineCount()));

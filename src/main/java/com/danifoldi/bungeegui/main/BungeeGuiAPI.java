@@ -1,6 +1,7 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.gui.GuiGrid;
+import io.netty.util.internal.UnstableApi;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -131,7 +132,9 @@ public class BungeeGuiAPI {
      * Register a custom placeholder for use later
      * @param name - the name of the placeholder without % symbols
      * @param placeholder - the function to be called on the player when the placeholder is requested
+     * @implNote if the function returns null, the placeholder isn't parsed, the argument can be null if the parse target is the console
      */
+    @UnstableApi
     public void registerPlaceholder(String name, Function<ProxiedPlayer, String> placeholder) {
         placeholderHandler.register(name, placeholder);
     }
@@ -140,6 +143,7 @@ public class BungeeGuiAPI {
      * Unregister a custom placeholder
      * @param name - the name of the placeholder to unregister
      */
+    @UnstableApi
     public void unregisterPlaceholder(String name) {
         placeholderHandler.unregister(name);
     }
@@ -150,6 +154,7 @@ public class BungeeGuiAPI {
      * @param text - the text to replace placeholders in
      * @return the text with the placeholders replaced
      */
+    @UnstableApi
     public String parsePlaceholders(ProxiedPlayer player, String text) {
         return placeholderHandler.parse(player, text);
     }
