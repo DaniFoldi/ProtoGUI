@@ -14,7 +14,7 @@
 
 ## Setup tutorial
 
-Dependencies: **Protocolize** is required. Please make sure you have it installed, or the plugin will fail to load.
+Dependencies: [**Protocolize**](https://www.spigotmc.org/resources/protocolize-protocollib-for-bungeecord-waterfall-aegis.63778/) is required. Please make sure you have it installed, or the plugin will fail to load.
 Download the latest version from either GitHub or Spigot, put it into the `plugins` folder of your Bungee, and you're done.
 
 Of course, you will probably want to customize the GUIs of the plugin. For that, see the example `config.yml` [here](https://github.com/DaniFoldi/BungeeGUI/blob/main/src/main/resources/config.yml), and below for explanations.
@@ -87,7 +87,7 @@ All commands, gui titles, item names, lores support the `{player}` and `{target}
 
 Set the `commands` of an item to `['']` to create a _close_ interaction, empty commands are ignored. Omit the `commands` property if you don't want an item to close the GUI.
 
-If a player does not have the permission to run the commands, you can still use the API (see below) to open the GUI for them.
+If a player does not have the permission to run the commands, you can still use the API or helper command (see below) to open the GUI for them.
 
 Setting many `owner:<UUID/name>` playerheads will delay the GUI opening, so unless you need it to be dynamic, `texture:<texture>` is recommended.
 
@@ -104,6 +104,7 @@ You can specify multiple slots with one item, and they will be cloned.
 - You can add or remove a slot from the list.
 
 Valid sound list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/Sound.java)
+
 Valid soundcategory list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/SoundCategory.java)
 
 You can send custom sounds with `custom:<soundName>`.
@@ -123,7 +124,7 @@ A list of these will be added here shortly. You can view them in-game with instr
 
 ## Placeholders
 
-All messages support the placeholders in the table below. The API can be used to register additional placeholders. You can escape placeholders with `%%`.
+All messages support the placeholders in the table below. The API can be used to register additional placeholders.
 
 | Placeholder | Description |
 | ----------- | ----------- |
