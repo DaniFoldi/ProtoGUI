@@ -18,7 +18,7 @@ dependencies {
     compileOnly 'io.github.waterfallmc:waterfall-api:1.16-R0.4-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-api:1.6.8-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-items:1.6.7-SNAPSHOT'
-    compileOnly 'de.exceptionflug:protocolize-inventory:1.6.7-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-inventory:1.6.8-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-world:1.6.8-SNAPSHOT'
 
     compileOnly 'net.luckperms:api:5.3'
