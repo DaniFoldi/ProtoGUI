@@ -36,6 +36,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy('include')
     from(sourceSets.main.resources) {
         expand version: project.version
     }
