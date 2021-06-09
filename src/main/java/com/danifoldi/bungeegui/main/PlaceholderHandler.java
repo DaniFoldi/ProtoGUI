@@ -1,10 +1,12 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.util.NumberUtil;
+import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.VersionUtil;
 import de.exceptionflug.protocolize.api.protocol.ProtocolAPI;
 import de.myzelyam.api.vanish.BungeeVanishAPI;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -23,6 +25,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class PlaceholderHandler {
@@ -59,10 +63,6 @@ public class PlaceholderHandler {
         builtinPlaceholders.putIfAbsent(name, placeholder);
     }
 
-    void unregisterBuiltin(String name) {
-        builtinPlaceholders.remove(name);
-    }
-
     String parse(ProxiedPlayer player, String text) {
         String result = text;
         int iter = 0;
@@ -71,37 +71,24 @@ public class PlaceholderHandler {
         while (changed && iter < 8) {
             changed = false;
 
-            for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : builtinPlaceholders.entrySet()) {
+            for (Pair<String, Function<ProxiedPlayer, String>> placeholderPair : Stream.concat(builtinPlaceholders.entrySet().stream(), placeholders.entrySet().stream()).map(e -> Pair.of(e.getKey(), e.getValue())).collect(Collectors.toList())) {
+                String placeholder = placeholderPair.getFirst();
+                Function<ProxiedPlayer, String> function = placeholderPair.getSecond();
                 try {
-                    if (result.contains("%" + placeholder.getKey() + "%")) {
-                        final String value = placeholder.getValue().apply(player);
+                    if (result.contains("%" + placeholder + "%")) {
+                        final String value = function.apply(player);
                         if (value == null) {
                             continue;
                         }
-                        result = result.replace("%" + placeholder.getKey() + "%", value);
+                        result = result.replace("%" + placeholder + "%", value);
                         changed = true;
                     }
                 } catch (Exception e) {
-                    logger.warning("Placeholder " + placeholder.getKey() + " couldn't be processed");
+                    logger.warning("Placeholder " + placeholder + " couldn't be processed");
                     e.printStackTrace();
                 }
             }
 
-            for (Map.Entry<String, Function<ProxiedPlayer, String>> placeholder : placeholders.entrySet()) {
-                try {
-                    if (result.contains("%" + placeholder.getKey() + "%")) {
-                        final String value = placeholder.getValue().apply(player);
-                        if (value == null) {
-                            continue;
-                        }
-                        result = result.replace("%" + placeholder.getKey() + "%", value);
-                        changed = true;
-                    }
-                } catch (Exception e) {
-                    logger.warning("Placeholder " + placeholder.getKey() + " couldn't be processed");
-                    e.printStackTrace();
-                }
-            }
             iter++;
         }
 
@@ -122,7 +109,7 @@ public class PlaceholderHandler {
         refreshData = proxyServer.getScheduler().schedule(plugin, () -> {
             for (ServerInfo server: proxyServer.getServersCopy().values()) {
                 server.ping((ping, error) -> {
-                    if (lastStatus.containsKey(server) && lastStatus.get(server) != (boolean)(error != null)) {
+                    if (lastStatus.containsKey(server) && lastStatus.get(server) == (error == null)) {
                         if (error != null) {
                             logger.info("Server " + server.getName() + " no longer available");
                         } else {
@@ -171,6 +158,13 @@ public class PlaceholderHandler {
             }
             return player.getDisplayName();
         });
+        registerBuiltin("uuid", player -> {
+            if (player == null) {
+                return "";
+            }
+
+            return player.getUniqueId().toString();
+        });
         registerBuiltin("name", player -> {
             if (player == null) {
                 return "";
@@ -189,6 +183,7 @@ public class PlaceholderHandler {
                 return "No";
             }
             if (pluginManager.getPlugin("PremiumVanish") != null) {
+                //noinspection ConstantConditions
                 return BungeeVanishAPI.isInvisible(player) ? "Yes" : "No";
             } else {
                 return "No";
@@ -263,12 +258,30 @@ public class PlaceholderHandler {
             return String.valueOf(ProtocolAPI.getTrafficManager().getTrafficData(player.getName()).getUpstreamOutputLastMinute());
         });
 
+        registerBuiltin("luckperms_friendlyname", player -> {
+            if (player == null) {
+                return "";
+            }
+            try {
+                User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+                if (user == null) {
+                    return "";
+                }
+                return user.getFriendlyName();
+            } catch (IllegalStateException | NullPointerException e) {
+                return "";
+            }
+        });
         registerBuiltin("luckperms_prefix", player -> {
             if (player == null) {
                 return "";
             }
             try {
-                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix();
+                User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+                if (user == null) {
+                    return "";
+                }
+                String value = user.getCachedData().getMetaData().getPrefix();
                 return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
@@ -279,7 +292,11 @@ public class PlaceholderHandler {
                 return "";
             }
             try {
-                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getSuffix();
+                User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+                if (user == null) {
+                    return "";
+                }
+                String value = user.getCachedData().getMetaData().getSuffix();
                 return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
@@ -290,7 +307,11 @@ public class PlaceholderHandler {
                 return "";
             }
             try {
-                String value = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrimaryGroup();
+                User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+                if (user == null) {
+                    return "";
+                }
+                String value = user.getCachedData().getMetaData().getPrimaryGroup();
                 return value == null ? "" : value;
             } catch (IllegalStateException | NullPointerException e) {
                 return "";
@@ -298,6 +319,14 @@ public class PlaceholderHandler {
         });
 
         for (Map.Entry<String, ServerInfo> server: proxyServer.getServersCopy().entrySet()) {
+            registerBuiltin("status@" + server.getKey(), player -> {
+                boolean online = lastStatus.get(server.getValue());
+                return online ? "Online" : "Offline";
+            });
+            registerBuiltin("is_online@" + server.getKey(), player -> {
+                boolean online = lastStatus.get(server.getValue());
+                return online ? "Yes" : "No";
+            });
             registerBuiltin("online_visible@" + server.getKey(), player -> {
                 ServerPing ping = latestPing.getOrDefault(server.getValue(), null);
                 if (ping == null) {

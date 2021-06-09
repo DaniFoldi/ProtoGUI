@@ -141,6 +141,7 @@ All messages support the placeholders in the table below. The API can be used to
 |`%online_visible%`|Number of players online that are not vanished _(PV required)_|
 |`%max%`|Maximum number of online players|
 |`%name%`|Player name|
+|`%uuid%`|Player UUID|
 |`%displayname%`|Player displayname|
 |`%locale%`|The locale used by the player|
 |`%version%`|The game version used by the player|
@@ -156,9 +157,12 @@ All messages support the placeholders in the table below. The API can be used to
 |`%traffic_downstream_output_last_minute%`|Traffic sent downstream in the last minute|
 |`%traffic_upstream_input_last_minute%`|Traffic received upstream in the last minute|
 |`%traffic_upstream_output_last_minute%`|Traffic sent upstream in the last minute|
+|`%luckperms_friendlyname%`|The friendly name of the player as set in LP _(LP required)_|
 |`%luckperms_prefix%`|The prefix of the player _(LP required)_|
 |`%luckperms_suffix%`|The suffix of the player _(LP required)_|
 |`%luckperms_group%`|The primary group of the player _(LP required)_|
+|`%is_online@<servername>%`|Whether the server is online or not _(Updates every 5 seconds)_|
+|`%status@<servername>%`|Returns Online / Offline based on the last ping _(Updates every 5 seconds)_|
 |`%online@<servername>%`|Number of players connected to a server _(Updates every 5 seconds)_|
 |`%online_visible@<servername>%`|Number of players not in vanish connected to a server  _(Updates every 5 seconds, PV required)_|
 |`%max@<servername>%`|Maximum number of players connected to a server _(Updates every 5 seconds)_|
