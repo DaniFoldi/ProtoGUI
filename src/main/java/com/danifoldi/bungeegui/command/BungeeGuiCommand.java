@@ -9,6 +9,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -18,21 +20,21 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
 
     private final String name;
 
-    public BungeeGuiCommand(String name) {
+    public BungeeGuiCommand(final @NotNull String name) {
         super(BungeeGuiAPI.getInstance().getGui(name).getCommandAliases().stream().findFirst().orElseThrow(), BungeeGuiAPI.getInstance().getGui(name).getPermission(), BungeeGuiAPI.getInstance().getGui(name).getCommandAliases().stream().skip(1L).toArray(String[]::new));
         this.name = name;
     }
 
     @Override
-    public void execute(CommandSender sender, String[] args) {
+    public void execute(final @NotNull CommandSender sender, final @NotNull String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(Message.PLAYER_ONLY.toComponent(null));
             return;
         }
 
-        ProxiedPlayer player = (ProxiedPlayer)sender;
+        final @NotNull ProxiedPlayer player = (ProxiedPlayer)sender;
 
-        String server = ((ProxiedPlayer)sender).getServer().getInfo().getName();
+        final @NotNull String server = ((ProxiedPlayer)sender).getServer().getInfo().getName();
         if (BungeeGuiAPI.getInstance().getGui(name).getBlacklistServers().contains(server)) {
             Message.SERVER_DISABLED.send(player);
             return;
@@ -47,9 +49,9 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
             return;
         }
 
-        String target = args.length == 0 ? "" : args[0];
+        @NotNull String target = args.length == 0 ? "" : args[0];
         if (BungeeGuiAPI.getInstance().getGui(name).isRequireOnlineTarget()) {
-            ProxiedPlayer targetPlayer = ProxyServer.getInstance().getPlayer(target);
+            final @Nullable ProxiedPlayer targetPlayer = ProxyServer.getInstance().getPlayer(target);
             if (targetPlayer == null) {
                 Message.TARGET_NOT_FOUND.send(player, Pair.of("target", target));
                 return;
@@ -78,7 +80,7 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
     }
 
     @Override
-    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+    public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
         if (!BungeeGuiAPI.getInstance().getGui(name).isTargeted()) {
             return Collections.emptyList();
         }
@@ -86,7 +88,7 @@ public class BungeeGuiCommand extends Command implements TabExecutor {
             return Collections.emptyList();
         }
 
-        final String filter = args.length == 0 ? "" : args[args.length - 1];
+        final @NotNull String filter = args.length == 0 ? "" : args[args.length - 1];
         return ProxyServer
                 .getInstance()
                 .getPlayers()

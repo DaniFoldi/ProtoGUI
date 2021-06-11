@@ -13,6 +13,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -25,17 +27,17 @@ import java.util.stream.Collectors;
 
 public class PluginCommand extends Command implements TabExecutor {
 
-    private final List<String> commands = List.of("actionbar", "broadcast", "chat", "close", "guis", "log", "open", "reload", "send", "sound", "title");
-    private final Logger logger;
+    private final @NotNull List<String> commands = List.of("actionbar", "broadcast", "chat", "close", "guis", "log", "open", "reload", "send", "sound", "title");
+    private final @NotNull Logger logger;
 
     @Inject
-    public PluginCommand(Logger logger) {
+    public PluginCommand(final @NotNull Logger logger) {
         super("bungeegui", "bungeegui.command", "bgui");
         this.logger = logger;
     }
 
     @Override
-    public void execute(CommandSender sender, String[] args) {
+    public void execute(final @NotNull CommandSender sender, final @NotNull String[] args) {
         if (args.length == 0 || !commands.contains(args[0].toLowerCase(Locale.ROOT))) {
             sender.sendMessage(Message.COMMAND_HELP.toComponent(null));
             sender.sendMessage(Message.COMMAND_ACTIONBAR.toComponent(null));
@@ -81,7 +83,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     sender.sendMessage(Message.EMPTY_MESSAGE.toComponent(null));
                     return;
                 }
-                Collection<ProxiedPlayer> players = targets(args[1]);
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
                 players.forEach(p -> p.sendMessage(Message.toComponent(p, skip(args, 2))));
                 sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
                 break;
@@ -96,7 +98,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(args[1]);
+                final @Nullable ProxiedPlayer player = ProxyServer.getInstance().getPlayer(args[1]);
                 if (player == null) {
                     sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(null, Pair.of("target", args[1])));
                     return;
@@ -110,7 +112,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                Collection<ProxiedPlayer> players = targets(args[1]);
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
                 players.forEach(BungeeGuiAPI.getInstance()::closeGui);
 
                 sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
@@ -118,7 +120,7 @@ public class PluginCommand extends Command implements TabExecutor {
             }
             case "guis": {
                 sender.sendMessage(Message.GUI_LIST_TOP.toComponent(null, Pair.of("count", String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()))));
-                for (String name : BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
+                for (final @NotNull String name: BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
                     sender.sendMessage(Message.GUI_LIST_ITEM.toComponent(null, Pair.of("name", name)));
                 }
                 break;
@@ -141,7 +143,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
                     return;
                 }
-                String gui = args[2];
+                final @NotNull String gui = args[2];
 
                 if (BungeeGuiAPI.getInstance().getGui(gui) == null) {
                     sender.sendMessage(Message.GUI_NOT_FOUND.toComponent(null, Pair.of("name", gui)));
@@ -152,13 +154,13 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                Collection<ProxiedPlayer> players = targets(args[1]);
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
                 players.forEach(p -> BungeeGuiAPI.getInstance().openGui(p, gui, args.length < 4 ? "" : args[3]));
                 sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
                 break;
             }
             case "reload": {
-                long length = BungeeGuiAPI.getInstance().reloadGuis();
+                final long length = BungeeGuiAPI.getInstance().reloadGuis();
                 sender.sendMessage(Message.RELOAD_SUCCESS.toComponent(null, Pair.of("time", String.valueOf(length))));
                 break;
             }
@@ -172,14 +174,14 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                ServerInfo server = ProxyServer.getInstance().getServerInfo(args[2]);
+                final @Nullable ServerInfo server = ProxyServer.getInstance().getServerInfo(args[2]);
 
                 if (server == null) {
                     sender.sendMessage(Message.SERVER_NOT_FOUND.toComponent(null, Pair.of("name", args[2])));
                     return;
                 }
 
-                Collection<ProxiedPlayer> players = targets(args[1]);
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
                 players.forEach(p -> p.connect(server));
                 sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
                 break;
@@ -198,7 +200,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                SoundCategory category = SoundCategory.MASTER;
+                @NotNull SoundCategory category = SoundCategory.MASTER;
                 if (args.length > 3) {
                     try {
                         category = SoundCategory.valueOf(args[3]);
@@ -217,7 +219,6 @@ public class PluginCommand extends Command implements TabExecutor {
                 }
 
                 float pitch = 1f;
-
                 if (args.length > 5) {
                     try {
                         pitch = Float.parseFloat(args[5]);
@@ -226,8 +227,8 @@ public class PluginCommand extends Command implements TabExecutor {
                     }
                 }
 
-                Collection<ProxiedPlayer> players = targets(args[1]);
-                for (ProxiedPlayer player: players) {
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
+                for (final @NotNull ProxiedPlayer player: players) {
                     SoundUtil.playSound(player, args[2], category, volume, pitch);
                 }
                 sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
@@ -239,34 +240,32 @@ public class PluginCommand extends Command implements TabExecutor {
                     return;
                 }
 
-                boolean isSubtitle = false;
-                if (args[2].equalsIgnoreCase("subtitle")) {
-                    isSubtitle = true;
-                }
+                final boolean isSubtitle = args[2].equalsIgnoreCase("subtitle");
 
                 int fadeIn = 20;
-                int stay = 60;
-                int fadeOut = 20;
-
                 try {
                     fadeIn = Integer.parseInt(args[3]);
                 } catch (NumberFormatException ignored) {
 
                 }
+
+                int stay = 60;
                 try {
                     stay = Integer.parseInt(args[4]);
                 } catch (NumberFormatException ignored) {
 
                 }
+
+                int fadeOut = 20;
                 try {
                     fadeOut = Integer.parseInt(args[5]);
                 } catch (NumberFormatException ignored) {
 
                 }
 
-                Collection<ProxiedPlayer> players = targets(args[1]);
+                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
 
-                for (ProxiedPlayer player: players) {
+                for (final @NotNull ProxiedPlayer player: players) {
                     if (isSubtitle) {
                         ProxyServer.getInstance().createTitle().subTitle(Message.toComponent(player, skip(args, 6))).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(player);
                     } else {
@@ -280,12 +279,12 @@ public class PluginCommand extends Command implements TabExecutor {
         }
     }
 
-    private Collection<ProxiedPlayer> targets(String value) {
+    private @NotNull Collection<ProxiedPlayer> targets(String value) {
         if (value.equals("all")) {
             return ProxyServer.getInstance().getPlayers();
         }
 
-        Pair<String, String> target = StringUtil.get(value);
+        final @NotNull Pair<String, String> target = StringUtil.get(value);
         switch (target.getFirst().toLowerCase(Locale.ROOT)) {
             case "p":
                 return List.of(ProxyServer.getInstance().getPlayer(target.getSecond()));
@@ -296,12 +295,12 @@ public class PluginCommand extends Command implements TabExecutor {
         }
     }
 
-    private String skip(String[] values, int elements) {
+    private @NotNull String skip(final @NotNull String[] values, final int elements) {
         return Arrays.stream(values).skip(elements).collect(Collectors.joining(" "));
     }
 
     @Override
-    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+    public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
         if (args.length <= 1) {
             return commands
                     .stream()
@@ -310,7 +309,7 @@ public class PluginCommand extends Command implements TabExecutor {
                     .collect(Collectors.toList());
         }
 
-        String command = args[0].toLowerCase(Locale.ROOT);
+        final @NotNull String command = args[0].toLowerCase(Locale.ROOT);
         if (!sender.hasPermission("bungeegui.command." + command)) {
             return Collections.emptyList();
         }

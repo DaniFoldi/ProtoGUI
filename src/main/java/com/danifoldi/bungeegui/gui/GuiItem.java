@@ -10,14 +10,14 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 public class GuiItem {
-    private final ItemType type;
+    private final @NotNull ItemType type;
     private final int amount;
-    private final String name;
-    private final List<String> lore;
+    private final @NotNull String name;
+    private final @NotNull List<String> lore;
     private final String data;
-    private final List<String> commands;
+    private final @NotNull List<String> commands;
     private final boolean enchanted;
-    private final GuiSound clickSound;
+    private final @Nullable GuiSound clickSound;
 
     private GuiItem(final @NotNull ItemType type,
                     final int amount,
@@ -65,12 +65,12 @@ public class GuiItem {
         return this.enchanted;
     }
 
-    public GuiSound getClickSound() {
+    public @Nullable GuiSound getClickSound() {
         return this.clickSound;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "GuiItem{type=" + this.type
                 + ", amount=" + this.amount
                 + ", name=" + this.name
@@ -102,19 +102,19 @@ public class GuiItem {
         return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchanted, this.clickSound);
     }
 
-    public static Builder builder() {
+    public static @NotNull Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
-        private ItemType type;
+        private @Nullable ItemType type;
         private int amount;
-        private String name;
-        private List<String> lore;
-        private String data;
-        private List<String> commands;
+        private @Nullable String name;
+        private @Nullable List<String> lore;
+        private @Nullable String data;
+        private @Nullable List<String> commands;
         private boolean enchanted;
-        private GuiSound clickSound;
+        private @Nullable GuiSound clickSound;
 
         private Builder() {}
 
@@ -176,7 +176,7 @@ public class GuiItem {
         }
     }
 
-    public GuiItem copy() {
+    public @NotNull GuiItem copy() {
         return new GuiItem(type,
                 amount,
                 name,

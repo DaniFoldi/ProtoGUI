@@ -7,6 +7,8 @@ import dagger.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.scheduler.TaskScheduler;
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 import java.nio.file.Path;
@@ -16,30 +18,29 @@ import java.util.logging.Logger;
 @Component
 public interface BungeeGuiComponent {
 
-    BungeeGuiLoader loader();
+    @NotNull BungeeGuiLoader loader();
 
     @Component.Builder
     interface Builder {
 
         @BindsInstance
-        Builder plugin(final BungeeGuiPlugin plugin);
+        Builder plugin(final @NotNull BungeeGuiPlugin plugin);
 
         @BindsInstance
-        Builder logger(final Logger logger);
+        Builder logger(final @NotNull Logger logger);
 
         @BindsInstance
-        Builder proxyServer(final ProxyServer proxyServer);
+        Builder proxyServer(final @NotNull ProxyServer proxyServer);
 
         @BindsInstance
-        Builder scheduler(final TaskScheduler scheduler);
+        Builder scheduler(final @NotNull TaskScheduler scheduler);
 
         @BindsInstance
-        Builder pluginManager(final PluginManager pluginManager);
+        Builder pluginManager(final @NotNull PluginManager pluginManager);
 
         @BindsInstance
-        Builder datafolder(final Path datafolder);
+        Builder datafolder(final @NotNull Path datafolder);
 
         BungeeGuiComponent build();
-
     }
 }

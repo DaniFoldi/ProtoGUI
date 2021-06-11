@@ -121,7 +121,7 @@ public class GuiHandler {
                         .items(itemMap)
                         .targeted(guiData.getOrElse("targeted", false))
                         .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
-                        .permssion(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                        .permission(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
                         .size(size)
                         .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
                         .selfTarget(guiData.getOrElse("selfTarget", true))

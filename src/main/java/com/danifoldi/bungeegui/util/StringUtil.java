@@ -3,6 +3,7 @@ package com.danifoldi.bungeegui.util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class StringUtil {
@@ -21,9 +22,11 @@ public class StringUtil {
         return Pair.of(a, b);
     }
 
-    public static List<String> blockPrint(String value) {
+    public static void blockPrint(Consumer<String> action, String value) {
         final String mid = " ".repeat(6) + value + " ".repeat(6);
-        return List.of("-".repeat(mid.length()), " ".repeat(mid.length()), mid, " ".repeat(mid.length()), "-".repeat(mid.length()));
+        List<String> lines = List.of("-".repeat(mid.length()), " ".repeat(mid.length()), mid, " ".repeat(mid.length()), "-".repeat(mid.length()));
+
+        lines.forEach(action);
     }
 
     private StringUtil() {

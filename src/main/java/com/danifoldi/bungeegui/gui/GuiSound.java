@@ -4,13 +4,16 @@ import com.danifoldi.bungeegui.util.SoundUtil;
 import de.exceptionflug.protocolize.world.SoundCategory;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 public class GuiSound {
 
-    private final String soundName;
-    private final SoundCategory soundCategory;
+    private final @NotNull String soundName;
+    private final @NotNull SoundCategory soundCategory;
     private final float volume;
     private final float pitch;
 
@@ -24,11 +27,11 @@ public class GuiSound {
         this.pitch = pitch;
     }
 
-    public String getSoundName() {
+    public @NotNull String getSoundName() {
         return this.soundName;
     }
 
-    public SoundCategory getSoundCategory() {
+    public @NotNull SoundCategory getSoundCategory() {
         return this.soundCategory;
     }
 
@@ -45,11 +48,11 @@ public class GuiSound {
             return;
         }
 
-        SoundUtil.playSound(player, soundName, soundCategory, volume, pitch);
+        SoundUtil.playSound(player, getSoundName(), getSoundCategory(), getVolume(), getPitch());
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "GuiSound{" +
                 "soundName=" + soundName +
                 ", soundCategory=" + soundCategory +
@@ -71,13 +74,13 @@ public class GuiSound {
         return Objects.hash(soundName, soundCategory, volume, pitch);
     }
 
-    public static Builder builder() {
+    public static @NotNull Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
-        private String soundName;
-        private SoundCategory soundCategory;
+        private @Nullable String soundName;
+        private @Nullable SoundCategory soundCategory;
         private float volume;
         private float pitch;
 
@@ -108,15 +111,15 @@ public class GuiSound {
 
         public @NotNull GuiSound build() {
             return new GuiSound(
-                    soundName,
-                    soundCategory,
+                    requireNonNull(soundName),
+                    requireNonNull(soundCategory),
                     volume,
                     pitch
             );
         }
     }
 
-    public GuiSound copy() {
+    public @NotNull GuiSound copy() {
         return new GuiSound(soundName, soundCategory, volume, pitch);
     }
 }

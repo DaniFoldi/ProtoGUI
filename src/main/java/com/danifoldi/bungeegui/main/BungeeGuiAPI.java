@@ -17,17 +17,17 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class BungeeGuiAPI {
 
-    private static BungeeGuiAPI apiInstance;
-    public static BungeeGuiAPI getInstance() {
+    private static @Nullable BungeeGuiAPI apiInstance;
+    public static @Nullable BungeeGuiAPI getInstance() {
         return apiInstance;
     }
-    static void setInstance(BungeeGuiAPI apiInstance) {
+    static void setInstance(final @Nullable BungeeGuiAPI apiInstance) {
         BungeeGuiAPI.apiInstance = apiInstance;
     }
 
-    private final GuiHandler guiHandler;
-    private final BungeeGuiLoader loader;
-    private final PlaceholderHandler placeholderHandler;
+    private final @NotNull GuiHandler guiHandler;
+    private final @NotNull BungeeGuiLoader loader;
+    private final @NotNull PlaceholderHandler placeholderHandler;
 
     @Inject
     BungeeGuiAPI(final @NotNull GuiHandler guiHandler,

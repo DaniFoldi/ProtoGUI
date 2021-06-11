@@ -60,7 +60,7 @@ public class GuiGrid {
         this.notifyTarget = notifyTarget;
     }
 
-    public Map<Integer, GuiItem> getItems() {
+    public @NotNull Map<Integer, GuiItem> getItems() {
         return Map.copyOf(this.items);
     }
 
@@ -68,11 +68,11 @@ public class GuiGrid {
         return this.isTargeted;
     }
 
-    public List<String> getCommandAliases() {
+    public @NotNull List<String> getCommandAliases() {
         return List.copyOf(this.commandAliases);
     }
 
-    public String getPermission() {
+    public @NotNull String getPermission() {
         return this.permission;
     }
 
@@ -80,7 +80,7 @@ public class GuiGrid {
         return this.guiSize;
     }
 
-    public String getTitle() {
+    public @NotNull String getTitle() {
         return this.title;
     }
 
@@ -96,11 +96,11 @@ public class GuiGrid {
         return this.requireOnlineTarget;
     }
 
-    public List<String> getWhitelistServers() {
+    public @NotNull List<String> getWhitelistServers() {
         return List.copyOf(this.whitelistServers);
     }
 
-    public List<String> getBlacklistServers() {
+    public @NotNull List<String> getBlacklistServers() {
         return List.copyOf(this.blacklistServers);
     }
 
@@ -124,27 +124,27 @@ public class GuiGrid {
         return this.notifyTarget;
     }
 
-    public static Builder builder() {
+    public static @NotNull Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
-        private Map<Integer, GuiItem> items;
+        private @Nullable Map<Integer, GuiItem> items;
         private boolean isTargeted;
-        private List<String> commandAliases;
-        private String permission;
+        private @Nullable List<String> commandAliases;
+        private @Nullable String permission;
         private int guiSize;
-        private String title;
+        private @Nullable String title;
         private boolean selfTarget;
         private boolean ignoreVanished;
         private boolean requireOnlineTarget;
-        private List<String> whitelistServers;
-        private List<String> blacklistServers;
+        private @Nullable List<String> whitelistServers;
+        private @Nullable List<String> blacklistServers;
         private boolean placeholdersTarget;
-        private GuiSound openSound;
+        private @Nullable GuiSound openSound;
         private boolean targetBypass;
         private boolean closeable;
-        private String notifyTarget;
+        private @Nullable String notifyTarget;
 
         private Builder() {}
 
@@ -163,7 +163,7 @@ public class GuiGrid {
             return this;
         }
 
-        public @NotNull Builder permssion(final @NotNull String permission) {
+        public @NotNull Builder permission(final @NotNull String permission) {
             this.permission = permission;
             return this;
         }

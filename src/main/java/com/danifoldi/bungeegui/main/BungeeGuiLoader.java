@@ -28,12 +28,13 @@ public class BungeeGuiLoader {
     private final PluginCommand command;
     private final BungeeGuiListener listener;
 
+    @SuppressWarnings("unused")
     private enum LogLevel {
         OFF(Level.OFF), SEVERE(Level.SEVERE), WARNING(Level.WARNING), INFO(Level.INFO), CONFIG(Level.CONFIG), FINE(Level.FINE), FINER(Level.FINER), FINEST(Level.FINEST), ALL(Level.ALL);
 
-        private Level level;
+        private final @NotNull Level level;
 
-        LogLevel(Level level) {
+        LogLevel(final @NotNull Level level) {
             this.level = level;
         }
     }
@@ -58,7 +59,7 @@ public class BungeeGuiLoader {
     }
 
     void load() {
-        StringUtil.blockPrint("Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
+        StringUtil.blockPrint(logger::info, "Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion());
 
         pluginManager.registerCommand(plugin, command);
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
@@ -73,16 +74,16 @@ public class BungeeGuiLoader {
             guiHandler.load(config);
             Message.setMessageProvider(config);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
-                StringUtil.blockPrint("BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as {file})".replace("{file}", ConfigUtil.backupAndUpgrade(config))).forEach(logger::warning);
+                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as {file})".replace("{file}", ConfigUtil.backupAndUpgrade(config)));
             }
 
             if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
-                StringUtil.blockPrint("BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.").forEach(logger::warning);
+                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.");
             }
 
             pluginManager.registerListener(plugin, listener);
         } catch (IOException e) {
-            StringUtil.blockPrint("Could not enable plugin, please see the error below").forEach(logger::severe);
+            StringUtil.blockPrint(logger::severe, "Could not enable plugin, please see the error below");
             logger.severe(e.getMessage());
             e.printStackTrace();
         }
@@ -92,13 +93,13 @@ public class BungeeGuiLoader {
                logger.warning("Could not check for updates");
            }
            if (!newest.equals(plugin.getDescription().getVersion())) {
-               StringUtil.blockPrint("You are not running the latest version of BungeeGUI. Please update for bugfixes and new features.").forEach(logger::warning);
+               StringUtil.blockPrint(logger::warning, "You are not running the latest version of BungeeGUI. Please update for bugfixes and new features.");
            }
         });
     }
 
     void unload() {
-        StringUtil.blockPrint("Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion()).forEach(logger::info);
+        StringUtil.blockPrint(logger::info, "Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion());
 
         guiHandler.getGuis().forEach(guiHandler::removeGui);
         placeholderHandler.unregisterAll();
