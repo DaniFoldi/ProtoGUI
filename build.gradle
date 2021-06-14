@@ -19,7 +19,7 @@ dependencies {
     compileOnly 'de.exceptionflug:protocolize-api:1.7.0-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-items:1.6.8-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-inventory:1.7.0-SNAPSHOT'
-    compileOnly 'de.exceptionflug:protocolize-world:1.6.8-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-world:1.7.0-SNAPSHOT'
 
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.6.3'
