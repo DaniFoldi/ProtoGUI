@@ -14,7 +14,7 @@ public class GuiItem {
     private final int amount;
     private final @NotNull String name;
     private final @NotNull List<String> lore;
-    private final String data;
+    private final @NotNull String data;
     private final @NotNull List<String> commands;
     private final boolean enchanted;
     private final @Nullable GuiSound clickSound;

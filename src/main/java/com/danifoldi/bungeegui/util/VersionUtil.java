@@ -1,9 +1,12 @@
 package com.danifoldi.bungeegui.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 
 public enum VersionUtil {
     UNKNOWN	(999),
+    v1_17   (755),
     v1_16_5 (754),
     v1_16_4	(754),
     v1_16_3	(753),
@@ -35,6 +38,15 @@ public enum VersionUtil {
     v1_9_2	(109),
     v1_9_1	(108),
     v1_9	(107),
+    v1_8_9	(47),
+    v1_8_8	(47),
+    v1_8_7	(47),
+    v1_8_6	(47),
+    v1_8_5	(47),
+    v1_8_4	(47),
+    v1_8_3	(47),
+    v1_8_2	(47),
+    v1_8_1	(47),
     v1_8	(47),
     v1_7_10	(5),
     v1_7_9	(5),
@@ -55,15 +67,15 @@ public enum VersionUtil {
 
     private final int protocolVersion;
 
-    VersionUtil(int protocolVersion) {
+    VersionUtil(final int protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
 
-    public static VersionUtil find(int protocolVersion) {
+    public static @NotNull VersionUtil find(final int protocolVersion) {
         return Arrays.stream(VersionUtil.values()).filter(p -> p.protocolVersion == protocolVersion).findFirst().orElse(UNKNOWN);
     }
 
-    public String getVersion() {
+    public @NotNull String getVersion() {
         for (VersionUtil version: VersionUtil.values()) {
             if (version.protocolVersion == protocolVersion) {
                 return version.toString().replace("v", "").replace("_", ".");

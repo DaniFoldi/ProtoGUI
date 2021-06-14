@@ -9,17 +9,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GuiGrid {
-    private final Map<Integer, GuiItem> items;
+    private final @NotNull Map<Integer, GuiItem> items;
     private final boolean isTargeted;
-    private final List<String> commandAliases;
-    private final String permission;
+    private final @NotNull List<String> commandAliases;
+    private final @NotNull String permission;
     private final int guiSize;
-    private final String title;
+    private final @NotNull String title;
     private final boolean selfTarget;
     private final boolean ignoreVanished;
     private final boolean requireOnlineTarget;
-    private final List<String> whitelistServers;
-    private final List<String> blacklistServers;
+    private final @NotNull List<String> whitelistServers;
+    private final @NotNull List<String> blacklistServers;
     private final boolean placeholdersTarget;
     private final @Nullable GuiSound openSound;
     private final boolean targetBypass;

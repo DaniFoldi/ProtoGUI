@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.danifoldi'
-version '1.2.2'
+version '1.2.4'
 sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -28,11 +28,10 @@ dependencies {
         exclude module: 'snakeyaml'
     }
 
-    implementation'org.jetbrains:annotations:20.1.0'
+    compileOnly 'org.jetbrains:annotations:20.1.0'
     implementation 'javax.inject:javax.inject:1'
     implementation 'com.google.dagger:dagger:2.37'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.37'
-
 }
 
 processResources {
@@ -50,5 +49,7 @@ shadowJar {
     relocate 'org.jetbrains.annotations', 'com.danifoldi.bungeegui.lib.annotations'
     relocate 'javax.inject', 'com.danifoldi.bungeegui.lib.inject'
     relocate 'dagger', 'com.danifoldi.bungeegui.lib.dagger'
+    relocate 'com.electronwill.night-config', 'com.danifoldi.bungeegui.lib.nightconfig'
+
     archiveFileName.set("${project.name}-${project.version}.jar")
 }
