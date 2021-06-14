@@ -109,7 +109,7 @@ public class PlaceholderHandler {
         refreshData = proxyServer.getScheduler().schedule(plugin, () -> {
             for (ServerInfo server: proxyServer.getServersCopy().values()) {
                 server.ping((ping, error) -> {
-                    if (lastStatus.containsKey(server) && lastStatus.get(server) == (error == null)) {
+                    if (lastStatus.containsKey(server) && lastStatus.get(server) != (error == null)) {
                         if (error != null) {
                             logger.info("Server " + server.getName() + " no longer available");
                         } else {
@@ -117,7 +117,7 @@ public class PlaceholderHandler {
                         }
                     }
 
-                    lastStatus.put(server, error != null);
+                    lastStatus.put(server, error == null);
                     if (error == null) {
                         latestPing.put(server, ping);
                     }
