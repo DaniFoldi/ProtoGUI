@@ -1,10 +1,12 @@
 package com.danifoldi.bungeegui.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DecimalFormat;
 
 public class NumberUtil {
-    private static final DecimalFormat format = new DecimalFormat("#.##");
-    public static String formatDecimal(double value) {
+    private static final @NotNull DecimalFormat format = new DecimalFormat("#.##");
+    public static @NotNull String formatDecimal(final double value) {
         return format.format(value);
     }
 

@@ -1,6 +1,7 @@
 package com.danifoldi.bungeegui.util;
 
 import de.exceptionflug.protocolize.inventory.InventoryType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,18 +12,18 @@ import java.util.stream.Collectors;
 
 public class SlotUtil {
 
-    public static Set<Integer> getSlots(String slots, int size) {
-        Set<Integer> slotList = new HashSet<>();
+    public static @NotNull Set<Integer> getSlots(final @NotNull String slots, final int size) {
+        final @NotNull Set<Integer> slotList = new HashSet<>();
 
-        for (String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList())) {
-            Consumer<Integer> action = slotList::add;
+        for (@NotNull String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList())) {
+            @NotNull Consumer<Integer> action = slotList::add;
             if (term.startsWith("-")) {
                 action = slotList::remove;
                 term = term.replace("-", "");
             }
 
             if (term.startsWith("row")) {
-                int row = Integer.parseInt(term, 3, 4, 10);
+                final int row = Integer.parseInt(term, 3, 4, 10);
 
                 if (term.endsWith("even")) {
                     for (int i = 0; i < 9; i++) {
@@ -49,7 +50,7 @@ public class SlotUtil {
             }
 
             if (term.startsWith("column")) {
-                int column = Integer.parseInt(term, 6, 7, 10);
+                final int column = Integer.parseInt(term, 6, 7, 10);
                 if (term.endsWith("even")) {
                     for (int i = 0; i < 6; i++) {
                         if (i % 2 != 0) {
@@ -74,14 +75,14 @@ public class SlotUtil {
                 continue;
             }
 
-            int slot = Integer.parseInt(term);
+            final int slot = Integer.parseInt(term);
             action.accept(slot);
         }
 
         return slotList.stream().filter(s -> s >= 0 && s < size).collect(Collectors.toSet());
     }
 
-    public static InventoryType getInventoryType(int size) {
+    public static @NotNull InventoryType getInventoryType(final int size) {
         if (size <= 9) {
             return InventoryType.GENERIC_9X1;
         } else if (size <= 2 * 9) {
@@ -97,7 +98,7 @@ public class SlotUtil {
         }
     }
 
-    public static int getInventorySize(InventoryType inventoryType) {
+    public static int getInventorySize(final @NotNull InventoryType inventoryType) {
         switch (inventoryType) {
             case GENERIC_9X1:
                 return 9;

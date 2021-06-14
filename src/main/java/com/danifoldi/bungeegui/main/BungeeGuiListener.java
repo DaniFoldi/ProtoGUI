@@ -11,13 +11,14 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.logging.Logger;
 
 public class BungeeGuiListener implements Listener {
-    private final GuiHandler guiHandler;
-    private final Logger logger;
+    private final @NotNull GuiHandler guiHandler;
+    private final @NotNull Logger logger;
 
     @Inject
     public BungeeGuiListener(final @NotNull GuiHandler guiHandler,
@@ -29,14 +30,14 @@ public class BungeeGuiListener implements Listener {
     @EventHandler
     @SuppressWarnings("unused")
     public void onInventoryClick(final @NotNull InventoryClickEvent event) {
-        final ProxiedPlayer player = event.getPlayer();
+        final @NotNull ProxiedPlayer player = event.getPlayer();
 
-        final GuiGrid openGui = guiHandler.getOpenGui(event.getPlayer().getUniqueId());
+        final @Nullable GuiGrid openGui = guiHandler.getOpenGui(event.getPlayer().getUniqueId());
         if (openGui == null) {
             return;
         }
 
-        final Inventory inventory = event.getInventory();
+        final @NotNull Inventory inventory = event.getInventory();
         final int slot = event.getSlot();
 
         if (inventory.getType().equals(InventoryType.PLAYER)) {
@@ -61,7 +62,7 @@ public class BungeeGuiListener implements Listener {
             return;
         }
 
-        final String target = guiHandler.getGuiTarget(player.getUniqueId());
+        final @NotNull String target = guiHandler.getGuiTarget(player.getUniqueId());
 
         guiHandler.runCommand(player,openGui, slot, target);
         guiHandler.close(player, true);

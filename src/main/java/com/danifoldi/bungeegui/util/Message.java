@@ -6,6 +6,8 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,57 +46,56 @@ public enum Message {
     GUI_LIST_TOP("guiListTop", "&a{count} GUIs are loaded:"),
     GUI_LIST_ITEM("guiListItem", "&0- &6{name}");
 
-    private static Map<String, String> messages = new HashMap<>();
+    private static final @NotNull Map<String, String> messages = new HashMap<>();
     public static void setMessageProvider(Config config) {
-        final Map<String, String> messages = new HashMap<>();
-        for (Config.Entry message: ((Config)config.get("messages")).entrySet()) {
+        final @NotNull Map<String, String> messages = new HashMap<>();
+        for (final @NotNull Config.Entry message: ((Config)config.get("messages")).entrySet()) {
             messages.put(message.getKey(), message.getValue());
         }
 
-        Message.messages = messages;
+        Message.messages.clear();
+        Message.messages.putAll(messages);
     }
 
-    private static final Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
+    private static final @NotNull Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
 
-    private final String messageId;
-    private final String defaultValue;
+    private final @NotNull String messageId;
+    private final @NotNull String defaultValue;
 
-    Message(String messageId, String defaultValue) {
+    Message(final @NotNull String messageId, final @NotNull String defaultValue) {
         this.messageId = messageId;
         this.defaultValue = defaultValue;
     }
 
-    public String getDefaultValue() {
+    public @NotNull String getDefaultValue() {
         return defaultValue;
     }
 
     @SafeVarargs
-    public static String replace(String text, Pair<String, String>... replacements) {
-        String result = text;
+    public static @NotNull String replace(@NotNull String text,final @NotNull Pair<String, String>... replacements) {
         for (Pair<String, String> replacement: replacements) {
             if (replacement.getFirst() == null || replacement.getSecond() == null) {
                 continue;
             }
-            result = result.replace("{" + replacement.getFirst() + "}", replacement.getSecond());
+            text = text.replace("{" + replacement.getFirst() + "}", replacement.getSecond());
         }
 
-        return result;
+        return text;
     }
 
-    public static String colorCodes(String text) {
-        String colorized = text;
-        Matcher matcher = HEX.matcher(colorized);
+    public static @NotNull String colorCodes(String text) {
+        final @NotNull Matcher matcher = HEX.matcher(text);
 
         while (matcher.find()) {
-            String color = matcher.group(1);
-            String value = ChatColor.COLOR_CHAR + "x" + color.replace("&#", "").chars().mapToObj(i -> (char)i).map(String::valueOf).map(s -> ChatColor.COLOR_CHAR + s).collect(Collectors.joining());
-            colorized = colorized.replace(color, value);
+            final @NotNull String color = matcher.group(1);
+            final @NotNull String value = ChatColor.COLOR_CHAR + "x" + color.replace("&#", "").chars().mapToObj(i -> (char)i).map(String::valueOf).map(s -> ChatColor.COLOR_CHAR + s).collect(Collectors.joining());
+            text = text.replace(color, value);
         }
-        return ChatColor.translateAlternateColorCodes('&', colorized);
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     @SafeVarargs
-    public final void send(ProxiedPlayer player, Pair<String, String>... replacements) {
+    public final void send(final @NotNull ProxiedPlayer player, final @NotNull Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
             send(player, defaultValue, replacements);
         }
@@ -103,12 +104,12 @@ public enum Message {
     }
 
     @SafeVarargs
-    public static void send(ProxiedPlayer player, String value, Pair<String, String>... replacements) {
+    public static void send(final @NotNull ProxiedPlayer player, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
         player.sendMessage(toComponent(player, value, replacements));
     }
 
     @SafeVarargs
-    public final BaseComponent[] toComponent(ProxiedPlayer player, Pair<String, String>... replacements) {
+    public final @NotNull BaseComponent[] toComponent(final @Nullable ProxiedPlayer player, final @NotNull Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId) == null || Message.messages.get(messageId).equals("")) {
             toComponent(player, defaultValue, replacements);
         }
@@ -117,7 +118,7 @@ public enum Message {
     }
 
     @SafeVarargs
-    public static BaseComponent[] toComponent(ProxiedPlayer player, String value, Pair<String, String>... replacements) {
+    public static @NotNull BaseComponent[] toComponent(final @Nullable ProxiedPlayer player, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
         return new BaseComponent[] {new TextComponent(colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(player, replace(value, replacements))))};
     }
 }

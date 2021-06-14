@@ -47,7 +47,7 @@ public class BungeeGuiAPI {
      * @param guiName - the name of the GUI to open
      * @param target - target value for the GUI, pass any {@link String} for untargeted
      */
-    public void openGui(ProxiedPlayer player, String guiName, String target) {
+    public void openGui(final @NotNull ProxiedPlayer player, final @NotNull String guiName, final @NotNull String target) {
         guiHandler.open(guiName, player, target);
     }
 
@@ -55,7 +55,7 @@ public class BungeeGuiAPI {
      * Closes the open GUI for a player
      * @param player - the player to force close the GUI for
      */
-    public void closeGui(ProxiedPlayer player) {
+    public void closeGui(final @NotNull ProxiedPlayer player) {
         guiHandler.close(player, true);
     }
 
@@ -64,7 +64,7 @@ public class BungeeGuiAPI {
      * @param player - the player to check
      * @return true if the player has an open GUI
      */
-    public boolean hasOpenGui(ProxiedPlayer player) {
+    public boolean hasOpenGui(final @NotNull ProxiedPlayer player) {
         return guiHandler.getOpenGui(player.getUniqueId()) != null;
     }
 
@@ -73,7 +73,7 @@ public class BungeeGuiAPI {
      * @param player - the player to check
      * @return the GUI name, or null if has no open GUI
      */
-    public @Nullable String getOpenGui(ProxiedPlayer player) {
+    public @Nullable String getOpenGui(final @NotNull ProxiedPlayer player) {
         return guiHandler.getGuiName(guiHandler.getOpenGui(player.getUniqueId()));
     }
 
@@ -82,7 +82,7 @@ public class BungeeGuiAPI {
      * @param name - the GUI name to retrieve
      * @return the {@link GuiGrid} with the name
      */
-    public GuiGrid getGui(String name) {
+    public @Nullable GuiGrid getGui(final @NotNull String name) {
         return guiHandler.getGui(name);
     }
 
@@ -90,7 +90,7 @@ public class BungeeGuiAPI {
      * Get all loaded GUI names
      * @return {@link List<String>} with the GUI names
      */
-    public List<String> getAvailableGuis() {
+    public @NotNull List<String> getAvailableGuis() {
         return guiHandler.getGuis();
     }
 
@@ -100,7 +100,7 @@ public class BungeeGuiAPI {
      * @param name - the name of the GUI to be added
      * @param gui - the GUI to be added
      */
-    public void addGui(String name, GuiGrid gui) {
+    public void addGui(final @NotNull String name, final @NotNull GuiGrid gui) {
         guiHandler.addGui(name, gui);
     }
 
@@ -109,7 +109,7 @@ public class BungeeGuiAPI {
      * @implNote the GUI is closed for all players immediately
      * @param name - the GUI to be removed
      */
-    public void removeGui(String name) {
+    public void removeGui(final @NotNull String name) {
         guiHandler.removeGui(name);
     }
 
@@ -119,12 +119,12 @@ public class BungeeGuiAPI {
      * @return the time the reload took in ms
      */
     public long reloadGuis() {
-        final Instant loadStart = Instant.now();
+        final @NotNull Instant loadStart = Instant.now();
 
         loader.unload();
         loader.load();
 
-        final Instant loadEnd = Instant.now();
+        final @NotNull Instant loadEnd = Instant.now();
         return Duration.between(loadStart, loadEnd).toMillis();
     }
 
@@ -135,7 +135,7 @@ public class BungeeGuiAPI {
      * @implNote if the function returns null, the placeholder isn't parsed, the argument can be null if the parse target is the console
      */
     @UnstableApi
-    public void registerPlaceholder(String name, Function<ProxiedPlayer, String> placeholder) {
+    public void registerPlaceholder(final @NotNull String name, final @NotNull Function<ProxiedPlayer, String> placeholder) {
         placeholderHandler.register(name, placeholder);
     }
 
@@ -144,7 +144,7 @@ public class BungeeGuiAPI {
      * @param name - the name of the placeholder to unregister
      */
     @UnstableApi
-    public void unregisterPlaceholder(String name) {
+    public void unregisterPlaceholder(final @NotNull String name) {
         placeholderHandler.unregister(name);
     }
 
@@ -155,7 +155,7 @@ public class BungeeGuiAPI {
      * @return the text with the placeholders replaced
      */
     @UnstableApi
-    public String parsePlaceholders(ProxiedPlayer player, String text) {
+    public @NotNull String parsePlaceholders(final @Nullable ProxiedPlayer player, final @NotNull String text) {
         return placeholderHandler.parse(player, text);
     }
 }

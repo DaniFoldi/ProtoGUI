@@ -19,14 +19,14 @@ import java.util.logging.Logger;
 
 public class BungeeGuiLoader {
 
-    private final GuiHandler guiHandler;
-    private final BungeeGuiPlugin plugin;
-    private final Logger logger;
-    private final PluginManager pluginManager;
-    private final Path datafolder;
-    private final PlaceholderHandler placeholderHandler;
-    private final PluginCommand command;
-    private final BungeeGuiListener listener;
+    private final @NotNull GuiHandler guiHandler;
+    private final @NotNull BungeeGuiPlugin plugin;
+    private final @NotNull Logger logger;
+    private final @NotNull PluginManager pluginManager;
+    private final @NotNull Path datafolder;
+    private final @NotNull PlaceholderHandler placeholderHandler;
+    private final @NotNull PluginCommand command;
+    private final @NotNull BungeeGuiListener listener;
 
     @SuppressWarnings("unused")
     private enum LogLevel {
@@ -66,7 +66,7 @@ public class BungeeGuiLoader {
         placeholderHandler.registerBuiltins();
 
         try {
-            final FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
+            final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
 
             logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
@@ -82,7 +82,7 @@ public class BungeeGuiLoader {
             }
 
             pluginManager.registerListener(plugin, listener);
-        } catch (IOException e) {
+        } catch (final @NotNull IOException e) {
             StringUtil.blockPrint(logger::severe, "Could not enable plugin, please see the error below");
             logger.severe(e.getMessage());
             e.printStackTrace();

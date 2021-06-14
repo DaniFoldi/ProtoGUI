@@ -1,5 +1,7 @@
 package com.danifoldi.bungeegui.util;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Pair<A, B> {
     private final A a;
     private final B b;
@@ -17,7 +19,7 @@ public class Pair<A, B> {
         return b;
     }
 
-    public static<A, B> Pair<A, B> of(A a, B b) {
+    public static<A, B> @NotNull Pair<A, B> of(A a, B b) {
         return new Pair<>(a, b);
     }
 }

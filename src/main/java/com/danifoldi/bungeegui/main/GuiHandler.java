@@ -11,6 +11,7 @@ import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
+import dagger.Module;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.items.ItemStack;
@@ -43,43 +44,42 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class GuiHandler {
-    private final Map<String, GuiGrid> menus = new HashMap<>();
-    private final Map<UUID, Pair<String, String>> openGuis = new HashMap<>();
-    private final Map<String, BungeeGuiCommand> commandHandlers = new HashMap<>();
-    private final Logger logger;
-    private final PluginManager pluginManager;
-    private final BungeeGuiPlugin plugin;
+    private final @NotNull Map<String, GuiGrid> menus = new HashMap<>();
+    private final @NotNull Map<UUID, Pair<String, String>> openGuis = new HashMap<>();
+    private final @NotNull Map<String, BungeeGuiCommand> commandHandlers = new HashMap<>();
+    private final @NotNull Logger logger;
+    private final @NotNull PluginManager pluginManager;
+    private final @NotNull BungeeGuiPlugin plugin;
 
     @Inject
     GuiHandler(final @NotNull Logger logger,
-                      final @NotNull PluginManager pluginManager,
-                      final @NotNull BungeeGuiPlugin plugin) {
+               final @NotNull PluginManager pluginManager,
+               final @NotNull BungeeGuiPlugin plugin) {
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.plugin = plugin;
     }
 
-    @NotNull
-    GuiGrid getGui(final @NotNull String name) {
+    @NotNull GuiGrid getGui(final @NotNull String name) {
         return this.menus.get(name);
     }
 
-    void load(Config config) {
-        final Config guis = config.get("guis");
+    void load(@NotNull Config config) {
+        final @NotNull Config guis = config.get("guis");
 
-        for (Config.Entry gui: guis.entrySet()) {
-            final String name = gui.getKey();
-            final Config guiData = gui.getValue();
-            final Config guiItems = guiData.getOrElse("items", Config.inMemory());
-            final Map<Integer, GuiItem> itemMap = new HashMap<>();
+        for (final @NotNull Config.Entry gui: guis.entrySet()) {
+            final @NotNull String name = gui.getKey();
+            final @NotNull Config guiData = gui.getValue();
+            final @NotNull Config guiItems = guiData.getOrElse("items", Config.inMemory());
+            final @NotNull Map<Integer, GuiItem> itemMap = new HashMap<>();
             final int size = guiData.getIntOrElse("size", 54);
 
             try {
-                for (Config.Entry guiItem : guiItems.entrySet()) {
-                    final Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
-                    final Config itemData = guiItem.getValue();
+                for (final @NotNull Config.Entry guiItem : guiItems.entrySet()) {
+                    final @NotNull Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
+                    final @NotNull Config itemData = guiItem.getValue();
 
-                    GuiSound clickSound = null;
+                    @Nullable GuiSound clickSound = null;
 
                     if (itemData.contains("clickSound")) {
                         clickSound = GuiSound.builder()
@@ -90,7 +90,7 @@ public class GuiHandler {
                                 .build();
                     }
 
-                    GuiItem item = GuiItem.builder()
+                    final @NotNull GuiItem item = GuiItem.builder()
                             .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
                             .amount(itemData.getOrElse("count", 1))
                             .title(itemData.getOrElse("name", ""))
@@ -101,12 +101,12 @@ public class GuiHandler {
                             .clickSound(clickSound)
                             .build();
 
-                    for (int slot : slots) {
+                    for (final int slot : slots) {
                         itemMap.put(slot, item.copy());
                     }
                 }
 
-                GuiSound openSound = null;
+                @Nullable GuiSound openSound = null;
 
                 if (guiData.contains("openSound")) {
                     openSound = GuiSound.builder()
@@ -117,7 +117,7 @@ public class GuiHandler {
                             .build();
                 }
 
-                final GuiGrid grid = GuiGrid.builder()
+                final @NotNull GuiGrid grid = GuiGrid.builder()
                         .items(itemMap)
                         .targeted(guiData.getOrElse("targeted", false))
                         .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
@@ -137,7 +137,7 @@ public class GuiHandler {
                         .build();
 
                 addGui(name, grid);
-            } catch (Exception e) {
+            } catch (final @NotNull Exception e) {
                 logger.warning("Could not load gui " + name);
                 logger.warning(e.getClass().getName() + ":  " + e.getMessage());
                 e.printStackTrace();
@@ -145,7 +145,7 @@ public class GuiHandler {
         }
     }
 
-    void addGui(String name, GuiGrid gui) {
+    void addGui(final @NotNull String name, final @NotNull GuiGrid gui) {
         if (menus.containsKey(name)) {
             return;
         }
@@ -154,14 +154,14 @@ public class GuiHandler {
         pluginManager.registerCommand(plugin, commandHandlers.get(name));
     }
 
-    void removeGui(String name) {
+    void removeGui(final @NotNull String name) {
         openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).map(Map.Entry::getKey).collect(Collectors.toList()).forEach(p -> close(ProxyServer.getInstance().getPlayer(p), true));
         pluginManager.unregisterCommand(commandHandlers.get(name));
         commandHandlers.remove(name);
         menus.remove(name);
     }
 
-    void open(String name, ProxiedPlayer player, @Nullable String target) {
+    void open(final @NotNull String name, final @NotNull ProxiedPlayer player, final @Nullable String target) {
         logger.info("Opening gui " + name + " for player " + player.getName() + " (target: " + target + ")");
 
         final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
@@ -179,13 +179,13 @@ public class GuiHandler {
             ProxyServer.getInstance().getPlayer(target).sendMessage(Message.toComponent(ProxyServer.getInstance().getPlayer(target), gui.getNotifyTarget(), Pair.of("player", player.getName()), Pair.of("target", target)));
         }
 
-        for (Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
+        for (final @NotNull Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
             if (guiItem.getKey() < 0 || guiItem.getKey() >= SlotUtil.getInventorySize(SlotUtil.getInventoryType(gui.getGuiSize()))) {
                 logger.warning("GUI " + name + " contains an item at slot " + guiItem.getKey() + " which is outside of the Inventory");
                 continue;
             }
 
-            final ItemStack item = new ItemStack(guiItem.getValue().getType());
+            final @NotNull ItemStack item = new ItemStack(guiItem.getValue().getType());
             item.setAmount((byte)guiItem.getValue().getAmount());
             item.setDisplayName(Message.toComponent(placeholderTarget, guiItem.getValue().getName(), Pair.of("player", player.getName()), Pair.of("target", target)));
             item.setLoreComponents(guiItem.getValue().getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player.getName()), Pair.of("target", target))).collect(Collectors.toList()));
@@ -199,11 +199,11 @@ public class GuiHandler {
                 }
             }
 
-            CompoundTag tag = (CompoundTag)item.getNBTTag();
+            final @NotNull CompoundTag tag = (CompoundTag)item.getNBTTag();
 
             if (guiItem.getValue().isEnchanted()) {
-                ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
-                CompoundTag enchantment = new CompoundTag();
+                final @NotNull ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
+                final @NotNull CompoundTag enchantment = new CompoundTag();
                 enchantment.put("id", new StringTag("minecraft:unbreaking"));
                 enchantment.put("lvl", new ShortTag((short)1));
                 enchantments.add(enchantment);
@@ -220,20 +220,20 @@ public class GuiHandler {
         openGuis.put(player.getUniqueId(), Pair.of(name, target));
     }
 
-    void runCommand(ProxiedPlayer player, GuiGrid openGui, int slot, String target) {
+    void runCommand(final @NotNull ProxiedPlayer player, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target) {
         logger.info("Running commands for player " + player.getName() + " slot " + slot + " with target " + target);
 
-        final GuiItem item = openGui.getItems().get(slot);
+        final @Nullable GuiItem item = openGui.getItems().get(slot);
         if (item == null) {
             return;
         }
 
-        for (String command: item.getCommands()) {
+        for (final @NotNull String command: item.getCommands()) {
             if (command.equals("")) {
                 continue;
             }
 
-            Pair<String, String> commandData = StringUtil.get(command);
+            final @NotNull Pair<String, String> commandData = StringUtil.get(command);
             if (commandData.getFirst().equalsIgnoreCase("console")) {
                 pluginManager.dispatchCommand(ProxyServer.getInstance().getConsole(), Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
                 continue;
@@ -243,7 +243,7 @@ public class GuiHandler {
         }
     }
 
-    void close(ProxiedPlayer player, boolean didClick) {
+    void close(final @NotNull ProxiedPlayer player, final boolean didClick) {
         if (!openGuis.containsKey(player.getUniqueId())) {
             return;
         }
@@ -259,22 +259,22 @@ public class GuiHandler {
         InventoryModule.closeAllInventories(player);
     }
 
-    GuiGrid getOpenGui(UUID uuid) {
+    @Nullable GuiGrid getOpenGui(final @NotNull UUID uuid) {
         if (!openGuis.containsKey(uuid)) {
             return null;
         }
 
         return menus.get(openGuis.get(uuid).getFirst());
     }
-    String getGuiTarget(UUID uuid) {
+    @Nullable String getGuiTarget(final @NotNull UUID uuid) {
         return openGuis.get(uuid).getSecond();
     }
 
-    String getGuiName(GuiGrid gui) {
+    @NotNull String getGuiName(final @NotNull GuiGrid gui) {
         return menus.entrySet().stream().filter(m -> m.getValue().equals(gui)).map(Map.Entry::getKey).findFirst().orElse("");
     }
 
-    List<String> getGuis() {
+    @NotNull List<String> getGuis() {
         return new ArrayList<>(menus.keySet());
     }
 }

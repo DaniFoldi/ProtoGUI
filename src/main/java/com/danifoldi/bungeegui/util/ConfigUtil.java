@@ -2,6 +2,7 @@ package com.danifoldi.bungeegui.util;
 
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,13 +12,13 @@ import java.util.Collections;
 public class ConfigUtil {
     public static final int LATEST = 3;
 
-    public static String backupAndUpgrade(FileConfig config) throws IOException {
-        Path folder = config.getFile().toPath().getParent();
-        String backup = getBackupFilename(folder);
+    public static @NotNull String backupAndUpgrade(final @NotNull FileConfig config) throws IOException {
+        final @NotNull Path folder = config.getFile().toPath().getParent();
+        final @NotNull String backup = getBackupFilename(folder);
 
         Files.copy(folder.resolve(config.getFile().getName()), folder.resolve(backup));
 
-        int currentVersion = config.getIntOrElse("configVersion", 0);
+        final int currentVersion = config.getIntOrElse("configVersion", 0);
         ConfigUtil.upgrade(config, currentVersion, LATEST);
 
         return backup;
@@ -73,13 +74,13 @@ public class ConfigUtil {
         config.save();
     }
 
-    private static void ensureValue(Config config, String path, Object value) {
+    private static void ensureValue(final @NotNull Config config, final @NotNull String path, final @NotNull Object value) {
         if (!config.contains(path)) {
             config.add(path, value);
         }
     }
 
-    private static String getBackupFilename(Path folder) {
+    private static @NotNull String getBackupFilename(final @NotNull Path folder) {
         if (!Files.exists(folder.resolve("config_backup.yml"))) {
             return "config_backup.yml";
         }

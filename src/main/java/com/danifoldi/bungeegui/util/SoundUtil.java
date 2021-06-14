@@ -6,29 +6,34 @@ import de.exceptionflug.protocolize.world.SoundCategory;
 import de.exceptionflug.protocolize.world.WorldModule;
 import de.exceptionflug.protocolize.world.packet.NamedSoundEffect;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 public class SoundUtil {
-    public static void playSound(ProxiedPlayer player, String soundName, SoundCategory category, float volume, float pitch) {
-        NamedSoundEffect soundEffect = new NamedSoundEffect();
+    public static void playSound(final @NotNull ProxiedPlayer player,
+                                 final @NotNull String soundName,
+                                 final @NotNull SoundCategory category,
+                                 final float volume,
+                                 final float pitch) {
+        final @NotNull NamedSoundEffect soundEffect = new NamedSoundEffect();
         soundEffect.setCategory(category);
         soundEffect.setPitch(pitch);
         soundEffect.setVolume(volume);
-        Pair<String, String> name = StringUtil.get(soundName);
+        final @NotNull Pair<String, String> name = StringUtil.get(soundName);
         soundEffect.setSound(name.getFirst().equalsIgnoreCase("custom") ? name.getSecond() : correct(name.getSecond()));
-        Location location = WorldModule.getLocation(player.getUniqueId());
+        final @NotNull Location location = WorldModule.getLocation(player.getUniqueId());
         soundEffect.setX(location.getX());
         soundEffect.setY(location.getY());
         soundEffect.setZ(location.getZ());
         player.unsafe().sendPacket(soundEffect);
     }
 
-    public static boolean isValidSound(String soundName) {
-        Pair<String, String> value = StringUtil.get(soundName);
+    public static boolean isValidSound(final @NotNull String soundName) {
+        final @NotNull Pair<String, String> value = StringUtil.get(soundName);
         try {
             Sound.valueOf(value.getSecond());
-        } catch (IllegalArgumentException e) {
+        } catch (final @NotNull IllegalArgumentException e) {
             if (!value.getFirst().equals("custom")) {
                 return false;
             }
@@ -37,7 +42,7 @@ public class SoundUtil {
         return true;
     }
 
-    private static final Map<String, String> rewrites = MapUtil.convertToMap(
+    private static final @NotNull Map<String, String> rewrites = MapUtil.convertToMap(
             "zombie.villager_", "zombie_villager.",
             "armor.stand", "armor_stand",
             "cave.spider", "cave_spider",
@@ -77,18 +82,14 @@ public class SoundUtil {
             "blow.up", "blow_up"
     );
 
-    private static String correct(String original) {
-        if (original == null) {
-            return null;
-        }
-        String replacement = original;
+    private static @NotNull String correct(@NotNull String value) {
         for (Map.Entry<String, String> rewrite: rewrites.entrySet()) {
             if (rewrite.getKey() == null || rewrite.getValue() == null) {
                 continue;
             }
-            replacement = replacement.replace(rewrite.getKey(), rewrite.getValue());
+            value = value.replace(rewrite.getKey(), rewrite.getValue());
         }
-        return replacement;
+        return value;
     }
 
     private SoundUtil() {
