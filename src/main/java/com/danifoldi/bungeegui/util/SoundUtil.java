@@ -33,7 +33,7 @@ public class SoundUtil {
         final @NotNull Pair<String, String> value = StringUtil.get(soundName);
         try {
             Sound.valueOf(value.getSecond());
-        } catch (final @NotNull IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             if (!value.getFirst().equals("custom")) {
                 return false;
             }

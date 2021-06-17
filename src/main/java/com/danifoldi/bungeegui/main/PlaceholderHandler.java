@@ -83,7 +83,7 @@ public class PlaceholderHandler {
                         text = text.replace("%" + placeholder + "%", value);
                         changed = true;
                     }
-                } catch (final @NotNull Exception e) {
+                } catch (Exception e) {
                     logger.warning("Placeholder " + placeholder + " couldn't be processed");
                     e.printStackTrace();
                 }
@@ -107,7 +107,7 @@ public class PlaceholderHandler {
     void registerBuiltins() {
         final @NotNull ConcurrentMap<ServerInfo, Boolean> lastStatus = new ConcurrentHashMap<>();
         refreshData = proxyServer.getScheduler().schedule(plugin, () -> {
-            for (ServerInfo server: Map.copyOf(proxyServer.getServers()).values()) {
+            for (ServerInfo server: proxyServer.getServersCopy().values()) {
                 server.ping((ping, error) -> {
                     if (lastStatus.containsKey(server) && lastStatus.get(server) != (error == null)) {
                         if (error != null) {
@@ -149,7 +149,7 @@ public class PlaceholderHandler {
             return String.valueOf(count);
         });
         registerBuiltin("guicount", player -> String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()));
-        registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServers().size()));
+        registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServersCopy().size()));
         registerBuiltin("plugincount", player -> String.valueOf(pluginManager.getPlugins().size()));
         registerBuiltin("placeholdercount", player -> String.valueOf(placeholders.size() + builtinPlaceholders.size()));
         registerBuiltin("displayname", player -> {
@@ -268,7 +268,7 @@ public class PlaceholderHandler {
                     return "";
                 }
                 return user.getFriendlyName();
-            } catch (final @NotNull IllegalStateException | NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
         });
@@ -283,7 +283,7 @@ public class PlaceholderHandler {
                 }
                 final @Nullable String value = user.getCachedData().getMetaData().getPrefix();
                 return value == null ? "" : value;
-            } catch (final @NotNull IllegalStateException | NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
         });
@@ -298,7 +298,7 @@ public class PlaceholderHandler {
                 }
                 final @Nullable String value = user.getCachedData().getMetaData().getSuffix();
                 return value == null ? "" : value;
-            } catch (final @NotNull IllegalStateException | NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
         });
@@ -313,12 +313,12 @@ public class PlaceholderHandler {
                 }
                 final @Nullable String value = user.getCachedData().getMetaData().getPrimaryGroup();
                 return value == null ? "" : value;
-            } catch (final @NotNull IllegalStateException | NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
                 return "";
             }
         });
 
-        for (Map.Entry<String, ServerInfo> server: Map.copyOf(proxyServer.getServers()).entrySet()) {
+        for (Map.Entry<String, ServerInfo> server: proxyServer.getServersCopy().entrySet()) {
             registerBuiltin("status@" + server.getKey(), player -> {
                 final boolean online = lastStatus.get(server.getValue());
                 return online ? "Online" : "Offline";

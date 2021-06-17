@@ -204,7 +204,7 @@ public class PluginCommand extends Command implements TabExecutor {
                 if (args.length > 3) {
                     try {
                         category = SoundCategory.valueOf(args[3]);
-                    } catch (final @NotNull IllegalArgumentException ignored) {
+                    } catch (IllegalArgumentException ignored) {
 
                     }
                 }
@@ -213,7 +213,7 @@ public class PluginCommand extends Command implements TabExecutor {
                 if (args.length > 4) {
                     try {
                         volume = Float.parseFloat(args[4]);
-                    } catch (final @NotNull IllegalArgumentException ignored) {
+                    } catch (IllegalArgumentException ignored) {
 
                     }
                 }
@@ -222,7 +222,7 @@ public class PluginCommand extends Command implements TabExecutor {
                 if (args.length > 5) {
                     try {
                         pitch = Float.parseFloat(args[5]);
-                    } catch (final @NotNull IllegalArgumentException ignored) {
+                    } catch (IllegalArgumentException ignored) {
 
                     }
                 }
@@ -245,21 +245,21 @@ public class PluginCommand extends Command implements TabExecutor {
                 int fadeIn = 20;
                 try {
                     fadeIn = Integer.parseInt(args[3]);
-                } catch (final @NotNull NumberFormatException ignored) {
+                } catch (NumberFormatException ignored) {
 
                 }
 
                 int stay = 60;
                 try {
                     stay = Integer.parseInt(args[4]);
-                } catch (final @NotNull NumberFormatException ignored) {
+                } catch (NumberFormatException ignored) {
 
                 }
 
                 int fadeOut = 20;
                 try {
                     fadeOut = Integer.parseInt(args[5]);
-                } catch (final @NotNull NumberFormatException ignored) {
+                } catch (NumberFormatException ignored) {
 
                 }
 
@@ -289,7 +289,7 @@ public class PluginCommand extends Command implements TabExecutor {
             case "p":
                 return List.of(ProxyServer.getInstance().getPlayer(target.getSecond()));
             case "s":
-                return ProxyServer.getInstance().getServers().get(target.getSecond()).getPlayers();
+                return ProxyServer.getInstance().getServersCopy().get(target.getSecond()).getPlayers();
             default:
                 return Collections.emptyList();
         }

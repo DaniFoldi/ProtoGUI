@@ -11,6 +11,7 @@ import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
+import dagger.Module;
 import de.exceptionflug.protocolize.inventory.Inventory;
 import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.items.ItemStack;
@@ -136,7 +137,7 @@ public class GuiHandler {
                         .build();
 
                 addGui(name, grid);
-            } catch (final @NotNull Exception e) {
+            } catch (Exception e) {
                 logger.warning("Could not load gui " + name);
                 logger.warning(e.getClass().getName() + ":  " + e.getMessage());
                 e.printStackTrace();

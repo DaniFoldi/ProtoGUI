@@ -82,7 +82,7 @@ public class BungeeGuiLoader {
             }
 
             pluginManager.registerListener(plugin, listener);
-        } catch (final @NotNull IOException e) {
+        } catch (IOException e) {
             StringUtil.blockPrint(logger::severe, "Could not enable plugin, please see the error below");
             logger.severe(e.getMessage());
             e.printStackTrace();

@@ -31,7 +31,7 @@ public class UpdateUtil {
                         .thenApply(o -> o.get("tag_name").getAsString())
                         .join();
 
-            } catch (final @NotNull Exception e) {
+            } catch (Exception e) {
                 Logger.getAnonymousLogger().warning(e.getMessage());
                 final @NotNull HttpRequest sgRequest = HttpRequest
                         .newBuilder()
@@ -45,7 +45,7 @@ public class UpdateUtil {
                             .thenApply(b -> new Gson().fromJson(b, JsonElement.class).getAsJsonObject())
                             .thenApply(o -> o.get("name").getAsString())
                             .join();
-                } catch (final @NotNull Exception e2) {
+                } catch (Exception e2) {
                     Logger.getAnonymousLogger().warning(e2.getMessage());
                     return "";
                 }
