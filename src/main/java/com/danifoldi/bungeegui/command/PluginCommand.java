@@ -289,7 +289,7 @@ public class PluginCommand extends Command implements TabExecutor {
             case "p":
                 return List.of(ProxyServer.getInstance().getPlayer(target.getSecond()));
             case "s":
-                return ProxyServer.getInstance().getServersCopy().get(target.getSecond()).getPlayers();
+                return ProxyServer.getInstance().getServers().get(target.getSecond()).getPlayers();
             default:
                 return Collections.emptyList();
         }
