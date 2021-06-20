@@ -107,7 +107,7 @@ public class PlaceholderHandler {
     void registerBuiltins() {
         final @NotNull ConcurrentMap<ServerInfo, Boolean> lastStatus = new ConcurrentHashMap<>();
         refreshData = proxyServer.getScheduler().schedule(plugin, () -> {
-            for (ServerInfo server: proxyServer.getServersCopy().values()) {
+            for (ServerInfo server: Map.copyOf(proxyServer.getServers()).values()) {
                 server.ping((ping, error) -> {
                     if (lastStatus.containsKey(server) && lastStatus.get(server) != (error == null)) {
                         if (error != null) {
@@ -149,7 +149,7 @@ public class PlaceholderHandler {
             return String.valueOf(count);
         });
         registerBuiltin("guicount", player -> String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()));
-        registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServersCopy().size()));
+        registerBuiltin("servercount", player -> String.valueOf(proxyServer.getServers().size()));
         registerBuiltin("plugincount", player -> String.valueOf(pluginManager.getPlugins().size()));
         registerBuiltin("placeholdercount", player -> String.valueOf(placeholders.size() + builtinPlaceholders.size()));
         registerBuiltin("displayname", player -> {
@@ -318,7 +318,7 @@ public class PlaceholderHandler {
             }
         });
 
-        for (Map.Entry<String, ServerInfo> server: proxyServer.getServersCopy().entrySet()) {
+        for (Map.Entry<String, ServerInfo> server: proxyServer.getServers().entrySet()) {
             registerBuiltin("status@" + server.getKey(), player -> {
                 final boolean online = lastStatus.get(server.getValue());
                 return online ? "Online" : "Offline";
