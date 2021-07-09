@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     compileOnly 'io.github.waterfallmc:waterfall-api:1.17-R0.1-SNAPSHOT'
-    compileOnly 'de.exceptionflug:protocolize-api:1.7.0-SNAPSHOT'
+    compileOnly 'de.exceptionflug:protocolize-api:1.7.1-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-items:1.7.0-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-inventory:1.7.0-SNAPSHOT'
     compileOnly 'de.exceptionflug:protocolize-world:1.7.0-SNAPSHOT'
