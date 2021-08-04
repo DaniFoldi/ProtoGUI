@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public enum VersionUtil {
     UNKNOWN	(999),
+    v1_17_1 (756),
     v1_17   (755),
     v1_16_5 (754),
     v1_16_4	(754),
