@@ -1,11 +1,23 @@
 package com.danifoldi.bungeegui.gui;
 
+import com.danifoldi.bungeegui.util.Message;
+import com.danifoldi.bungeegui.util.Pair;
+import com.danifoldi.bungeegui.util.StringUtil;
+import de.exceptionflug.protocolize.items.ItemStack;
 import de.exceptionflug.protocolize.items.ItemType;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.querz.nbt.tag.ByteTag;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.IntTag;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.ShortTag;
+import net.querz.nbt.tag.StringTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -67,6 +79,38 @@ public class GuiItem {
 
     public @Nullable GuiSound getClickSound() {
         return this.clickSound;
+    }
+
+    public @NotNull ItemStack toItemStack(ProxiedPlayer placeholderTarget, String player, String target) {
+        final @NotNull ItemStack item = new ItemStack(this.getType());
+        item.setAmount((byte)this.getAmount());
+        item.setDisplayName(Message.toComponent(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)));
+        item.setLoreComponents(this.getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()));
+
+        if (item.isPlayerSkull()) {
+            final Pair<String, String> data = StringUtil.get(this.getData());
+            if (data.getFirst().equalsIgnoreCase("owner")) {
+                item.setSkullOwner(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target)));
+            } else if (data.getFirst().equalsIgnoreCase("texture")) {
+                item.setSkullTexture(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target)));
+            }
+        }
+
+        final @NotNull CompoundTag tag = (CompoundTag)item.getNBTTag();
+
+        if (this.isEnchanted()) {
+            final @NotNull ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
+            final @NotNull CompoundTag enchantment = new CompoundTag();
+            enchantment.put("id", new StringTag("minecraft:unbreaking"));
+            enchantment.put("lvl", new ShortTag((short)1));
+            enchantments.add(enchantment);
+            tag.put("Enchantments", enchantments);
+        }
+
+        tag.put("HideFlags", new IntTag(99));
+        tag.put("overrideMeta", new ByteTag((byte)1));
+
+        return item;
     }
 
     @Override

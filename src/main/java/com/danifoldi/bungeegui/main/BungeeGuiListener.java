@@ -3,11 +3,16 @@ package com.danifoldi.bungeegui.main;
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.util.SoundUtil;
 import de.exceptionflug.protocolize.inventory.Inventory;
+import de.exceptionflug.protocolize.inventory.InventoryModule;
 import de.exceptionflug.protocolize.inventory.InventoryType;
 import de.exceptionflug.protocolize.inventory.event.InventoryClickEvent;
 import de.exceptionflug.protocolize.inventory.event.InventoryCloseEvent;
+import de.exceptionflug.protocolize.items.InventoryManager;
+import de.exceptionflug.protocolize.items.PlayerInventory;
+import de.exceptionflug.protocolize.items.event.PlayerInteractEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +30,23 @@ public class BungeeGuiListener implements Listener {
                              final @NotNull Logger logger) {
         this.guiHandler = guiHandler;
         this.logger = logger;
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    public void onServerSwitch(final @NotNull ServerSwitchEvent event) {
+        guiHandler.actions(event.getPlayer());
+    }
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    public void onItemClick(final @NotNull PlayerInteractEvent event) {
+        if (guiHandler.getOpenGui(event.getPlayer().getUniqueId()) != null) {
+            return;
+        }
+
+        PlayerInventory inventory = InventoryManager.getInventory(event.getPlayer().getUniqueId());
+        guiHandler.interact(event.getPlayer(), inventory.getHeldItem());
     }
 
     @EventHandler
