@@ -7,7 +7,6 @@ import dagger.Component;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.scheduler.TaskScheduler;
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;

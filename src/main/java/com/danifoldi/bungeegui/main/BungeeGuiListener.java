@@ -1,18 +1,10 @@
 package com.danifoldi.bungeegui.main;
 
-import com.danifoldi.bungeegui.gui.GuiGrid;
-import com.danifoldi.bungeegui.util.SoundUtil;
-import dev.simplix.protocolize.api.inventory.Inventory;
-import dev.simplix.protocolize.api.inventory.InventoryClick;
-import dev.simplix.protocolize.api.inventory.InventoryClose;
-import dev.simplix.protocolize.data.inventory.InventoryType;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.logging.Logger;
