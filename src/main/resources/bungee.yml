@@ -4,7 +4,7 @@ description: Create GUIs that perform commands on behalf of the player
 version: ${version}
 author: DaniFoldi, HgeX
 depends:
-  - protocolize-plugin
+  - Protocolize
 softdepends:
   - LuckPerms
   - PremiumVanish

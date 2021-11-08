@@ -71,7 +71,6 @@ public class BungeeGuiLoader {
 
             logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
-            guiHandler.load(config);
             Message.setMessageProvider(config);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
                 StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as {file})".replace("{file}", ConfigUtil.backupAndUpgrade(config)));
@@ -81,6 +80,7 @@ public class BungeeGuiLoader {
                 StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.");
             }
 
+            guiHandler.load(config);
             pluginManager.registerListener(plugin, listener);
         } catch (IOException e) {
             StringUtil.blockPrint(logger::severe, "Could not enable plugin, please see the error below");

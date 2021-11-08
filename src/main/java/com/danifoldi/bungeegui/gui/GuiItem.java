@@ -108,6 +108,7 @@ public class GuiItem {
                     propertiesTag = new CompoundTag();
                 }
 
+                textureTag.put("Value", new StringTag(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target))));
                 texturesTag.add(textureTag);
                 propertiesTag.put("textures", texturesTag);
                 skullOwnerTag.put("Properties", propertiesTag);
