@@ -1,6 +1,6 @@
 package com.danifoldi.bungeegui.util;
 
-import de.exceptionflug.protocolize.inventory.InventoryType;
+import dev.simplix.protocolize.data.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

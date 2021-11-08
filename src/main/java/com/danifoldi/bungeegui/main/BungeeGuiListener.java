@@ -2,14 +2,10 @@ package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.util.SoundUtil;
-import de.exceptionflug.protocolize.inventory.Inventory;
-import de.exceptionflug.protocolize.inventory.InventoryModule;
-import de.exceptionflug.protocolize.inventory.InventoryType;
-import de.exceptionflug.protocolize.inventory.event.InventoryClickEvent;
-import de.exceptionflug.protocolize.inventory.event.InventoryCloseEvent;
-import de.exceptionflug.protocolize.items.InventoryManager;
-import de.exceptionflug.protocolize.items.PlayerInventory;
-import de.exceptionflug.protocolize.items.event.PlayerInteractEvent;
+import dev.simplix.protocolize.api.inventory.Inventory;
+import dev.simplix.protocolize.api.inventory.InventoryClick;
+import dev.simplix.protocolize.api.inventory.InventoryClose;
+import dev.simplix.protocolize.data.inventory.InventoryType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -38,63 +34,14 @@ public class BungeeGuiListener implements Listener {
         guiHandler.actions(event.getPlayer());
     }
 
-    @EventHandler
-    @SuppressWarnings("unused")
-    public void onItemClick(final @NotNull PlayerInteractEvent event) {
+    /*public void onItemClick(final @NotNull PlayerInteractEvent event) {
         if (guiHandler.getOpenGui(event.getPlayer().getUniqueId()) != null) {
             return;
         }
 
         PlayerInventory inventory = InventoryManager.getInventory(event.getPlayer().getUniqueId());
         guiHandler.interact(event.getPlayer(), inventory.getHeldItem());
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    public void onInventoryClick(final @NotNull InventoryClickEvent event) {
-        final @NotNull ProxiedPlayer player = event.getPlayer();
-
-        final @Nullable GuiGrid openGui = guiHandler.getOpenGui(event.getPlayer().getUniqueId());
-        if (openGui == null) {
-            return;
-        }
-
-        final @NotNull Inventory inventory = event.getInventory();
-        final int slot = event.getSlot();
-
-        if (inventory.getType().equals(InventoryType.PLAYER)) {
-            return;
-        }
-        if (slot == -999) {
-            return;
-        }
-
-        if (inventory.getItem(slot) == null) {
-            return;
-        }
-
-        if (openGui.getItems().get(slot).getClickSound() != null) {
-            if (SoundUtil.isValidSound(openGui.getItems().get(slot).getClickSound().getSoundName())) {
-                logger.warning("Sound " + openGui.getItems().get(slot).getClickSound().getSoundName() + " is probably invalid");
-            }
-            openGui.getItems().get(slot).getClickSound().playFor(player);
-        }
-
-        if (openGui.getItems().get(slot).getCommands().isEmpty()) {
-            return;
-        }
-
-        final @NotNull String target = guiHandler.getGuiTarget(player.getUniqueId());
-
-        guiHandler.runCommand(player,openGui, slot, target);
-        guiHandler.close(player, true);
-    }
-
-    @EventHandler
-    @SuppressWarnings("unused")
-    public void onInventoryClose(final @NotNull InventoryCloseEvent event) {
-        guiHandler.close(event.getPlayer(), false);
-    }
+    }*/
 
     @EventHandler
     @SuppressWarnings("unused")

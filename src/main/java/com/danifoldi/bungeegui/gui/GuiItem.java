@@ -3,8 +3,8 @@ package com.danifoldi.bungeegui.gui;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.StringUtil;
-import de.exceptionflug.protocolize.items.ItemStack;
-import de.exceptionflug.protocolize.items.ItemType;
+import dev.simplix.protocolize.api.item.ItemStack;
+import dev.simplix.protocolize.data.ItemType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
@@ -83,20 +83,42 @@ public class GuiItem {
 
     public @NotNull ItemStack toItemStack(ProxiedPlayer placeholderTarget, String player, String target) {
         final @NotNull ItemStack item = new ItemStack(this.getType());
-        item.setAmount((byte)this.getAmount());
-        item.setDisplayName(Message.toComponent(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)));
-        item.setLoreComponents(this.getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()));
+        item
+                .amount((byte)this.getAmount())
+                .displayName(Message.toComponent(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)))
+                .lore(this.getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()), false);
 
-        if (item.isPlayerSkull()) {
+        if (item.itemType().equals(ItemType.PLAYER_HEAD)) {
             final Pair<String, String> data = StringUtil.get(this.getData());
             if (data.getFirst().equalsIgnoreCase("owner")) {
-                item.setSkullOwner(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target)));
+                final @NotNull CompoundTag tag = item.nbtData();
+                tag.put("SkullOwner", new StringTag(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target))));
+                item.nbtData(tag);
             } else if (data.getFirst().equalsIgnoreCase("texture")) {
-                item.setSkullTexture(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target)));
+                final @NotNull CompoundTag tag = item.nbtData();
+                @Nullable CompoundTag skullOwnerTag = tag.getCompoundTag("SkullOwner");
+                @Nullable CompoundTag propertiesTag = tag.getCompoundTag("Properties");
+                final @NotNull ListTag<@NotNull CompoundTag> texturesTag = new ListTag<>(CompoundTag.class);
+                final @NotNull CompoundTag textureTag = new CompoundTag();
+
+                if (skullOwnerTag == null) {
+                    skullOwnerTag = new CompoundTag();
+                }
+                if (propertiesTag == null) {
+                    propertiesTag = new CompoundTag();
+                }
+
+                texturesTag.add(textureTag);
+                propertiesTag.put("textures", texturesTag);
+                skullOwnerTag.put("Properties", propertiesTag);
+                skullOwnerTag.put("Name", new StringTag(Message.replace(data.getSecond(), Pair.of("player", player), Pair.of("target", target))));
+
+                tag.put("SkullOwner", skullOwnerTag);
+                item.nbtData(tag);
             }
         }
 
-        final @NotNull CompoundTag tag = (CompoundTag)item.getNBTTag();
+        final @NotNull CompoundTag tag = item.nbtData();
 
         if (this.isEnchanted()) {
             final @NotNull ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);

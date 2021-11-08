@@ -149,14 +149,6 @@ All messages support the placeholders in the table below. The API can be used to
 |`%vanished%`|Whether the player is vanished or not|
 |`%servername%`|The name of the server the player is connected to|
 |`%servermotd%`|The MOTD of the server the player is connected to|
-|`%traffic_downstream_input%`|Traffic received from downstream|
-|`%traffic_downstream_output%`|Traffic sent downstream|
-|`%traffic_upstream_input%`|Traffic received upstream|
-|`%traffic_upstream_output%`|Traffic sent upstream|
-|`%traffic_downstream_input_last_minute%`|Traffic received from downstream in the last minute|
-|`%traffic_downstream_output_last_minute%`|Traffic sent downstream in the last minute|
-|`%traffic_upstream_input_last_minute%`|Traffic received upstream in the last minute|
-|`%traffic_upstream_output_last_minute%`|Traffic sent upstream in the last minute|
 |`%luckperms_friendlyname%`|The friendly name of the player as set in LP _(LP required)_|
 |`%luckperms_prefix%`|The prefix of the player _(LP required)_|
 |`%luckperms_suffix%`|The suffix of the player _(LP required)_|

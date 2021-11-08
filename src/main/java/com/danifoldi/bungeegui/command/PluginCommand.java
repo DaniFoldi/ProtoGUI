@@ -5,7 +5,7 @@ import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
-import de.exceptionflug.protocolize.world.SoundCategory;
+import dev.simplix.protocolize.api.SoundCategory;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;

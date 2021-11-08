@@ -1,10 +1,10 @@
 package com.danifoldi.bungeegui.util;
 
-import de.exceptionflug.protocolize.world.Location;
-import de.exceptionflug.protocolize.world.Sound;
-import de.exceptionflug.protocolize.world.SoundCategory;
-import de.exceptionflug.protocolize.world.WorldModule;
-import de.exceptionflug.protocolize.world.packet.NamedSoundEffect;
+import dev.simplix.protocolize.api.Location;
+import dev.simplix.protocolize.api.Protocolize;
+import dev.simplix.protocolize.api.SoundCategory;
+import dev.simplix.protocolize.data.Sound;
+import dev.simplix.protocolize.data.packets.NamedSoundEffect;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,16 +17,16 @@ public class SoundUtil {
                                  final float volume,
                                  final float pitch) {
         final @NotNull NamedSoundEffect soundEffect = new NamedSoundEffect();
-        soundEffect.setCategory(category);
-        soundEffect.setPitch(pitch);
-        soundEffect.setVolume(volume);
+        soundEffect.category(category);
+        soundEffect.pitch(pitch);
+        soundEffect.volume(volume);
         final @NotNull Pair<String, String> name = StringUtil.get(soundName);
-        soundEffect.setSound(name.getFirst().equalsIgnoreCase("custom") ? name.getSecond() : correct(name.getSecond()));
-        final @NotNull Location location = WorldModule.getLocation(player.getUniqueId());
-        soundEffect.setX(location.getX());
-        soundEffect.setY(location.getY());
-        soundEffect.setZ(location.getZ());
-        player.unsafe().sendPacket(soundEffect);
+        soundEffect.sound(name.getFirst().equalsIgnoreCase("custom") ? name.getSecond() : correct(name.getSecond()));
+        final @NotNull Location location = Protocolize.playerProvider().player(player.getUniqueId()).location();
+        soundEffect.x(location.x());
+        soundEffect.y(location.y());
+        soundEffect.z(location.z());
+        Protocolize.playerProvider().player(player.getUniqueId()).sendPacket(soundEffect);
     }
 
     public static boolean isValidSound(final @NotNull String soundName) {

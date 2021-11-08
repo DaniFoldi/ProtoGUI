@@ -13,13 +13,11 @@ import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import dagger.Module;
-import de.exceptionflug.protocolize.inventory.Inventory;
-import de.exceptionflug.protocolize.inventory.InventoryModule;
-import de.exceptionflug.protocolize.items.InventoryManager;
-import de.exceptionflug.protocolize.items.ItemStack;
-import de.exceptionflug.protocolize.items.ItemType;
-import de.exceptionflug.protocolize.items.PlayerInventory;
-import de.exceptionflug.protocolize.world.SoundCategory;
+import dev.simplix.protocolize.api.Protocolize;
+import dev.simplix.protocolize.api.SoundCategory;
+import dev.simplix.protocolize.api.inventory.Inventory;
+import dev.simplix.protocolize.data.ItemType;
+import dev.simplix.protocolize.data.inventory.InventoryType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -207,18 +205,18 @@ public class GuiHandler {
     }
 
     void actions(final @NotNull ProxiedPlayer player) {
-        PlayerInventory inventory = InventoryManager.getInventory(player.getUniqueId());
+        /*PlayerInventory inventory = InventoryManager.getInventory(player.getUniqueId());
 
         guiActions
                 .stream()
                 .filter(a -> a.getServer().equalsIgnoreCase(player.getServer().getInfo().getName()))
                 .forEach(a -> inventory.setItem(a.getSlot(), a.getGuiItem().toItemStack(player, player.getName(), "")));
 
-        inventory.update();
+        inventory.update();*/
     }
 
     void interact(final @NotNull ProxiedPlayer player, final int slot) {
-        Optional<GuiAction> action = guiActions
+        /*Optional<GuiAction> action = guiActions
                 .stream()
                 .filter(a -> a.getServer().equalsIgnoreCase(player.getServer().getInfo().getName()))
                 .filter(a -> a.getSlot() == slot)
@@ -229,7 +227,7 @@ public class GuiHandler {
                 guiAction.getGuiItem().getClickSound().playFor(player);
             }
             open(guiAction.getGui(), player, null);
-        });
+        });*/
     }
 
     void open(final @NotNull String name, final @NotNull ProxiedPlayer player, final @Nullable String target) {
@@ -237,7 +235,7 @@ public class GuiHandler {
 
         final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
         final GuiGrid gui = menus.get(name);
-        final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize()), Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
+        final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize())).title(Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
 
         if (gui.getOpenSound() != null) {
             if (SoundUtil.isValidSound(gui.getOpenSound().getSoundName())) {
@@ -256,10 +254,50 @@ public class GuiHandler {
                 continue;
             }
 
-            inventory.setItem(guiItem.getKey(), guiItem.getValue().toItemStack(placeholderTarget, player.getName(), target));
+            inventory.item(guiItem.getKey(), guiItem.getValue().toItemStack(placeholderTarget, player.getName(), target));
         }
 
-        InventoryModule.sendInventory(player, inventory);
+        inventory.onClick(event -> {
+            //final @NotNull ProxiedPlayer player = event.player().handle();
+
+            final @Nullable GuiGrid openGui = getOpenGui(player.getUniqueId());
+            if (openGui == null) {
+                return;
+            }
+
+            //final @NotNull Inventory inventory = event.inventory();
+            final int slot = event.slot();
+
+            if (inventory.type().equals(InventoryType.PLAYER)) {
+                return;
+            }
+            if (slot == -999) {
+                return;
+            }
+
+            if (inventory.item(slot) == null) {
+                return;
+            }
+
+            if (openGui.getItems().get(slot).getClickSound() != null) {
+                if (SoundUtil.isValidSound(openGui.getItems().get(slot).getClickSound().getSoundName())) {
+                    logger.warning("Sound " + openGui.getItems().get(slot).getClickSound().getSoundName() + " is probably invalid");
+                }
+                openGui.getItems().get(slot).getClickSound().playFor(player);
+            }
+
+            if (openGui.getItems().get(slot).getCommands().isEmpty()) {
+                return;
+            }
+
+            //final @NotNull String target = guiHandler.getGuiTarget(player.getUniqueId());
+
+            runCommand(player,openGui, slot, target);
+            close(player, true);
+        });
+        inventory.onClose(event -> close(event.player().handle(), false));
+
+        Protocolize.playerProvider().player(player.getUniqueId()).openInventory(inventory);
         openGuis.put(player.getUniqueId(), Pair.of(name, target));
     }
 
@@ -319,7 +357,7 @@ public class GuiHandler {
         logger.info("Removing gui from cache for " + player.getName());
 
         openGuis.remove(player.getUniqueId());
-        InventoryModule.closeAllInventories(player);
+        Protocolize.playerProvider().player(player.getUniqueId()).closeInventory();
     }
 
     @Nullable GuiGrid getOpenGui(final @NotNull UUID uuid) {
