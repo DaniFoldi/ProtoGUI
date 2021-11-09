@@ -21,7 +21,7 @@ dependencies {
     compileOnly 'dev.simplix:protocolize-api:2.0.0'
 
     compileOnly 'net.luckperms:api:5.3'
-    compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.6.3'
+    compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.3'
 
     implementation ('com.electronwill.night-config:yaml:3.6.3') {
         exclude module: 'snakeyaml'
