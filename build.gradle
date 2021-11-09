@@ -23,7 +23,7 @@ dependencies {
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.6.3'
 
-    implementation ('com.electronwill.night-config:yaml:3.6.3') {
+    implementation ('com.electronwill.night-config:yaml:3.6.5') {
         exclude module: 'snakeyaml'
     }
 
