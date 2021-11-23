@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.waterfallmc:waterfall-api:1.17-R0.1-SNAPSHOT'
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'dev.simplix:protocolize-api:2.0.1'
 
     compileOnly 'net.luckperms:api:5.3'
