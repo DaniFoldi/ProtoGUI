@@ -30,7 +30,7 @@ dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
     implementation 'javax.inject:javax.inject:1'
     implementation 'com.google.dagger:dagger:2.40'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.40'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.40.5'
 }
 
 processResources {
