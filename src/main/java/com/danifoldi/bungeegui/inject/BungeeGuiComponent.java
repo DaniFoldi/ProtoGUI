@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 @Singleton
@@ -39,6 +40,9 @@ public interface BungeeGuiComponent {
 
         @BindsInstance
         Builder datafolder(final @NotNull Path datafolder);
+
+        @BindsInstance
+        Builder threadPool(final @NotNull ExecutorService threadPool);
 
         BungeeGuiComponent build();
     }

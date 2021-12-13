@@ -4,33 +4,45 @@ plugins {
 }
 
 group 'com.danifoldi'
-version '2.0.0'
+version '2.2.0'
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
     google()
+    maven { url 'https://repo.danifoldi.com/repository/maven-releases/' }
     maven { url 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url 'https://nexus.velocitypowered.com/repository/maven-public/' }
     maven { url 'https://jitpack.io/' }
     maven { url 'https://mvn.exceptionflug.de/repository/exceptionflug-public/' }
+    maven { url 'https://repo.simplix.dev/repository/simplixsoft-public/' }
 }
 
 dependencies {
-    compileOnly 'io.github.waterfallmc:waterfall-api:1.17-R0.1-SNAPSHOT'
-    compileOnly 'dev.simplix:protocolize-api:2.0.1'
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.18-R0.1-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.0.1'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.0.1'
+
+    implementation ('grapefruit:grapefruit:1.3.0') {
+        exclude module: 'annotation'
+        exclude module: 'guava'
+    }
+    implementation 'com.danifoldi:messagelib:1.0.1'
+    compileOnly 'dev.simplix:protocolize-api:2.1.0'
 
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.3'
+    compileOnly 'dev.simplix.plugins:punishcontrol-api:2.0.1'
 
     implementation ('com.electronwill.night-config:yaml:3.6.5') {
         exclude module: 'snakeyaml'
     }
 
-    compileOnly 'org.jetbrains:annotations:22.0.0'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
     implementation 'javax.inject:javax.inject:1'
-    implementation 'com.google.dagger:dagger:2.40'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.40'
+    implementation 'com.google.dagger:dagger:2.40.5'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.40.5'
 }
 
 processResources {

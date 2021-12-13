@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,7 @@ public class BungeeGuiLoader {
     private final @NotNull PlaceholderHandler placeholderHandler;
     private final @NotNull PluginCommand command;
     private final @NotNull BungeeGuiListener listener;
+    private final @NotNull ExecutorService threadPool;
 
     @SuppressWarnings("unused")
     private enum LogLevel {
@@ -47,7 +49,8 @@ public class BungeeGuiLoader {
                            final @NotNull Path datafolder,
                            final @NotNull PlaceholderHandler placeholderHandler,
                            final @NotNull PluginCommand command,
-                           final @NotNull BungeeGuiListener listener) {
+                           final @NotNull BungeeGuiListener listener,
+                           final @NotNull ExecutorService threadPool) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
         this.logger = logger;
@@ -56,10 +59,11 @@ public class BungeeGuiLoader {
         this.placeholderHandler = placeholderHandler;
         this.command = command;
         this.listener = listener;
+        this.threadPool = threadPool;
     }
 
     void load() {
-        StringUtil.blockPrint(logger::info, "Loading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion());
+        StringUtil.blockPrint(logger::info, "Loading %s version %s".formatted(plugin.getDescription().getName(), plugin.getDescription().getVersion()));
 
         pluginManager.registerCommand(plugin, command);
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
@@ -69,11 +73,11 @@ public class BungeeGuiLoader {
             final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
 
-            logger.setFilter(record -> config.getEnumOrElse("debugLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
+            logger.setFilter(record -> config.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             Message.setMessageProvider(config);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
-                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as {file})".replace("{file}", ConfigUtil.backupAndUpgrade(config)));
+                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(ConfigUtil.backupAndUpgrade(config)));
             }
 
             if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
@@ -88,18 +92,19 @@ public class BungeeGuiLoader {
             e.printStackTrace();
         }
 
-        UpdateUtil.getNewest().thenAccept(newest -> {
+        UpdateUtil.getNewest(threadPool).thenAccept(newest -> {
            if (newest.equals("")) {
                logger.warning("Could not check for updates");
            }
            if (!newest.equals(plugin.getDescription().getVersion())) {
-               StringUtil.blockPrint(logger::warning, "You are not running the latest version of BungeeGUI. Please update for bugfixes and new features.");
+               StringUtil.blockPrint(logger::warning, "A new release is available for BungeeGUI. Please update for bugfixes and new features.");
+               logger.warning("Your current version: %s, newest: %s".formatted(plugin.getDescription().getVersion(), newest));
            }
         });
     }
 
     void unload() {
-        StringUtil.blockPrint(logger::info, "Unloading " + plugin.getDescription().getName() + " version " + plugin.getDescription().getVersion());
+        StringUtil.blockPrint(logger::info, "Unloading %s version %s".formatted(plugin.getDescription().getName(), plugin.getDescription().getVersion()));
 
         guiHandler.getGuis().forEach(guiHandler::removeGui);
         placeholderHandler.unregisterAll();

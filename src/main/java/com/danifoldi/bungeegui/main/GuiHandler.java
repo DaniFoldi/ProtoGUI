@@ -1,6 +1,6 @@
 package com.danifoldi.bungeegui.main;
 
-import com.danifoldi.bungeegui.command.BungeeGuiCommand;
+import com.danifoldi.bungeegui.command.GuiCommand;
 import com.danifoldi.bungeegui.gui.GuiAction;
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.gui.GuiItem;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class GuiHandler {
     private final @NotNull Map<String, GuiGrid> menus = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, Pair<String, String>> openGuis = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, BungeeGuiCommand> commandHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, GuiCommand> commandHandlers = new ConcurrentHashMap<>();
     private final @NotNull List<GuiAction> guiActions = Collections.synchronizedList(new ArrayList<>());
     private final @NotNull Logger logger;
     private final @NotNull PluginManager pluginManager;
@@ -185,14 +185,18 @@ public class GuiHandler {
             return;
         }
         menus.put(name, gui);
-        commandHandlers.put(name, new BungeeGuiCommand(name));
-        pluginManager.registerCommand(plugin, commandHandlers.get(name));
+        if (!gui.getCommandAliases().isEmpty()) {
+            commandHandlers.put(name, new GuiCommand(name));
+            pluginManager.registerCommand(plugin, commandHandlers.get(name));
+        }
     }
 
     void removeGui(final @NotNull String name) {
         openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).map(Map.Entry::getKey).collect(Collectors.toList()).forEach(p -> close(ProxyServer.getInstance().getPlayer(p), true));
-        pluginManager.unregisterCommand(commandHandlers.get(name));
-        commandHandlers.remove(name);
+        if (commandHandlers.get(name) != null) {
+            pluginManager.unregisterCommand(commandHandlers.get(name));
+            commandHandlers.remove(name);
+        }
         menus.remove(name);
     }
 

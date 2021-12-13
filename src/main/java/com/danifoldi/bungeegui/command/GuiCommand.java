@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class BungeeGuiCommand extends Command implements TabExecutor {
+public class GuiCommand extends Command implements TabExecutor {
 
     private final String name;
 
-    public BungeeGuiCommand(final @NotNull String name) {
+    public GuiCommand(final @NotNull String name) {
         super(BungeeGuiAPI.getInstance().getGui(name).getCommandAliases().stream().findFirst().orElseThrow(), BungeeGuiAPI.getInstance().getGui(name).getPermission(), BungeeGuiAPI.getInstance().getGui(name).getCommandAliases().stream().skip(1L).toArray(String[]::new));
         this.name = name;
     }

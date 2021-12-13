@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 public class ConfigUtil {
-    public static final int LATEST = 4;
+    public static final int LATEST = 5;
 
     public static @NotNull String backupAndUpgrade(final @NotNull FileConfig config) throws IOException {
         final @NotNull Path folder = config.getFile().toPath().getParent();
@@ -72,6 +72,11 @@ public class ConfigUtil {
 
         if (oldVersion <= 3 && newVersion >= 4) {
             ensureValue(config, "actions", Collections.emptyList());
+        }
+
+        if (oldVersion <= 4 && newVersion >= 5) {
+            ensureValue(config, "logLevel", config.getOrElse("debugLevel", "ALL"));
+            config.remove("debugLevel");
         }
 
         config.set("configVersion", newVersion);

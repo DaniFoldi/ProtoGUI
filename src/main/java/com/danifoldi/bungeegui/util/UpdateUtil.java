@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 public class UpdateUtil {
@@ -16,7 +17,7 @@ public class UpdateUtil {
     private static final @NotNull String GITHUB_URL = "https://api.github.com/repos/DaniFoldi/BungeeGui/releases/latest";
     private static final @NotNull String SPIGET_URL = "https://api.spiget.org/v2/resources/92209/versions/latest";
 
-    public static CompletableFuture<String> getNewest() {
+    public static CompletableFuture<String> getNewest(ExecutorService threadPool) {
         return CompletableFuture.supplyAsync(() -> {
             final @NotNull HttpRequest ghRequest = HttpRequest
                     .newBuilder()
@@ -50,7 +51,7 @@ public class UpdateUtil {
                     return "";
                 }
             }
-        });
+        }, threadPool);
     }
 
     private UpdateUtil() {

@@ -4,322 +4,167 @@ import com.danifoldi.bungeegui.main.BungeeGuiAPI;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.SoundUtil;
-import com.danifoldi.bungeegui.util.StringUtil;
 import dev.simplix.protocolize.api.SoundCategory;
+import grapefruit.command.CommandContainer;
+import grapefruit.command.CommandDefinition;
+import grapefruit.command.dispatcher.Redirect;
+import grapefruit.command.parameter.modifier.OptParam;
+import grapefruit.command.parameter.modifier.Range;
+import grapefruit.command.parameter.modifier.Source;
+import grapefruit.command.parameter.modifier.string.Greedy;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class PluginCommand extends Command implements TabExecutor {
+public class PluginCommand implements CommandContainer {
 
-    private final @NotNull List<String> commands = List.of("actionbar", "broadcast", "chat", "close", "guis", "log", "open", "reload", "send", "sound", "title");
     private final @NotNull Logger logger;
 
     @Inject
     public PluginCommand(final @NotNull Logger logger) {
-        super("bungeegui", "bungeegui.command", "bgui");
         this.logger = logger;
     }
 
-    @Override
-    public void execute(final @NotNull CommandSender sender, final @NotNull String[] args) {
-        if (args.length == 0 || !commands.contains(args[0].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage(Message.COMMAND_HELP.toComponent(null));
-            sender.sendMessage(Message.COMMAND_ACTIONBAR.toComponent(null));
-            sender.sendMessage(Message.COMMAND_BROADCAST.toComponent(null));
-            sender.sendMessage(Message.COMMAND_CHAT.toComponent(null));
-            sender.sendMessage(Message.COMMAND_CLOSE.toComponent(null));
-            sender.sendMessage(Message.COMMAND_GUIS.toComponent(null));
-            sender.sendMessage(Message.COMMAND_LOG.toComponent(null));
-            sender.sendMessage(Message.COMMAND_OPEN.toComponent(null));
-            sender.sendMessage(Message.COMMAND_RELOAD.toComponent(null));
-            sender.sendMessage(Message.COMMAND_SEND.toComponent(null));
-            sender.sendMessage(Message.COMMAND_SOUND.toComponent(null));
-            sender.sendMessage(Message.COMMAND_TITLE.toComponent(null));
+    @Redirect(from = "bgui|bungeegui")
+    @CommandDefinition(route = "bgui|bungeegui help", permission = "bungeegui.command.help", runAsync = true)
+    public void onHelpCommand(@Source CommandSender sender) {
+
+        sender.sendMessage(Message.COMMAND_HELP.toComponent(null));
+        sender.sendMessage(Message.COMMAND_ACTIONBAR.toComponent(null));
+        sender.sendMessage(Message.COMMAND_BROADCAST.toComponent(null));
+        sender.sendMessage(Message.COMMAND_CHAT.toComponent(null));
+        sender.sendMessage(Message.COMMAND_CLOSE.toComponent(null));
+        sender.sendMessage(Message.COMMAND_GUIS.toComponent(null));
+        sender.sendMessage(Message.COMMAND_LOG.toComponent(null));
+        sender.sendMessage(Message.COMMAND_OPEN.toComponent(null));
+        sender.sendMessage(Message.COMMAND_RELOAD.toComponent(null));
+        sender.sendMessage(Message.COMMAND_SEND.toComponent(null));
+        sender.sendMessage(Message.COMMAND_SOUND.toComponent(null));
+        sender.sendMessage(Message.COMMAND_TITLE.toComponent(null));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui actionbar", permission = "bungeegui.command.actionbar", runAsync = true)
+    public void onActionbarCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, @Greedy String content) {
+
+        targets.forEach(p -> p.sendMessage(ChatMessageType.ACTION_BAR, Message.toComponent(p, content)));
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui broadcast", permission = "bungeegui.command.broadcast", runAsync = true)
+    public void onBroadcastCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, @Greedy String content) {
+
+        targets.forEach(p -> p.sendMessage(Message.toComponent(p, content)));
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui chat", permission = "bungeegui.command.chat", runAsync = true)
+    public void onChatCommand(@Source CommandSender sender, ProxiedPlayer target, @Greedy String content) {
+
+        target.chat(Message.colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(target, content)));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui close", permission = "bungeegui.command.close", runAsync = true)
+    public void onCloseCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets) {
+
+        targets.forEach(BungeeGuiAPI.getInstance()::closeGui);
+
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui list|guis", permission = "bungeegui.command.list", runAsync = true)
+    public void onListCommand(@Source CommandSender sender) {
+
+        sender.sendMessage(Message.GUI_LIST_TOP.toComponent(null, Pair.of("count", String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()))));
+        for (final @NotNull String name: BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
+            sender.sendMessage(Message.GUI_LIST_ITEM.toComponent(null, Pair.of("name", name)));
+        }
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui log", permission = "bungeegui.command.log", runAsync = true)
+    public void onLogCommand(@Source CommandSender sender, @Greedy String message) {
+
+        logger.info("Command Log: %s".formatted(message));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui open", permission = "bungeegui.command.open", runAsync = true)
+    public void onOpenCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String guiName, @OptParam String target) {
+
+        if (BungeeGuiAPI.getInstance().getGui(guiName) == null) {
+            sender.sendMessage(Message.GUI_NOT_FOUND.toComponent(null, Pair.of("name", guiName)));
+            return;
+        }
+        if (target == null && BungeeGuiAPI.getInstance().getGui(guiName).isTargeted()) {
+            sender.sendMessage(Message.GUI_TARGET_REQUIRED.toComponent(null));
             return;
         }
 
-        if (!sender.hasPermission("bungeegui.command." + args[0].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage(Message.NO_PERMISSION.toComponent(null));
+        targets.forEach(p -> BungeeGuiAPI.getInstance().openGui(p, guiName, target == null ? "" : target));
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui reload", permission = "bungeegui.command.reload", runAsync = true)
+    public void onReloadCommand(@Source CommandSender sender) {
+
+        final long length = BungeeGuiAPI.getInstance().reloadGuis();
+        sender.sendMessage(Message.RELOAD_SUCCESS.toComponent(null, Pair.of("time", String.valueOf(length))));
+    }
+
+    @CommandDefinition(route = "bgui|bungeegui send", permission = "bungeegui.command.send", runAsync = true)
+    public void onSendCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String serverName) {
+
+        final @Nullable ServerInfo server = ProxyServer.getInstance().getServerInfo(serverName);
+
+        if (server == null) {
+            sender.sendMessage(Message.SERVER_NOT_FOUND.toComponent(null, Pair.of("name", serverName)));
             return;
         }
 
-        switch (args[0].toLowerCase(Locale.ROOT)) {
-            case "actionbar": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.EMPTY_MESSAGE.toComponent(null));
-                    return;
-                }
-                Collection<ProxiedPlayer> players = targets(args[1]);
-                players.forEach(p -> p.sendMessage(ChatMessageType.ACTION_BAR, Message.toComponent(p, skip(args, 2))));
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "broadcast": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.EMPTY_MESSAGE.toComponent(null));
-                    return;
-                }
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-                players.forEach(p -> p.sendMessage(Message.toComponent(p, skip(args, 2))));
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "chat": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.EMPTY_MESSAGE.toComponent(null));
-                    return;
-                }
-
-                final @Nullable ProxiedPlayer player = ProxyServer.getInstance().getPlayer(args[1]);
-                if (player == null) {
-                    sender.sendMessage(Message.TARGET_NOT_FOUND.toComponent(null, Pair.of("target", args[1])));
-                    return;
-                }
-                player.chat(Message.colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(player, skip(args, 2))));
-                break;
-            }
-            case "close": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-                players.forEach(BungeeGuiAPI.getInstance()::closeGui);
-
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "guis": {
-                sender.sendMessage(Message.GUI_LIST_TOP.toComponent(null, Pair.of("count", String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()))));
-                for (final @NotNull String name: BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
-                    sender.sendMessage(Message.GUI_LIST_ITEM.toComponent(null, Pair.of("name", name)));
-                }
-                break;
-            }
-            case "log": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.EMPTY_MESSAGE.toComponent(null));
-                    return;
-                }
-
-                logger.info("Command Log: " + skip(args, 1));
-                break;
-            }
-            case "open": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
-                    return;
-                }
-                final @NotNull String gui = args[2];
-
-                if (BungeeGuiAPI.getInstance().getGui(gui) == null) {
-                    sender.sendMessage(Message.GUI_NOT_FOUND.toComponent(null, Pair.of("name", gui)));
-                    return;
-                }
-                if (args.length < 4 && BungeeGuiAPI.getInstance().getGui(gui).isTargeted()) {
-                    sender.sendMessage(Message.GUI_TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-                players.forEach(p -> BungeeGuiAPI.getInstance().openGui(p, gui, args.length < 4 ? "" : args[3]));
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "reload": {
-                final long length = BungeeGuiAPI.getInstance().reloadGuis();
-                sender.sendMessage(Message.RELOAD_SUCCESS.toComponent(null, Pair.of("time", String.valueOf(length))));
-                break;
-            }
-            case "send": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
-                    return;
-                }
-
-                final @Nullable ServerInfo server = ProxyServer.getInstance().getServerInfo(args[2]);
-
-                if (server == null) {
-                    sender.sendMessage(Message.SERVER_NOT_FOUND.toComponent(null, Pair.of("name", args[2])));
-                    return;
-                }
-
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-                players.forEach(p -> p.connect(server));
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "sound": {
-                if (args.length < 2) {
-                    sender.sendMessage(Message.TARGET_REQUIRED.toComponent(null));
-                    return;
-                }
-                if (args.length < 3) {
-                    sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
-                    return;
-                }
-                if (!SoundUtil.isValidSound(args[2])) {
-                    sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
-                    return;
-                }
-
-                @NotNull SoundCategory category = SoundCategory.MASTER;
-                if (args.length > 3) {
-                    try {
-                        category = SoundCategory.valueOf(args[3]);
-                    } catch (IllegalArgumentException ignored) {
-
-                    }
-                }
-
-                float volume = 1f;
-                if (args.length > 4) {
-                    try {
-                        volume = Float.parseFloat(args[4]);
-                    } catch (IllegalArgumentException ignored) {
-
-                    }
-                }
-
-                float pitch = 1f;
-                if (args.length > 5) {
-                    try {
-                        pitch = Float.parseFloat(args[5]);
-                    } catch (IllegalArgumentException ignored) {
-
-                    }
-                }
-
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-                for (final @NotNull ProxiedPlayer player: players) {
-                    SoundUtil.playSound(player, args[2], category, volume, pitch);
-                }
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-            case "title": {
-                if (args.length < 7) {
-                    sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
-                    return;
-                }
-
-                final boolean isSubtitle = args[2].equalsIgnoreCase("subtitle");
-
-                int fadeIn = 20;
-                try {
-                    fadeIn = Integer.parseInt(args[3]);
-                } catch (NumberFormatException ignored) {
-
-                }
-
-                int stay = 60;
-                try {
-                    stay = Integer.parseInt(args[4]);
-                } catch (NumberFormatException ignored) {
-
-                }
-
-                int fadeOut = 20;
-                try {
-                    fadeOut = Integer.parseInt(args[5]);
-                } catch (NumberFormatException ignored) {
-
-                }
-
-                final @NotNull Collection<ProxiedPlayer> players = targets(args[1]);
-
-                for (final @NotNull ProxiedPlayer player: players) {
-                    if (isSubtitle) {
-                        ProxyServer.getInstance().createTitle().subTitle(Message.toComponent(player, skip(args, 6))).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(player);
-                    } else {
-                        ProxyServer.getInstance().createTitle().title(Message.toComponent(player, skip(args, 6))).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(player);
-                    }
-                }
-
-                sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(players.size()))));
-                break;
-            }
-        }
+        targets.forEach(p -> p.connect(server));
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    private @NotNull Collection<ProxiedPlayer> targets(String value) {
-        if (value.equals("all")) {
-            return ProxyServer.getInstance().getPlayers();
+    @CommandDefinition(route = "bgui|bungeegui sound", permission = "bungeegui.command.sound", runAsync = true)
+    public void onSoundCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String soundName, @OptParam String soundCategory, @OptParam @Range(min = 0.0, max = 1.0) Double volume, @OptParam @Range(min = 0.0, max = 2.0) Double pitch) {
+
+        if (!SoundUtil.isValidSound(soundName)) {
+            sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
+            return;
         }
 
-        final @NotNull Pair<String, String> target = StringUtil.get(value);
-        switch (target.getFirst().toLowerCase(Locale.ROOT)) {
-            case "p":
-                return List.of(ProxyServer.getInstance().getPlayer(target.getSecond()));
-            case "s":
-                return ProxyServer.getInstance().getServers().get(target.getSecond()).getPlayers();
-            default:
-                return Collections.emptyList();
+        @NotNull SoundCategory category = SoundCategory.MASTER;
+        if (soundCategory != null) {
+            try {
+                category = SoundCategory.valueOf(soundCategory);
+            } catch (IllegalArgumentException ignored) {
+
+            }
         }
+        @NotNull SoundCategory finalCategory = category;
+
+        targets.forEach(p -> SoundUtil.playSound(p, soundName, finalCategory, volume == null ? 1.0f : volume.floatValue(), pitch == null ? 1.0f : pitch.floatValue()));
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    private @NotNull String skip(final @NotNull String[] values, final int elements) {
-        return Arrays.stream(values).skip(elements).collect(Collectors.joining(" "));
-    }
+    @CommandDefinition(route = "bgui|bungeegui title", permission = "bungeegui.command.title", runAsync = true)
+    public void onTitleCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String mode, int fadeIn, int stay, int fadeOut, String message) {
 
-    @Override
-    public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
-        if (args.length <= 1) {
-            return commands
-                    .stream()
-                    .filter(c -> sender.hasPermission("bungeegui.command." + c))
-                    .filter(c -> c.startsWith((args.length == 0) ? "" : args[0]))
-                    .collect(Collectors.toList());
+        for (final @NotNull ProxiedPlayer p: targets) {
+            if (mode.equalsIgnoreCase("subtitle")) {
+                ProxyServer.getInstance().createTitle().subTitle(Message.toComponent(p, message)).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(p);
+            } else {
+                ProxyServer.getInstance().createTitle().title(Message.toComponent(p, message)).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(p);
+            }
         }
 
-        final @NotNull String command = args[0].toLowerCase(Locale.ROOT);
-        if (!sender.hasPermission("bungeegui.command." + command)) {
-            return Collections.emptyList();
-        }
-
-       switch (command) {
-           case "reload":
-           case "guis":
-               return Collections.emptyList();
-       }
-
-        return Collections.emptyList();
+        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 }
