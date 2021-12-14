@@ -1,5 +1,6 @@
 package com.danifoldi.bungeegui.main;
 
+import com.danifoldi.bungeegui.command.CommandManager;
 import com.danifoldi.bungeegui.command.PluginCommand;
 import com.danifoldi.bungeegui.util.ConfigUtil;
 import com.danifoldi.bungeegui.util.FileUtil;
@@ -28,6 +29,7 @@ public class BungeeGuiLoader {
     private final @NotNull PlaceholderHandler placeholderHandler;
     private final @NotNull PluginCommand command;
     private final @NotNull BungeeGuiListener listener;
+    private final @NotNull CommandManager commandManager;
     private final @NotNull ExecutorService threadPool;
 
     @SuppressWarnings("unused")
@@ -50,6 +52,7 @@ public class BungeeGuiLoader {
                            final @NotNull PlaceholderHandler placeholderHandler,
                            final @NotNull PluginCommand command,
                            final @NotNull BungeeGuiListener listener,
+                           final @NotNull CommandManager commandManager,
                            final @NotNull ExecutorService threadPool) {
         this.guiHandler = guiHandler;
         this.plugin = plugin;
@@ -59,13 +62,14 @@ public class BungeeGuiLoader {
         this.placeholderHandler = placeholderHandler;
         this.command = command;
         this.listener = listener;
+        this.commandManager = commandManager;
         this.threadPool = threadPool;
     }
 
     void load() {
         StringUtil.blockPrint(logger::info, "Loading %s version %s".formatted(plugin.getDescription().getName(), plugin.getDescription().getVersion()));
 
-        pluginManager.registerCommand(plugin, command);
+        commandManager.setup();
         BungeeGuiAPI.setInstance(new BungeeGuiAPI(guiHandler, this, placeholderHandler));
         placeholderHandler.registerBuiltins();
 

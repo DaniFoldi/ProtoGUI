@@ -15,7 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
 @Singleton
-@Component
+@Component(modules = {
+        BungeeGuiBindingModule.class
+})
 public interface BungeeGuiComponent {
 
     @NotNull BungeeGuiLoader loader();

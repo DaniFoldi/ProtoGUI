@@ -60,7 +60,8 @@ shadowJar {
     relocate 'org.jetbrains.annotations', 'com.danifoldi.bungeegui.lib.annotations'
     relocate 'javax.inject', 'com.danifoldi.bungeegui.lib.inject'
     relocate 'dagger', 'com.danifoldi.bungeegui.lib.dagger'
-    relocate 'com.electronwill.night-config', 'com.danifoldi.bungeegui.lib.nightconfig'
+    relocate 'com.electronwill.nightconfig', 'com.danifoldi.bungeegui.lib.nightconfig'
+    relocate 'grapefruit.command', 'com.danifoldi.bungeegui.lib.grapefruit'
 
     archiveFileName.set("${project.name}-${project.version}.jar")
 }

@@ -1,43 +1,46 @@
 package com.danifoldi.bungeegui.command;
 
-import com.danifoldi.bungeegui.command.grapefruit.ChatBridgeMessageProvider;
+import com.danifoldi.bungeegui.command.grapefruit.ProxiedPlayerCollectionMapper;
 import com.danifoldi.bungeegui.command.grapefruit.ProxiedPlayerMapper;
 import com.danifoldi.bungeegui.main.BungeeGuiPlugin;
 import com.danifoldi.bungeegui.util.Message;
-import com.danifoldi.messagelib.core.MessageBuilder;
 import com.google.common.reflect.TypeToken;
 import grapefruit.command.CommandContainer;
 import grapefruit.command.dispatcher.CommandDispatcher;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 @Singleton
 public final class CommandManager {
-    private final ProxiedPlayerMapper playerMapper;
+    private final @NotNull ProxiedPlayerMapper playerMapper;
+    private final @NotNull ProxiedPlayerCollectionMapper playerCollectionMapper;
     private final Set<CommandContainer> commands;
     private final CommandDispatcher<CommandSender> dispatcher;
 
     @Inject
     public CommandManager(final @NotNull ProxiedPlayerMapper playerMapper,
-                          final @NotNull ChatBridgeMessageProvider messageProvider,
+                          final @NotNull ProxiedPlayerCollectionMapper playerCollectionMapper,
                           final @NotNull @Named("commands") Set<CommandContainer> commands,
                           final @NotNull ExecutorService threadPool,
-                          final @NotNull BungeeGuiPlugin plugin) {
+                          final @NotNull BungeeGuiPlugin plugin,
+                          final @NotNull PluginManager pluginManager) {
         this.playerMapper = playerMapper;
+        this.playerCollectionMapper = playerCollectionMapper;
         this.commands = commands;
         this.dispatcher = CommandDispatcher.builder(TypeToken.of(CommandSender.class))
                 .withAsyncExecutor(threadPool)
                 .withAuthorizer(CommandSender::hasPermission)
-                .withMessageProvider(messageProvider)
+                .withMessageProvider(key -> Message.valueOf(key.key().toUpperCase(Locale.ROOT).replace("-", "_")).value())
                 .withRegistrationHandler(context -> {
                     final String[] rootAliases = context.route().get(0).split("\\|");
                     if (rootAliases.length == 0) {
@@ -50,7 +53,7 @@ public final class CommandManager {
                             this
                     );
 
-                    ProxyServer.getInstance().getPluginManager().registerCommand(plugin, wrapper);
+                    pluginManager.registerCommand(plugin, wrapper);
                 })
                 .withMessenger((source, message) -> source.sendMessage(Message.toComponent(source instanceof ProxiedPlayer ? (ProxiedPlayer)source : null, message)))
                 .build();
@@ -62,6 +65,7 @@ public final class CommandManager {
 
     public void setup() {
         this.dispatcher.mappers().registerMapper(this.playerMapper);
+        this.dispatcher.mappers().registerMapper(this.playerCollectionMapper);
         this.commands.forEach(this.dispatcher::registerCommands);
     }
 

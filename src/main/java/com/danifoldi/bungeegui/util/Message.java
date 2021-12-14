@@ -71,6 +71,10 @@ public enum Message {
         return defaultValue;
     }
 
+    public @NotNull String value() {
+        return Message.messages.get(messageId);
+    }
+
     @SafeVarargs
     public static @NotNull String replace(@NotNull String text,final @NotNull Pair<String, String>... replacements) {
         for (Pair<String, String> replacement: replacements) {
@@ -114,7 +118,7 @@ public enum Message {
             toComponent(player, defaultValue, replacements);
         }
 
-        return toComponent(player, Message.messages.get(messageId), replacements);
+        return toComponent(player, value(), replacements);
     }
 
     @SafeVarargs
