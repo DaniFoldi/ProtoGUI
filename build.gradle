@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly 'io.github.waterfallmc:waterfall-api:1.18-R0.1-SNAPSHOT'
-    compileOnly 'com.velocitypowered:velocity-api:3.0.1'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
     annotationProcessor 'com.velocitypowered:velocity-api:3.0.1'
 
     implementation ('grapefruit:grapefruit:1.3.0') {
