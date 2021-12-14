@@ -13,6 +13,7 @@ import grapefruit.command.parameter.mapper.ParameterMappingException;
 import grapefruit.command.util.AnnotationList;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +34,6 @@ import java.util.stream.Stream;
 
 @Singleton
 public class ProxiedPlayerCollectionMapper extends AbstractParameterMapper<CommandSender, Collection<ProxiedPlayer>> {
-    protected static final Pattern UUID_PATTERN =
-            Pattern.compile("([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})");
 
     private final @NotNull ProxyServer proxyServer;
 
@@ -58,9 +57,11 @@ public class ProxiedPlayerCollectionMapper extends AbstractParameterMapper<Comma
         final @NotNull Pair<String, String> target = StringUtil.get(input);
         switch (target.getFirst().toLowerCase(Locale.ROOT)) {
             case "p":
-                return List.of(proxyServer.getPlayer(target.getSecond()));
+                ProxiedPlayer player = proxyServer.getPlayer(target.getSecond());
+                return player != null ? List.of(player) : Collections.emptyList();
             case "s":
-                return Map.copyOf(proxyServer.getServers()).get(target.getSecond()).getPlayers();
+                ServerInfo server = Map.copyOf(proxyServer.getServers()).get(target.getSecond());
+                return server != null ? server.getPlayers() : Collections.emptyList();
             default:
                 return Collections.emptyList();
         }

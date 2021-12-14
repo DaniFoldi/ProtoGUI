@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class PluginCommand implements CommandContainer {
 
     private final @NotNull Logger logger;
