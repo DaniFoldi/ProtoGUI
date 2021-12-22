@@ -12,10 +12,6 @@ import java.nio.file.Path;
 
 public class FileUtil {
     public static @NotNull FileConfig ensureConfigFile(final @NotNull Path folder, final @NotNull String fileName) throws IOException {
-        if (Files.notExists(folder)) {
-            Files.createDirectories(folder);
-        }
-
         final @NotNull Path dest = folder.resolve(fileName);
         if (Files.exists(dest)) {
             return loadConfigFile(dest);
@@ -33,6 +29,12 @@ public class FileUtil {
         config.load();
 
         return config;
+    }
+
+    public static @NotNull void ensureFolder(final @NotNull Path folder) throws IOException {
+        if (Files.notExists(folder)) {
+            Files.createDirectories(folder);
+        }
     }
 
     private FileUtil() {

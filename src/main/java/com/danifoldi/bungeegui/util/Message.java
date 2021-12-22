@@ -44,7 +44,9 @@ public enum Message {
     EMPTY_MESSAGE("emptyMessage", "&cMessage can't be empty"),
     NO_PERMISSION("noPermission", "&cYou don't have permission to execute that command"),
     GUI_LIST_TOP("guiListTop", "&a{count} GUIs are loaded:"),
-    GUI_LIST_ITEM("guiListItem", "&0- &6{name}");
+    GUI_LIST_ITEM("guiListItem", "&0- &6{name}"),
+    PLAYER_NOT_FOUND("playerNotFound", "&cPlayer {player} could not be found"),
+    DISPATCHER_FAILED_TO_EXECUTE_COMMAND("dispatcherFailedToExecuteCommand", "&cFailed to execute command") ;
 
     private static final @NotNull Map<String, String> messages = new HashMap<>();
     public static void setMessageProvider(Config config) {

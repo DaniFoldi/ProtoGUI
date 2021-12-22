@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class GuiHandler {
+    private final @NotNull Map<String, GuiGrid> templates = new ConcurrentHashMap<>();
     private final @NotNull Map<String, GuiGrid> menus = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, Pair<String, String>> openGuis = new ConcurrentHashMap<>();
     private final @NotNull Map<String, GuiCommand> commandHandlers = new ConcurrentHashMap<>();
@@ -65,39 +68,7 @@ public class GuiHandler {
         final @NotNull Config actions = config.get("actions");
 
         for (final @NotNull Config.Entry action: actions.entrySet()) {
-            final @NotNull Config actionData = action.getValue();
-            final @NotNull Config itemData = actionData.getOrElse("item", Config.inMemory());
-
-            @Nullable GuiSound clickSound = null;
-
-            if (itemData.contains("clickSound")) {
-                clickSound = GuiSound.builder()
-                        .soundName(itemData.getOrElse("clickSound.sound", "entity_villager_no"))
-                        .soundCategory(itemData.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                        .volume(itemData.getOrElse("clickSound.volume", 1.0d).floatValue())
-                        .pitch(itemData.getOrElse("clickSound.pitch", 1.0d).floatValue())
-                        .build();
-            }
-
-            final @NotNull GuiItem item = GuiItem.builder()
-                    .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
-                    .amount(itemData.getOrElse("count", 1))
-                    .title(itemData.getOrElse("name", ""))
-                    .lore(itemData.getOrElse("lore", Collections.emptyList()))
-                    .data(itemData.getOrElse("data", ""))
-                    .commands(itemData.getOrElse("commands", Collections.emptyList()))
-                    .enchanted(itemData.getOrElse("enchanted", false))
-                    .clickSound(clickSound)
-                    .build();
-
-            final @NotNull GuiAction guiAction = GuiAction.builder()
-                    .server(actionData.getOrElse("server", ""))
-                    .slot(actionData.getIntOrElse("slot", 1))
-                    .guiItem(item)
-                    .gui(actionData.getOrElse("gui", ""))
-                    .build();
-
-            guiActions.add(guiAction);
+            guiActions.add(loadAction(action.getValue()));
         }
 
         final @NotNull Config guis = config.get("guis");
@@ -105,79 +76,106 @@ public class GuiHandler {
         for (final @NotNull Config.Entry gui: guis.entrySet()) {
             final @NotNull String name = gui.getKey();
             final @NotNull Config guiData = gui.getValue();
-            final @NotNull Config guiItems = guiData.getOrElse("items", Config.inMemory());
-            final @NotNull Map<Integer, GuiItem> itemMap = new HashMap<>();
-            final int size = guiData.getIntOrElse("size", 54);
 
             try {
-                for (final @NotNull Config.Entry guiItem : guiItems.entrySet()) {
-                    final @NotNull Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
-                    final @NotNull Config itemData = guiItem.getValue();
-
-                    @Nullable GuiSound clickSound = null;
-
-                    if (itemData.contains("clickSound")) {
-                        clickSound = GuiSound.builder()
-                                .soundName(itemData.getOrElse("clickSound.sound", "entity_villager_no"))
-                                .soundCategory(itemData.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                                .volume(itemData.getOrElse("clickSound.volume", 1.0d).floatValue())
-                                .pitch(itemData.getOrElse("clickSound.pitch", 1.0d).floatValue())
-                                .build();
-                    }
-
-                    final @NotNull GuiItem item = GuiItem.builder()
-                            .type(itemData.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
-                            .amount(itemData.getOrElse("count", 1))
-                            .title(itemData.getOrElse("name", ""))
-                            .lore(itemData.getOrElse("lore", Collections.emptyList()))
-                            .data(itemData.getOrElse("data", ""))
-                            .commands(itemData.getOrElse("commands", Collections.emptyList()))
-                            .enchanted(itemData.getOrElse("enchanted", false))
-                            .clickSound(clickSound)
-                            .build();
-
-                    for (final int slot : slots) {
-                        itemMap.put(slot, item.copy());
-                    }
-                }
-
-                @Nullable GuiSound openSound = null;
-
-                if (guiData.contains("openSound")) {
-                    openSound = GuiSound.builder()
-                            .soundName(guiData.getOrElse("openSound.sound", "entity_villager_no"))
-                            .soundCategory(guiData.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
-                            .volume(guiData.getOrElse("openSound.volume", 1.0d).floatValue())
-                            .pitch(guiData.getOrElse("openSound.pitch", 1.0d).floatValue())
-                            .build();
-                }
-
-                final @NotNull GuiGrid grid = GuiGrid.builder()
-                        .items(itemMap)
-                        .targeted(guiData.getOrElse("targeted", false))
-                        .commands(guiData.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
-                        .permission(guiData.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
-                        .size(size)
-                        .title(guiData.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
-                        .selfTarget(guiData.getOrElse("selfTarget", true))
-                        .ignoreVanished(guiData.getOrElse("ignoreVanished", true))
-                        .requireOnlineTarget(guiData.getOrElse("requireOnlineTarget", false))
-                        .whitelistServers(guiData.getOrElse("whitelist", List.of("*")))
-                        .blacklistServers(guiData.getOrElse("blacklist", Collections.emptyList()))
-                        .placeholdersTarget(guiData.getOrElse("placeholdersTarget", false))
-                        .openSound(openSound)
-                        .targetBypass(guiData.getOrElse("targetBypass", false))
-                        .closeable(guiData.getOrElse("closeable", true))
-                        .notifyTarget(guiData.getOrElse("notifyTarget", ""))
-                        .build();
-
-                addGui(name, grid);
+                addGui(name, loadGuiGrid(guiData, name));
             } catch (Exception e) {
                 logger.warning("Could not load gui " + name);
                 logger.warning(e.getClass().getName() + ":  " + e.getMessage());
                 e.printStackTrace();
             }
         }
+    }
+
+    Map<Integer, GuiItem> loadItemMap(Config guiItems, int size) {
+        Map<Integer, GuiItem> itemMap = new ConcurrentHashMap<>();
+
+        for (final @NotNull Config.Entry guiItem : guiItems.entrySet()) {
+            final @NotNull Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
+            final @NotNull Config itemData = guiItem.getValue();
+
+            GuiItem item = loadItem(itemData);
+            for (final int slot : slots) {
+                itemMap.put(slot, item.copy());
+            }
+        }
+
+        return itemMap;
+    }
+
+    GuiGrid loadGuiGrid(Config gui, String name) {
+        int size = gui.getIntOrElse("size", 54);
+
+        return GuiGrid.builder()
+                .items(loadItemMap(gui.get("items"), size))
+                .targeted(gui.getOrElse("targeted", false))
+                .commands(gui.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
+                .permission(gui.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                .size(size)
+                .title(gui.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
+                .selfTarget(gui.getOrElse("selfTarget", true))
+                .ignoreVanished(gui.getOrElse("ignoreVanished", true))
+                .requireOnlineTarget(gui.getOrElse("requireOnlineTarget", false))
+                .whitelistServers(gui.getOrElse("whitelist", List.of("*")))
+                .blacklistServers(gui.getOrElse("blacklist", Collections.emptyList()))
+                .placeholdersTarget(gui.getOrElse("placeholdersTarget", false))
+                .openSound(loadOpenSound(gui))
+                .targetBypass(gui.getOrElse("targetBypass", false))
+                .closeable(gui.getOrElse("closeable", true))
+                .notifyTarget(gui.getOrElse("notifyTarget", ""))
+                .build();
+    }
+
+    GuiSound loadOpenSound(Config gui) {
+        @Nullable GuiSound openSound = null;
+
+        if (gui.contains("openSound")) {
+            openSound = GuiSound.builder()
+                    .soundName(gui.getOrElse("openSound.sound", "entity_villager_no"))
+                    .soundCategory(gui.getEnumOrElse("openSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                    .volume(gui.getOrElse("openSound.volume", 1.0d).floatValue())
+                    .pitch(gui.getOrElse("openSound.pitch", 1.0d).floatValue())
+                    .build();
+        }
+
+        return openSound;
+    }
+
+    GuiSound loadClickSound(Config item) {
+        @Nullable GuiSound clickSound = null;
+
+        if (item.contains("clickSound")) {
+            clickSound = GuiSound.builder()
+                    .soundName(item.getOrElse("clickSound.sound", "entity_villager_no"))
+                    .soundCategory(item.getEnumOrElse("clickSound.soundCategory", SoundCategory.MASTER, EnumGetMethod.NAME_IGNORECASE))
+                    .volume(item.getOrElse("clickSound.volume", 1.0d).floatValue())
+                    .pitch(item.getOrElse("clickSound.pitch", 1.0d).floatValue())
+                    .build();
+        }
+
+        return clickSound;
+    }
+
+    GuiItem loadItem(Config item) {
+        return GuiItem.builder()
+                .type(item.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
+                .amount(item.getOrElse("count", 1))
+                .title(item.getOrElse("name", ""))
+                .lore(item.getOrElse("lore", Collections.emptyList()))
+                .data(item.getOrElse("data", ""))
+                .commands(item.getOrElse("commands", Collections.emptyList()))
+                .enchanted(item.getOrElse("enchanted", false))
+                .clickSound(loadClickSound(item))
+                .build();
+    }
+
+    GuiAction loadAction(Config action) {
+        return GuiAction.builder()
+                .server(action.getOrElse("server", ""))
+                .slot(action.getIntOrElse("slot", 1))
+                .guiItem(loadItem(action.getOrElse("item", Config.inMemory())))
+                .gui(action.getOrElse("gui", ""))
+                .build();
     }
 
     void addGui(final @NotNull String name, final @NotNull GuiGrid gui) {

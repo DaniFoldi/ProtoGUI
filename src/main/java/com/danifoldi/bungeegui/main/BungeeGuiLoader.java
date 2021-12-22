@@ -74,7 +74,9 @@ public class BungeeGuiLoader {
         placeholderHandler.registerBuiltins();
 
         try {
+            FileUtil.ensureFolder(datafolder);
             final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
+            FileUtil.ensureFolder(datafolder.resolve("templates"));
             config.load();
 
             logger.setFilter(record -> config.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());

@@ -5,6 +5,7 @@ import com.google.common.reflect.TypeToken;
 import grapefruit.command.dispatcher.CommandContext;
 import grapefruit.command.dispatcher.CommandInput;
 import grapefruit.command.message.Message;
+import grapefruit.command.message.MessageKey;
 import grapefruit.command.message.Template;
 import grapefruit.command.parameter.mapper.AbstractParameterMapper;
 import grapefruit.command.parameter.mapper.ParameterMappingException;
@@ -50,7 +51,8 @@ public class ProxiedPlayerMapper extends AbstractParameterMapper<CommandSender, 
 
         if (player == null) {
             throw new ParameterMappingException(Message.of(
-                    ChatBridgeMessageKeys.NO_SUCH_PLAYER,
+                    // TODO improve this
+                    MessageKey.of(String.valueOf(com.danifoldi.bungeegui.util.Message.PLAYER_NOT_FOUND)),
                     Template.of("{player}", input)
             ));
         }
