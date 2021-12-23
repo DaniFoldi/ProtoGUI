@@ -134,7 +134,6 @@ public class BungeeGuiAPI {
      * @param placeholder - the function to be called on the player when the placeholder is requested
      * @implNote if the function returns null, the placeholder isn't parsed, the argument can be null if the parse target is the console
      */
-    @UnstableApi
     public void registerPlaceholder(final @NotNull String name, final @NotNull Function<ProxiedPlayer, String> placeholder) {
         placeholderHandler.register(name, placeholder);
     }
@@ -143,7 +142,6 @@ public class BungeeGuiAPI {
      * Unregister a custom placeholder
      * @param name - the name of the placeholder to unregister
      */
-    @UnstableApi
     public void unregisterPlaceholder(final @NotNull String name) {
         placeholderHandler.unregister(name);
     }
@@ -154,7 +152,6 @@ public class BungeeGuiAPI {
      * @param text - the text to replace placeholders in
      * @return the text with the placeholders replaced
      */
-    @UnstableApi
     public @NotNull String parsePlaceholders(final @Nullable ProxiedPlayer player, final @NotNull String text) {
         return placeholderHandler.parse(player, text);
     }
