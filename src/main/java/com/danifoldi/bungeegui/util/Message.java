@@ -51,7 +51,7 @@ public enum Message {
     private static final @NotNull Map<String, String> messages = new HashMap<>();
     public static void setMessageProvider(Config config) {
         final @NotNull Map<String, String> messages = new HashMap<>();
-        for (final @NotNull Config.Entry message: ((Config)config.get("messages")).entrySet()) {
+        for (final @NotNull Config.Entry message: config.entrySet()) {
             messages.put(message.getKey(), message.getValue());
         }
 

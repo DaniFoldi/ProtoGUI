@@ -76,13 +76,14 @@ public class BungeeGuiLoader {
         try {
             FileUtil.ensureFolder(datafolder);
             final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
+            final @NotNull FileConfig messages = FileUtil.ensureConfigFile(datafolder, "messages.yml");
             FileUtil.ensureFolder(datafolder.resolve("templates"));
             FileUtil.ensureFolder(datafolder.resolve("guis"));
             config.load();
 
             logger.setFilter(record -> config.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
-            Message.setMessageProvider(config);
+            Message.setMessageProvider(messages);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
                 StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(ConfigUtil.backupAndUpgrade(config)));
             }
