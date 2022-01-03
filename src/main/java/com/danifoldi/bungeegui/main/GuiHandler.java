@@ -5,6 +5,7 @@ import com.danifoldi.bungeegui.gui.GuiAction;
 import com.danifoldi.bungeegui.gui.GuiGrid;
 import com.danifoldi.bungeegui.gui.GuiItem;
 import com.danifoldi.bungeegui.gui.GuiSound;
+import com.danifoldi.bungeegui.util.ListUtil;
 import com.danifoldi.bungeegui.util.Message;
 import com.danifoldi.bungeegui.util.Pair;
 import com.danifoldi.bungeegui.util.SlotUtil;
@@ -12,6 +13,8 @@ import com.danifoldi.bungeegui.util.SoundUtil;
 import com.danifoldi.bungeegui.util.StringUtil;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
+import com.electronwill.nightconfig.core.file.FileConfig;
+import dev.simplix.protocolize.api.ClickType;
 import dev.simplix.protocolize.api.Protocolize;
 import dev.simplix.protocolize.api.SoundCategory;
 import dev.simplix.protocolize.api.inventory.Inventory;
@@ -25,6 +28,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class GuiHandler {
@@ -61,26 +68,65 @@ public class GuiHandler {
         return this.menus.get(name);
     }
 
-    void load(@NotNull Config config) {
-        final @NotNull Config actions = config.get("actions");
-
-        for (final @NotNull Config.Entry action: actions.entrySet()) {
-            guiActions.add(loadAction(action.getValue()));
+    void load(@NotNull Path datafolder) throws IOException {
+        try (Stream<Path> stream = Files.list(datafolder.resolve("actions"))) {
+            stream
+                    .filter(p -> !Files.isDirectory(p))
+                    .filter(p -> p.getFileName().endsWith(".yml"))
+                    .forEach(p -> {
+                        try {
+                            FileConfig f = FileConfig.of(p);
+                            f.load();
+                            String actionName = p.getFileName().toString().replace(".yml", "");
+                            logger.info("Loading action %s".formatted(actionName));
+                            guiActions.add(loadAction(f));
+                        } catch (Exception e) {
+                            logger.warning("Failed to load action %s".formatted(p.getFileName()));
+                        }
+                    });
         }
 
-        final @NotNull Config guis = config.get("guis");
+        try (Stream<Path> stream = Files.list(datafolder.resolve("templates"))) {
+            stream
+                    .filter(p -> !Files.isDirectory(p))
+                    .filter(p -> p.getFileName().endsWith(".yml"))
+                    .forEach(p -> {
+                        try {
+                            FileConfig f = FileConfig.of(p);
+                            f.load();
+                            String templateName = p.getFileName().toString().replace(".yml", "");
+                            logger.info("Loading template %s".formatted(templateName));
+                            templates.put(templateName, loadGuiGrid(f, templateName));
+                        } catch (Exception e) {
+                            logger.warning("Failed to load template %s".formatted(p.getFileName()));
+                        }
+                    });
+        }
 
-        for (final @NotNull Config.Entry gui: guis.entrySet()) {
-            final @NotNull String name = gui.getKey();
-            final @NotNull Config guiData = gui.getValue();
+        try (Stream<Path> stream = Files.list(datafolder.resolve("guis"))) {
+            stream
+                    .filter(p -> !Files.isDirectory(p))
+                    .filter(p -> p.getFileName().endsWith(".yml") || p.getFileName().endsWith(".yaml"))
+                    .forEach(p -> {
+                        try {
+                            FileConfig f = FileConfig.of(p);
+                            f.load();
+                            String guiName = p.getFileName().toString().replace(".yml", "");
+                            logger.info("Loading gui %s".formatted(guiName));
+                            GuiGrid templateGui = templates.get(f.getOrElse("template", ""));
+                            addGui(guiName, templateGui == null ? loadGuiGrid(f, guiName) : loadGuiGrid(f, guiName, templateGui));
+                        } catch (Exception e) {
+                            logger.warning("Failed to load gui %s".formatted(p.getFileName()));
+                        }
+                    });
+        }
+    }
 
-            try {
-                addGui(name, loadGuiGrid(guiData, name));
-            } catch (Exception e) {
-                logger.warning("Could not load gui " + name);
-                logger.warning(e.getClass().getName() + ":  " + e.getMessage());
-                e.printStackTrace();
-            }
+    void unload() {
+        guiActions.clear();
+        templates.clear();
+        for (String gui: getGuis()) {
+            removeGui(gui);
         }
     }
 
@@ -100,11 +146,19 @@ public class GuiHandler {
         return itemMap;
     }
 
+    Map<Integer, GuiItem> loadItemMap(Config guiItems, int size, Map<Integer, GuiItem> fallback) {
+        Map<Integer, GuiItem> itemMap = loadItemMap(guiItems, size);
+
+        fallback.forEach(itemMap::putIfAbsent);
+
+        return itemMap;
+    }
+
     GuiGrid loadGuiGrid(Config gui, String name) {
         int size = gui.getIntOrElse("size", 54);
 
         return GuiGrid.builder()
-                .items(loadItemMap(gui.get("items"), size))
+                .items(loadItemMap(gui.getOrElse("items", Config.inMemory()), size))
                 .targeted(gui.getOrElse("targeted", false))
                 .commands(gui.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
                 .permission(gui.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
@@ -123,6 +177,29 @@ public class GuiHandler {
                 .build();
     }
 
+    GuiGrid loadGuiGrid(Config gui, String name, GuiGrid template) {
+        int size = gui.getIntOrElse("size", template.getGuiSize());
+
+        return GuiGrid.builder()
+                .items(loadItemMap(gui.get("items"), size, template.getItems()))
+                .targeted(gui.getOrElse("targeted", template.isTargeted()))
+                .commands(gui.getOrElse("aliases", template.getCommandAliases()))
+                .permission(gui.getOrElse("permission", template.getPermission()))
+                .size(size)
+                .title(gui.getOrElse("title", template.getTitle()))
+                .selfTarget(gui.getOrElse("selfTarget", template.isSelfTarget()))
+                .ignoreVanished(gui.getOrElse("ignoreVanished", template.isIgnoreVanished()))
+                .requireOnlineTarget(gui.getOrElse("requireOnlineTarget", template.isRequireOnlineTarget()))
+                .whitelistServers(gui.getOrElse("whitelist", template.getWhitelistServers()))
+                .blacklistServers(gui.getOrElse("blacklist", template.getBlacklistServers()))
+                .placeholdersTarget(gui.getOrElse("placeholdersTarget", template.isPlaceholdersTarget()))
+                .openSound(loadOpenSound(gui, template.getOpenSound()))
+                .targetBypass(gui.getOrElse("targetBypass", template.isTargetBypass()))
+                .closeable(gui.getOrElse("closeable", template.isCloseable()))
+                .notifyTarget(gui.getOrElse("notifyTarget", template.getNotifyTarget()))
+                .build();
+    }
+
     GuiSound loadOpenSound(Config gui) {
         @Nullable GuiSound openSound = null;
 
@@ -136,6 +213,11 @@ public class GuiHandler {
         }
 
         return openSound;
+    }
+
+    GuiSound loadOpenSound(Config gui, GuiSound fallback) {
+        GuiSound sound = loadOpenSound(gui);
+        return sound == null ? fallback : sound;
     }
 
     GuiSound loadClickSound(Config item) {
@@ -161,6 +243,8 @@ public class GuiHandler {
                 .lore(item.getOrElse("lore", Collections.emptyList()))
                 .data(item.getOrElse("data", ""))
                 .commands(item.getOrElse("commands", Collections.emptyList()))
+                .rightCommands(item.getOrElse("rightCommands", Collections.emptyList()))
+                .leftCommands(item.getOrElse("leftCommands", Collections.emptyList()))
                 .enchanted(item.getOrElse("enchanted", false))
                 .clickSound(loadClickSound(item))
                 .build();
@@ -249,14 +333,11 @@ public class GuiHandler {
         }
 
         inventory.onClick(event -> {
-            //final @NotNull ProxiedPlayer player = event.player().handle();
-
             final @Nullable GuiGrid openGui = getOpenGui(player.getUniqueId());
             if (openGui == null) {
                 return;
             }
 
-            //final @NotNull Inventory inventory = event.inventory();
             final int slot = event.slot();
 
             if (inventory.type().equals(InventoryType.PLAYER)) {
@@ -270,20 +351,19 @@ public class GuiHandler {
                 return;
             }
 
-            if (openGui.getItems().get(slot).getClickSound() != null) {
-                if (SoundUtil.isValidSound(openGui.getItems().get(slot).getClickSound().getSoundName())) {
-                    logger.warning("Sound " + openGui.getItems().get(slot).getClickSound().getSoundName() + " is probably invalid");
+            GuiSound clickSound = openGui.getItems().get(slot).getClickSound();
+            if (clickSound != null) {
+                if (SoundUtil.isValidSound(clickSound.getSoundName())) {
+                    logger.warning("Sound " + clickSound + " is probably invalid");
                 }
-                openGui.getItems().get(slot).getClickSound().playFor(player);
+                clickSound.playFor(player);
             }
 
             if (openGui.getItems().get(slot).getCommands().isEmpty()) {
                 return;
             }
 
-            //final @NotNull String target = guiHandler.getGuiTarget(player.getUniqueId());
-
-            runCommand(player,openGui, slot, target);
+            runCommand(player,openGui, slot, target, event.clickType());
             close(player, true);
         });
         inventory.onClose(event -> close(event.player().handle(), false));
@@ -295,15 +375,19 @@ public class GuiHandler {
     private final Pattern permissionPattern = Pattern.compile("^perm<(?<node>[\\w.]+)>");
     private final Pattern noPermissionPattern = Pattern.compile("^noperm<(?<node>[\\w.]+)>");
 
-    void runCommand(final @NotNull ProxiedPlayer player, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target) {
-        logger.info("Running commands for player " + player.getName() + " slot " + slot + " with target " + target);
+    void runCommand(final @NotNull ProxiedPlayer player, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {
+        logger.info("Running " + clickType.name() + " commands for player " + player.getName() + " slot " + slot + " with target " + target);
 
         final @Nullable GuiItem item = openGui.getItems().get(slot);
         if (item == null) {
             return;
         }
 
-        for (final @NotNull String command: item.getCommands()) {
+        List<String> commands = clickType == ClickType.LEFT_CLICK ? ListUtil.concat(item.getLeftCommands(), item.getCommands()) :
+                                clickType == ClickType.RIGHT_CLICK ? ListUtil.concat(item.getRightCommands(), item.getCommands()) :
+                                item.getCommands();
+
+        for (final @NotNull String command: commands) {
             if (command.equals("")) {
                 continue;
             }
@@ -358,6 +442,7 @@ public class GuiHandler {
 
         return menus.get(openGuis.get(uuid).getFirst());
     }
+
     @Nullable String getGuiTarget(final @NotNull UUID uuid) {
         return openGuis.get(uuid).getSecond();
     }

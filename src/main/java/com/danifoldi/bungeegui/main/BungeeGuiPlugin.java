@@ -21,10 +21,10 @@ public class BungeeGuiPlugin extends Plugin {
                 .scheduler(getProxy().getScheduler())
                 .pluginManager(getProxy().getPluginManager())
                 .datafolder(getDataFolder().toPath())
-                .threadPool(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("BungeeGUI Async Pool - #%1$d").setDaemon(false).build()))
+                .threadPool(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + " Async Pool - #%1$d").setDaemon(false).build()))
                 .build();
-        this.loader = component.loader();
 
+        this.loader = component.loader();
         this.loader.load();
     }
 

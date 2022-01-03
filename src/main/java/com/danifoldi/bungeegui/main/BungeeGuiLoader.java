@@ -1,7 +1,6 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.command.CommandManager;
-import com.danifoldi.bungeegui.command.PluginCommand;
 import com.danifoldi.bungeegui.util.ConfigUtil;
 import com.danifoldi.bungeegui.util.FileUtil;
 import com.danifoldi.bungeegui.util.Message;
@@ -27,7 +26,6 @@ public class BungeeGuiLoader {
     private final @NotNull PluginManager pluginManager;
     private final @NotNull Path datafolder;
     private final @NotNull PlaceholderHandler placeholderHandler;
-    private final @NotNull PluginCommand command;
     private final @NotNull BungeeGuiListener listener;
     private final @NotNull CommandManager commandManager;
     private final @NotNull ExecutorService threadPool;
@@ -50,7 +48,6 @@ public class BungeeGuiLoader {
                            final @NotNull PluginManager pluginManager,
                            final @NotNull Path datafolder,
                            final @NotNull PlaceholderHandler placeholderHandler,
-                           final @NotNull PluginCommand command,
                            final @NotNull BungeeGuiListener listener,
                            final @NotNull CommandManager commandManager,
                            final @NotNull ExecutorService threadPool) {
@@ -60,7 +57,6 @@ public class BungeeGuiLoader {
         this.pluginManager = pluginManager;
         this.datafolder = datafolder;
         this.placeholderHandler = placeholderHandler;
-        this.command = command;
         this.listener = listener;
         this.commandManager = commandManager;
         this.threadPool = threadPool;
@@ -77,22 +73,24 @@ public class BungeeGuiLoader {
             FileUtil.ensureFolder(datafolder);
             final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             final @NotNull FileConfig messages = FileUtil.ensureConfigFile(datafolder, "messages.yml");
+            FileUtil.ensureFolder(datafolder.resolve("actions"));
             FileUtil.ensureFolder(datafolder.resolve("templates"));
             FileUtil.ensureFolder(datafolder.resolve("guis"));
             config.load();
+            messages.load();
 
             logger.setFilter(record -> config.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             Message.setMessageProvider(messages);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
-                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(ConfigUtil.backupAndUpgrade(config)));
+                StringUtil.blockPrint(logger::warning, "%s config is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(plugin.getDescription().getName(), ConfigUtil.backupAndUpgrade(config)));
             }
 
             if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
-                StringUtil.blockPrint(logger::warning, "BungeeGUI config.yml is built with a newer version. Compatibility is not guaranteed.");
+                StringUtil.blockPrint(logger::warning, "%s config is built with a newer version. Compatibility is not guaranteed.".formatted(plugin.getDescription().getName()));
             }
 
-            guiHandler.load(config);
+            guiHandler.load(datafolder);
             pluginManager.registerListener(plugin, listener);
         } catch (IOException e) {
             StringUtil.blockPrint(logger::severe, "Could not enable plugin, please see the error below");
@@ -105,7 +103,7 @@ public class BungeeGuiLoader {
                logger.warning("Could not check for updates");
            }
            if (!newest.equals(plugin.getDescription().getVersion())) {
-               StringUtil.blockPrint(logger::warning, "A new release is available for BungeeGUI. Please update for bugfixes and new features.");
+               StringUtil.blockPrint(logger::warning, "A new release is available for %s. Please update for bugfixes and new features.".formatted(plugin.getDescription().getName()));
                logger.warning("Your current version: %s, newest: %s".formatted(plugin.getDescription().getVersion(), newest));
            }
         });
@@ -114,7 +112,7 @@ public class BungeeGuiLoader {
     void unload() {
         StringUtil.blockPrint(logger::info, "Unloading %s version %s".formatted(plugin.getDescription().getName(), plugin.getDescription().getVersion()));
 
-        guiHandler.getGuis().forEach(guiHandler::removeGui);
+        guiHandler.unload();
         placeholderHandler.unregisterAll();
         BungeeGuiAPI.setInstance(null);
         pluginManager.unregisterCommands(plugin);
