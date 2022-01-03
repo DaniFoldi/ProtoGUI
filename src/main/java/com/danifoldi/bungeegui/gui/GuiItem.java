@@ -28,6 +28,8 @@ public class GuiItem {
     private final @NotNull List<String> lore;
     private final @NotNull String data;
     private final @NotNull List<String> commands;
+    private final @NotNull List<String> rightCommands;
+    private final @NotNull List<String> leftCommands;
     private final boolean enchanted;
     private final @Nullable GuiSound clickSound;
 
@@ -37,6 +39,8 @@ public class GuiItem {
                     final @NotNull List<String> lore,
                     final @NotNull String data,
                     final @NotNull List<String> commands,
+                    final @NotNull List<String> rightCommands,
+                    final @NotNull List<String> leftCommands,
                     final boolean enchanted,
                     final @Nullable GuiSound clickSound) {
         this.type = type;
@@ -45,6 +49,8 @@ public class GuiItem {
         this.lore = lore;
         this.data = data;
         this.commands = commands;
+        this.rightCommands = rightCommands;
+        this.leftCommands = leftCommands;
         this.enchanted = enchanted;
         this.clickSound = clickSound;
     }
@@ -71,6 +77,13 @@ public class GuiItem {
 
     public @NotNull List<String> getCommands() {
         return List.copyOf(this.commands);
+    }
+
+    public @NotNull List<String> getRightCommands() {
+        return List.copyOf(this.rightCommands);
+    }
+    public @NotNull List<String> getLeftCommands() {
+        return List.copyOf(this.leftCommands);
     }
 
     public boolean isEnchanted() {
@@ -180,6 +193,8 @@ public class GuiItem {
         private @Nullable List<String> lore;
         private @Nullable String data;
         private @Nullable List<String> commands;
+        private @Nullable List<String> rightCommands;
+        private @Nullable List<String> leftCommands;
         private boolean enchanted;
         private @Nullable GuiSound clickSound;
 
@@ -215,6 +230,16 @@ public class GuiItem {
             return this;
         }
 
+        public @NotNull Builder rightCommands(final @NotNull List<String> rightCommands) {
+            this.rightCommands = rightCommands;
+            return this;
+        }
+
+        public @NotNull Builder leftCommands(final @NotNull List<String> leftCommands) {
+            this.leftCommands = leftCommands;
+            return this;
+        }
+
         public @NotNull Builder enchanted(final boolean enchanted) {
             this.enchanted = enchanted;
             return this;
@@ -237,6 +262,8 @@ public class GuiItem {
                     requireNonNull(this.lore),
                     requireNonNull(this.data),
                     requireNonNull(this.commands),
+                    requireNonNull(this.rightCommands),
+                    requireNonNull(this.leftCommands),
                     this.enchanted,
                     clickSound
             );
@@ -250,6 +277,8 @@ public class GuiItem {
                 List.copyOf(lore),
                 data,
                 List.copyOf(commands),
+                List.copyOf(rightCommands),
+                List.copyOf(leftCommands),
                 enchanted,
                 clickSound == null ? null : clickSound.copy());
     }
