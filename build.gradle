@@ -57,11 +57,11 @@ shadowJar {
         exclude(dependency('com.electronwill.night-config:.*:.*'))
     }
 
-    relocate 'org.jetbrains.annotations', 'com.danifoldi.bungeegui.lib.annotations'
-    relocate 'javax.inject', 'com.danifoldi.bungeegui.lib.inject'
-    relocate 'dagger', 'com.danifoldi.bungeegui.lib.dagger'
-    relocate 'com.electronwill.nightconfig', 'com.danifoldi.bungeegui.lib.nightconfig'
-    relocate 'grapefruit.command', 'com.danifoldi.bungeegui.lib.grapefruit'
+    relocate 'org.jetbrains.annotations', 'com.danifoldi.protogui.lib.annotations'
+    relocate 'javax.inject', 'com.danifoldi.protogui.lib.inject'
+    relocate 'dagger', 'com.danifoldi.protogui.lib.dagger'
+    relocate 'com.electronwill.nightconfig', 'com.danifoldi.protogui.lib.nightconfig'
+    relocate 'grapefruit.command', 'com.danifoldi.protogui.lib.grapefruit'
 
     archiveFileName.set("${project.name}-${project.version}.jar")
 }
