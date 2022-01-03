@@ -1,7 +1,6 @@
 package com.danifoldi.bungeegui.main;
 
 import com.danifoldi.bungeegui.gui.GuiGrid;
-import io.netty.util.internal.UnstableApi;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
