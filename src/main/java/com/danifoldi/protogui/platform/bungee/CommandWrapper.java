@@ -6,7 +6,9 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -27,12 +29,18 @@ public class CommandWrapper extends Command implements TabExecutor {
 
     @Override
     public void execute(final @NotNull CommandSender sender, @NotNull final String[] args) {
-        dispatch.accept(protoGui.senderGenerator.apply(sender), String.join(", ", args));
+        dispatch.accept(protoGui.senderGenerator.apply(sender), buildArguments(args));
     }
 
     @Override
     public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
-        return suggest.apply(protoGui.senderGenerator.apply(sender), String.join(", ", args));
+        return suggest.apply(protoGui.senderGenerator.apply(sender), buildArguments(args));
     }
 
+    private @NotNull String buildArguments(final @NotNull String[] args) {
+        final StringJoiner joiner = new StringJoiner(" ");
+        joiner.add(getName());
+        Arrays.stream(args).forEach(joiner::add);
+        return joiner.toString();
+    }
 }

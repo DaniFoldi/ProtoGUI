@@ -97,7 +97,7 @@ public class GuiHandler {
         try (Stream<Path> stream = Files.list(datafolder.resolve("guis"))) {
             stream
                     .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> p.getFileName().endsWith(".yml") || p.getFileName().endsWith(".yaml"))
+                    .filter(p -> p.getFileName().endsWith(".yml"))
                     .forEach(p -> {
                         try {
                             FileConfig f = FileConfig.of(p);

@@ -25,7 +25,9 @@ import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -48,8 +50,38 @@ public class ProtoGui extends Plugin implements Listener {
     private final @NotNull Map<String, CommandWrapper> registeredCommands = new ConcurrentHashMap<>();
     private final @NotNull Map<ServerInfo, ServerPing> lastResponse = new ConcurrentHashMap<>();
 
+    // Everything in onLoad is only needed for compatibility with older versions, so only on Bungee
+    private boolean enabled = false;
+    @Override
+    public void onLoad() {
+        try {
+            Files.move(getDataFolder().toPath().getParent().resolve("BungeeGUI"), getDataFolder().toPath());
+            getLogger().info("Moved datafolder to new location");
+        } catch (IOException ignored) {
+
+        }
+        try {
+            PluginManager pluginManager = ProxyServer.getInstance().getPluginManager();
+            Field pluginsField = pluginManager.getClass().getDeclaredField("plugins");
+            pluginsField.setAccessible(true);
+            if (pluginsField.get(pluginManager) instanceof Map pluginMap) {
+                //noinspection unchecked
+                pluginMap.put("BungeeGUI", this);
+            }
+            getLogger().info("Registering plugin as BungeeGUI, double loading message is normal");
+        } catch (ReflectiveOperationException e) {
+            getLogger().warning("Could not force-add old plugin name");
+            getLogger().info(e.getMessage());
+        }
+    }
+
     @Override
     public void onEnable() {
+        if (!enabled) {
+            enabled = true;
+        } else {
+            return;
+        }
         final @NotNull ProtoGuiComponent component = DaggerProtoGuiComponent.builder()
                 .plugin(this)
                 .logger(getLogger())
@@ -61,25 +93,17 @@ public class ProtoGui extends Plugin implements Listener {
                 .platformInteraction(platform)
                 .build();
 
-        try {
-            PluginManager pluginManager = ProxyServer.getInstance().getPluginManager();
-            Field pluginsField = pluginManager.getClass().getDeclaredField("plugins");
-            pluginsField.setAccessible(true);
-            if (pluginsField.get(pluginManager) instanceof Map pluginMap) {
-                //noinspection unchecked
-                pluginMap.put("BungeeGUI", this);
-            }
-        } catch (ReflectiveOperationException e) {
-            getLogger().warning("Could not force-add old plugin name");
-            getLogger().info(e.getMessage());
-        }
-
         this.loader = component.loader();
         this.loader.load();
     }
 
     @Override
     public void onDisable() {
+        if (enabled) {
+            enabled = false;
+        } else {
+            return;
+        }
         if (this.loader == null) {
             return;
         }
