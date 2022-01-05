@@ -59,6 +59,7 @@ blossom {
 
 shadowJar {
     minimize {
+        //noinspection GroovyAssignabilityCheck
         exclude(dependency('com.electronwill.night-config:.*:.*'))
     }
 
