@@ -1,10 +1,10 @@
 package com.danifoldi.protogui.main;
 
-import com.danifoldi.protogui.command.GuiCommand;
 import com.danifoldi.protogui.gui.GuiAction;
 import com.danifoldi.protogui.gui.GuiGrid;
 import com.danifoldi.protogui.gui.GuiItem;
 import com.danifoldi.protogui.gui.GuiSound;
+import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.danifoldi.protogui.util.ListUtil;
 import com.danifoldi.protogui.util.Message;
 import com.danifoldi.protogui.util.Pair;
@@ -18,11 +18,9 @@ import dev.simplix.protocolize.api.ClickType;
 import dev.simplix.protocolize.api.Protocolize;
 import dev.simplix.protocolize.api.SoundCategory;
 import dev.simplix.protocolize.api.inventory.Inventory;
+import dev.simplix.protocolize.api.inventory.PlayerInventory;
 import dev.simplix.protocolize.data.ItemType;
 import dev.simplix.protocolize.data.inventory.InventoryType;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,19 +47,12 @@ public class GuiHandler {
     private final @NotNull Map<String, GuiGrid> templates = new ConcurrentHashMap<>();
     private final @NotNull Map<String, GuiGrid> menus = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, Pair<String, String>> openGuis = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, GuiCommand> commandHandlers = new ConcurrentHashMap<>();
     private final @NotNull List<GuiAction> guiActions = Collections.synchronizedList(new ArrayList<>());
     private final @NotNull Logger logger;
-    private final @NotNull PluginManager pluginManager;
-    private final @NotNull BungeeGuiPlugin plugin;
 
     @Inject
-    GuiHandler(final @NotNull Logger logger,
-               final @NotNull PluginManager pluginManager,
-               final @NotNull BungeeGuiPlugin plugin) {
+    GuiHandler(final @NotNull Logger logger) {
         this.logger = logger;
-        this.pluginManager = pluginManager;
-        this.plugin = plugin;
     }
 
     @NotNull GuiGrid getGui(final @NotNull String name) {
@@ -265,62 +256,64 @@ public class GuiHandler {
         }
         menus.put(name, gui);
         if (!gui.getCommandAliases().isEmpty()) {
-            commandHandlers.put(name, new GuiCommand(name));
-            pluginManager.registerCommand(plugin, commandHandlers.get(name));
+            gui.getCommandAliases().forEach(alias -> {
+                CommandHandler commandHandler = new CommandHandler(name, gui);
+                ProtoGuiAPI.getInstance().getPlatform().registerCommand(alias, commandHandler::dispatch, commandHandler::suggest);
+            });
         }
     }
 
     void removeGui(final @NotNull String name) {
-        openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).map(Map.Entry::getKey).collect(Collectors.toList()).forEach(p -> close(ProxyServer.getInstance().getPlayer(p), true));
-        if (commandHandlers.get(name) != null) {
-            pluginManager.unregisterCommand(commandHandlers.get(name));
-            commandHandlers.remove(name);
-        }
+        openGuis.entrySet().stream().filter(v -> v.getValue().getFirst().equals(name)).map(Map.Entry::getKey).forEach(u -> close(u, true));
+        menus.get(name).getCommandAliases().forEach(ProtoGuiAPI.getInstance().getPlatform()::unregisterCommand);
+
         menus.remove(name);
     }
 
-    void actions(final @NotNull ProxiedPlayer player) {
-        /*PlayerInventory inventory = InventoryManager.getInventory(player.getUniqueId());
+    void updateActions(final @NotNull UUID uuid) {
+        PlayerInventory inventory = Protocolize.playerProvider().player(uuid).proxyInventory();
+        PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
 
         guiActions
                 .stream()
-                .filter(a -> a.getServer().equalsIgnoreCase(player.getServer().getInfo().getName()))
-                .forEach(a -> inventory.setItem(a.getSlot(), a.getGuiItem().toItemStack(player, player.getName(), "")));
+                .filter(a -> a.getServer().equalsIgnoreCase(player.connectedTo().name()))
+                .forEach(a -> inventory.item(a.getSlot(), a.getGuiItem().toItemStack(player, player.name(), "")));
 
-        inventory.update();*/
+        inventory.update();
     }
 
-    void interact(final @NotNull ProxiedPlayer player, final int slot) {
-        /*Optional<GuiAction> action = guiActions
+    void handleActions(final @NotNull UUID uuid, final int slot) {
+        guiActions
                 .stream()
-                .filter(a -> a.getServer().equalsIgnoreCase(player.getServer().getInfo().getName()))
+                .filter(a -> a.getServer().equalsIgnoreCase(ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid).connectedTo().name()))
                 .filter(a -> a.getSlot() == slot)
-                .findFirst();
-
-        action.ifPresent(guiAction -> {
-            if (guiAction.getGuiItem().getClickSound() != null) {
-                guiAction.getGuiItem().getClickSound().playFor(player);
-            }
-            open(guiAction.getGui(), player, null);
-        });*/
+                .findFirst()
+                .ifPresent(guiAction -> {
+                    if (guiAction.getGuiItem().getClickSound() != null) {
+                        guiAction.getGuiItem().getClickSound().playFor(uuid);
+                    }
+                  open(guiAction.getGui(), uuid, null);
+        });
     }
 
-    void open(final @NotNull String name, final @NotNull ProxiedPlayer player, final @Nullable String target) {
-        logger.info("Opening gui " + name + " for player " + player.getName() + " (target: " + target + ")");
+    void open(final @NotNull String name, final @NotNull UUID uuid, final @NotNull String target) {
+        logger.info("Opening gui " + name + " for player " + uuid + " (target: " + target + ")");
 
-        final ProxiedPlayer placeholderTarget = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && ProxyServer.getInstance().getPlayer(target) != null ? ProxyServer.getInstance().getPlayer(target) : player;
+        final PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
+        final PlatformInteraction.ProtoPlayer targetPlayer = ProtoGuiAPI.getInstance().getPlatform().getPlayer(target);
+        final PlatformInteraction.ProtoPlayer placeholderPlayer = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && targetPlayer != null ? targetPlayer : player;
         final GuiGrid gui = menus.get(name);
-        final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize())).title(Message.toComponent(placeholderTarget, gui.getTitle(), Pair.of("player", player.getName()), Pair.of("target", target)));
+        final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize())).title(Message.process(placeholderPlayer, gui.getTitle(), Pair.of("player", player.name()), Pair.of("target", targetPlayer != null ? targetPlayer.name() : target)));
 
         if (gui.getOpenSound() != null) {
             if (SoundUtil.isValidSound(gui.getOpenSound().getSoundName())) {
                 logger.warning("Sound " + gui.getOpenSound().getSoundName() + " is probably invalid");
             }
-            gui.getOpenSound().playFor(player);
+            gui.getOpenSound().playFor(uuid);
         }
 
-        if (ProxyServer.getInstance().getPlayer(target) != null && !gui.getNotifyTarget().equals("")) {
-            ProxyServer.getInstance().getPlayer(target).sendMessage(Message.toComponent(ProxyServer.getInstance().getPlayer(target), gui.getNotifyTarget(), Pair.of("player", player.getName()), Pair.of("target", target)));
+        if (targetPlayer != null && !gui.getNotifyTarget().equals("")) {
+            targetPlayer.send(Message.process(targetPlayer, gui.getNotifyTarget(), Pair.of("player", player.name()), Pair.of("target", targetPlayer.name())));
         }
 
         for (final @NotNull Map.Entry<Integer, GuiItem> guiItem: gui.getItems().entrySet()) {
@@ -329,11 +322,11 @@ public class GuiHandler {
                 continue;
             }
 
-            inventory.item(guiItem.getKey(), guiItem.getValue().toItemStack(placeholderTarget, player.getName(), target));
+            inventory.item(guiItem.getKey(), guiItem.getValue().toItemStack(placeholderPlayer, player.name(), target));
         }
 
         inventory.onClick(event -> {
-            final @Nullable GuiGrid openGui = getOpenGui(player.getUniqueId());
+            final @Nullable GuiGrid openGui = getOpenGui(uuid);
             if (openGui == null) {
                 return;
             }
@@ -356,27 +349,27 @@ public class GuiHandler {
                 if (SoundUtil.isValidSound(clickSound.getSoundName())) {
                     logger.warning("Sound " + clickSound + " is probably invalid");
                 }
-                clickSound.playFor(player);
+                clickSound.playFor(uuid);
             }
 
             if (openGui.getItems().get(slot).getCommands().isEmpty()) {
                 return;
             }
 
-            runCommand(player,openGui, slot, target, event.clickType());
-            close(player, true);
+            runCommand(uuid,openGui, slot, target, event.clickType());
+            close(uuid, true);
         });
         inventory.onClose(event -> close(event.player().handle(), false));
 
-        Protocolize.playerProvider().player(player.getUniqueId()).openInventory(inventory);
-        openGuis.put(player.getUniqueId(), Pair.of(name, target));
+        Protocolize.playerProvider().player(uuid).openInventory(inventory);
+        openGuis.put(uuid, Pair.of(name, target));
     }
 
     private final Pattern permissionPattern = Pattern.compile("^perm<(?<node>[\\w.]+)>");
     private final Pattern noPermissionPattern = Pattern.compile("^noperm<(?<node>[\\w.]+)>");
 
-    void runCommand(final @NotNull ProxiedPlayer player, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {
-        logger.info("Running " + clickType.name() + " commands for player " + player.getName() + " slot " + slot + " with target " + target);
+    void runCommand(final @NotNull UUID uuid, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {
+        logger.info("Running " + clickType.name() + " commands for player " + uuid + " slot " + slot + " with target " + target);
 
         final @Nullable GuiItem item = openGui.getItems().get(slot);
         if (item == null) {
@@ -393,6 +386,7 @@ public class GuiHandler {
             }
 
             @NotNull Pair<String, String> commandData = StringUtil.get(command);
+            PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
 
             if (permissionPattern.matcher(commandData.getFirst()).matches()) {
                 String node = permissionPattern.matcher(commandData.getFirst()).group("node");
@@ -411,28 +405,28 @@ public class GuiHandler {
             }
 
             if (commandData.getFirst().equalsIgnoreCase("console")) {
-                pluginManager.dispatchCommand(ProxyServer.getInstance().getConsole(), Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
+                ProtoGuiAPI.getInstance().getPlatform().runConsoleCommand(Message.replace(command, Pair.of("player", player.name()), Pair.of("target", target)));
                 continue;
             }
 
-            pluginManager.dispatchCommand(player, Message.replace(command, Pair.of("player", player.getName()), Pair.of("target", target)));
+            player.run(Message.replace(command, Pair.of("player", player.name()), Pair.of("target", target)));
         }
     }
 
-    void close(final @NotNull ProxiedPlayer player, final boolean didClick) {
-        if (!openGuis.containsKey(player.getUniqueId())) {
+    void close(final @NotNull UUID uuid, final boolean didClick) {
+        if (!openGuis.containsKey(uuid)) {
             return;
         }
 
-        if (!menus.get(openGuis.get(player.getUniqueId()).getFirst()).isCloseable() && !didClick) {
-            open(openGuis.get(player.getUniqueId()).getFirst(), player, openGuis.get(player.getUniqueId()).getSecond());
+        if (!menus.get(openGuis.get(uuid).getFirst()).isCloseable() && !didClick) {
+            open(openGuis.get(uuid).getFirst(), uuid, openGuis.get(uuid).getSecond());
             return;
         }
 
-        logger.info("Removing gui from cache for " + player.getName());
+        logger.info("Removing gui from cache for " + uuid);
 
-        openGuis.remove(player.getUniqueId());
-        Protocolize.playerProvider().player(player.getUniqueId()).closeInventory();
+        openGuis.remove(uuid);
+        Protocolize.playerProvider().player(uuid).closeInventory();
     }
 
     @Nullable GuiGrid getOpenGui(final @NotNull UUID uuid) {
@@ -451,7 +445,7 @@ public class GuiHandler {
         return menus.entrySet().stream().filter(m -> m.getValue().equals(gui)).map(Map.Entry::getKey).findFirst().orElse("");
     }
 
-    @NotNull List<String> getGuis() {
-        return new ArrayList<>(menus.keySet());
+    @NotNull Set<String> getGuis() {
+        return Set.copyOf(menus.keySet());
     }
 }

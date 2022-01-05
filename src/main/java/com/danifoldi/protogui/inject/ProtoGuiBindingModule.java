@@ -9,7 +9,7 @@ import grapefruit.command.CommandContainer;
 import javax.inject.Named;
 
 @Module
-public interface BungeeGuiBindingModule {
+public interface ProtoGuiBindingModule {
 
     @Binds
     @IntoSet

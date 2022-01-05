@@ -1,6 +1,5 @@
 package com.danifoldi.protogui.util;
 
-import com.danifoldi.protogui.main.BungeeGuiPlugin;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +16,7 @@ public class FileUtil {
             return loadConfigFile(dest);
         }
 
-        try (final @Nullable InputStream stream = BungeeGuiPlugin.class.getResourceAsStream("/" + fileName)) {
+        try (final @Nullable InputStream stream = FileUtil.class.getResourceAsStream("/" + fileName)) {
             Files.copy(stream, dest);
         }
 
@@ -31,7 +30,7 @@ public class FileUtil {
         return config;
     }
 
-    public static @NotNull void ensureFolder(final @NotNull Path folder) throws IOException {
+    public static void ensureFolder(final @NotNull Path folder) throws IOException {
         if (Files.notExists(folder)) {
             Files.createDirectories(folder);
         }

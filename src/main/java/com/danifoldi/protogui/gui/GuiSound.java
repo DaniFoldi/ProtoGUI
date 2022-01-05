@@ -2,14 +2,15 @@ package com.danifoldi.protogui.gui;
 
 import com.danifoldi.protogui.util.SoundUtil;
 import dev.simplix.protocolize.api.SoundCategory;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class GuiSound {
 
     private final @NotNull String soundName;
@@ -43,35 +44,12 @@ public class GuiSound {
         return this.pitch;
     }
 
-    public void playFor(ProxiedPlayer player) {
+    public void playFor(UUID uuid) {
         if (volume <= 0) {
             return;
         }
 
-        SoundUtil.playSound(player, getSoundName(), getSoundCategory(), getVolume(), getPitch());
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return "GuiSound{" +
-                "soundName=" + soundName +
-                ", soundCategory=" + soundCategory +
-                ", volume=" + volume +
-                ", pitch=" + pitch +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GuiSound guiSound = (GuiSound) o;
-        return Float.compare(guiSound.volume, volume) == 0 && Float.compare(guiSound.pitch, pitch) == 0 && soundName.equals(guiSound.soundName) && soundCategory == guiSound.soundCategory;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(soundName, soundCategory, volume, pitch);
+        SoundUtil.playSound(uuid, getSoundName(), getSoundCategory(), getVolume(), getPitch());
     }
 
     public static @NotNull Builder builder() {
@@ -117,6 +95,29 @@ public class GuiSound {
                     pitch
             );
         }
+    }
+
+    @Override
+    public String toString() {
+        return "GuiSound{" +
+                "soundName='" + soundName + '\'' +
+                ", soundCategory=" + soundCategory +
+                ", volume=" + volume +
+                ", pitch=" + pitch +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuiSound guiSound = (GuiSound) o;
+        return Float.compare(guiSound.volume, volume) == 0 && Float.compare(guiSound.pitch, pitch) == 0 && soundName.equals(guiSound.soundName) && soundCategory == guiSound.soundCategory;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(soundName, soundCategory, volume, pitch);
     }
 
     public @NotNull GuiSound copy() {

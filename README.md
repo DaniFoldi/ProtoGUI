@@ -1,4 +1,4 @@
-# BungeeGUI Plugin for BungeeCord
+# ProtoGUI Plugin for BungeeCord
 
 ## Features
 
@@ -17,7 +17,7 @@
 Dependencies: [**Protocolize**](https://www.spigotmc.org/resources/protocolize-protocollib-for-bungeecord-waterfall-aegis.63778/) is required. Please make sure you have it installed, or the plugin will fail to load.
 Download the latest version from either GitHub or Spigot, put it into the `plugins` folder of your Bungee, and you're done.
 
-Of course, you will probably want to customize the GUIs of the plugin. For that, see the example `config.yml` [here](https://github.com/DaniFoldi/BungeeGUI/blob/main/src/main/resources/config.yml), and below for explanations.
+Of course, you will probably want to customize the GUIs of the plugin. For that, see the example `config.yml` [here](https://github.com/DaniFoldi/ProtoGUI/blob/main/src/main/resources/config.yml), and below for explanations.
 
 Optional dependencies: *PremiumVanish*, *LuckPerms*.
 
@@ -40,7 +40,7 @@ test: # the name of the gui, used internally and in the API
     aliases: # default: []; the commands that open the GUI
       - test
       - testcommand
-    permission: 'somepermission.test' # default: bungeegui.gui.<guiname>; overrides the permission required to execute the commands
+    permission: 'somepermission.test' # default: protogui.gui.<guiname>; overrides the permission required to execute the commands
     size: 27 # default: 54; the size of the GUI
     title: '&2Test {target}' # default: GUI <guiname>; the title of the GUI displayed on top
     selfTarget: false # default: true; can the executing player and the target be the same player
@@ -60,7 +60,7 @@ test: # the name of the gui, used internally and in the API
       pitch: 1.2 # default 1.0; the pitch to play the sound at
     targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
     closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
-    notifyTarget: '{player} targeted you with a GUI' # default: ''; the message that will sent to the target, if they are online. NOTE: omit to send no message
+    notifyTarget: '{player} targeted you with a GUI' # default: ''; the message that will be sent to the target, if they are online. NOTE: omit to send no message
     items: # default: []; the items in the GUI
       '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0
         type: 'cobblestone' # default: stone; the material of the item
@@ -119,68 +119,68 @@ This should say `3`. If there are any config changes, the value will be incremen
 
 ## Commands
 
-The plugin registers the command `/bungeegui` with many subcommands that contain useful utility functions.
+The plugin registers the command `/protogui` with many subcommands that contain useful utility functions.
 A list of these will be added here shortly. You can view them in-game with instructions on how to use each.
 
 ## Placeholders
 
 All messages support the placeholders in the table below. The API can be used to register additional placeholders.
 
-| Placeholder | Description |
-| ----------- | ----------- |
-|`%bungeegui%`|BungeeGUI information|
-|`%guicount%`|Number of loaded GUIs in BungeeGUI|
-|`%placeholdercount%`|Number of placeholders registered in BungeeGUI|
-|`%ram_used%`|Amount of RAM used by the proxy|
-|`%ram_total%`|Total RAM allocated by the proxy|
-|`%proxyname%`|The name of the proxy|
-|`%proxyversion%`|The version of the proxy|
-|`%plugincount%`|Number of plugins loaded|
-|`%servercount%`|Number of servers proxied|
-|`%online%`|Total number of players online|
-|`%online_visible%`|Number of players online that are not vanished _(PV required)_|
-|`%max%`|Maximum number of online players|
-|`%name%`|Player name|
-|`%uuid%`|Player UUID|
-|`%displayname%`|Player displayname|
-|`%locale%`|The locale used by the player|
-|`%version%`|The game version used by the player|
-|`%ping%`|Latest ping measurement of the player|
-|`%vanished%`|Whether the player is vanished or not|
-|`%servername%`|The name of the server the player is connected to|
-|`%servermotd%`|The MOTD of the server the player is connected to|
-|`%luckperms_friendlyname%`|The friendly name of the player as set in LP _(LP required)_|
-|`%luckperms_prefix%`|The prefix of the player _(LP required)_|
-|`%luckperms_suffix%`|The suffix of the player _(LP required)_|
-|`%luckperms_group%`|The primary group of the player _(LP required)_|
-|`%is_online@<servername>%`|Whether the server is online or not _(Updates every 5 seconds)_|
-|`%status@<servername>%`|Returns Online / Offline based on the last ping _(Updates every 5 seconds)_|
-|`%online@<servername>%`|Number of players connected to a server _(Updates every 5 seconds)_|
-|`%online_visible@<servername>%`|Number of players not in vanish connected to a server  _(Updates every 5 seconds, PV required)_|
-|`%max@<servername>%`|Maximum number of players connected to a server _(Updates every 5 seconds)_|
-|`%version@<servername>%`|Game version of a server _(Updates every 5 seconds)_|
-|`%name@<servername>%`|Name of a server _(Updates every 5 seconds)_|
-|`%motd@<servername>%`|MOTD of a server  _(Updates every 5 seconds)_|
-|`%restricted@<servername>%`|Whether a server is restricted or not|
-|`%canaccess@<servername>%`|Whether the player can connect to a server|
-|`%plugin_description@<pluginname>%`|The description of a plugin|
-|`%plugin_version@<pluginname>%`|The version of a plugin|
-|`%plugin_main@<pluginname>%`|The main class of a plugin|
-|`%plugin_author@<pluginname>%`|The author of a plugin|
-|`%plugin_depends@<pluginname>%`|The dependencies of a plugin|
-|`%plugin_softdepends@<pluginname>%`|The soft-dependencies of a plugin|
+| Placeholder | Description                                                                                    |
+| ----------- |------------------------------------------------------------------------------------------------|
+|`%protogui%`| ProtoGUI information                                                                          |
+|`%guicount%`| Number of loaded GUIs in ProtoGUI                                                             |
+|`%placeholdercount%`| Number of placeholders registered in ProtoGUI                                                 |
+|`%ram_used%`| Amount of RAM used by the proxy                                                                |
+|`%ram_total%`| Total RAM allocated by the proxy                                                               |
+|`%proxyname%`| The name of the proxy                                                                          |
+|`%proxyversion%`| The version of the proxy                                                                       |
+|`%plugincount%`| Number of plugins loaded                                                                       |
+|`%servercount%`| Number of servers proxied                                                                      |
+|`%online%`| Total number of players online                                                                 |
+|`%online_visible%`| Number of players online that are not vanished _(PV required)_                                 |
+|`%max%`| Maximum number of online players                                                               |
+|`%name%`| Player name                                                                                    |
+|`%uuid%`| Player UUID                                                                                    |
+|`%displayname%`| Player displayname                                                                             |
+|`%locale%`| The locale used by the player                                                                  |
+|`%version%`| The game version used by the player                                                            |
+|`%ping%`| Latest ping measurement of the player                                                          |
+|`%vanished%`| Whether the player is vanished or not                                                          |
+|`%servername%`| The name of the server the player is connected to                                              |
+|`%servermotd%`| The MOTD of the server the player is connected to                                              |
+|`%luckperms_friendlyname%`| The friendly name of the player as set in LP _(LP required)_                                   |
+|`%luckperms_prefix%`| The prefix of the player _(LP required)_                                                       |
+|`%luckperms_suffix%`| The suffix of the player _(LP required)_                                                       |
+|`%luckperms_group%`| The primary group of the player _(LP required)_                                                |
+|`%is_online@<servername>%`| Whether the server is online or not _(Updates every 5 seconds)_                                |
+|`%status@<servername>%`| Returns Online / Offline based on the last ping _(Updates every 5 seconds)_                    |
+|`%online@<servername>%`| Number of players connected to a server _(Updates every 5 seconds)_                            |
+|`%online_visible@<servername>%`| Number of players not vanished connected to a server  _(Updates every 5 seconds, PV required)_ |
+|`%max@<servername>%`| Maximum number of players connected to a server _(Updates every 5 seconds)_                    |
+|`%version@<servername>%`| Game version of a server _(Updates every 5 seconds)_                                           |
+|`%name@<servername>%`| Name of a server _(Updates every 5 seconds)_                                                   |
+|`%motd@<servername>%`| MOTD of a server  _(Updates every 5 seconds)_                                                  |
+|`%plugin_description@<pluginname>%`| The description of a plugin                                                                    |
+|`%plugin_version@<pluginname>%`| The version of a plugin                                                                        |
+|`%plugin_main@<pluginname>%`| The main class of a plugin                                                                     |
+|`%plugin_author@<pluginname>%`| The author of a plugin                                                                         |
+|`%plugin_depends@<pluginname>%`| The dependencies of a plugin                                                                   |
+|`%plugin_softdepends@<pluginname>%`| The soft-dependencies of a plugin                                                              |
 
 
 ## Permissions
 
-The default permission to open a GUI is `bungeegui.gui.<guiname>`. You can override this in the config of each GUI.
-The permission for each of the utility commands is `bungeegui.command.<command>`. You can see the complete list in-game by typing `/bgui`.
+The default permission to open a GUI is `protogui.gui.<guiname>`. You can override this in the config of each GUI.
+The permission for each of the utility commands is `protogui.command.<command>`. You can see the complete list in-game by typing `/pgui`.
 
 ## API Usage
 
-BungeeGUI provides an API which you can use to open and close GUIs for players and more. You can obtain the API instance with `BungeeGuiAPI.getInstance()`.
+As the plugin was previously called BungeeGUI, the old API class had a different package, which is now deprecated, but bridging is provided for a smooth transition until a future version. **The old API class is now deprecated.**
 
-All available methods have JavaDocs provided in `BungeeGuiAPI.java`. [Click here](https://github.com/DaniFoldi/BungeeGUI/blob/main/src/main/java/com/danifoldi/bungeegui/main/BungeeGuiAPI.java) to see the available methods and how to use them.
+ProtoGUI provides an API which you can use to open and close GUIs for players and more. You can obtain the API instance with `ProtoGuiAPI.getInstance()`.
+
+All available methods have JavaDocs provided in `ProtoGuiAPI.java`. [Click here](https://github.com/DaniFoldi/ProtoGUI/blob/main/src/main/java/com/danifoldi/protogui/main/ProtoGuiAPI.java) to see the available methods and how to use them.
 
 NOTE: the placeholder registry is currently in beta, and the API will likely be changed.
 
@@ -192,7 +192,7 @@ What I can guarantee however, is that leaving a 1* review won't get you far. Ple
 
 ## License, terms
 
-The plugin is licensed under the GNU GPL v3.0 license. [check here](https://github.com/DaniFoldi/BungeeGUI/blob/main/LICENSE)
+The plugin is licensed under the GNU GPL v3.0 license. [check here](https://github.com/DaniFoldi/ProtoGUI/blob/main/LICENSE)
 
 For non-coders:
 - don't claim the plugin as yours

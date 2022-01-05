@@ -1,0 +1,38 @@
+package com.danifoldi.protogui.platform.bungee;
+
+import com.danifoldi.protogui.platform.PlatformInteraction;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+
+public class CommandWrapper extends Command implements TabExecutor {
+    private final @NotNull ProtoGui protoGui;
+    private final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch;
+    private final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest;
+
+    CommandWrapper(final @NotNull String name,
+                   final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch,
+                   final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest,
+                   final @NotNull ProtoGui protoGui) {
+        super(name, null);
+        this.dispatch = dispatch;
+        this.suggest = suggest;
+        this.protoGui = protoGui;
+    }
+
+    @Override
+    public void execute(final @NotNull CommandSender sender, @NotNull final String[] args) {
+        dispatch.accept(protoGui.senderGenerator.apply(sender), String.join(", ", args));
+    }
+
+    @Override
+    public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
+        return suggest.apply(protoGui.senderGenerator.apply(sender), String.join(", ", args));
+    }
+
+}

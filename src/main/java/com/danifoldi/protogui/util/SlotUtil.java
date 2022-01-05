@@ -15,7 +15,7 @@ public class SlotUtil {
     public static @NotNull Set<Integer> getSlots(final @NotNull String slots, final int size) {
         final @NotNull Set<Integer> slotList = new HashSet<>();
 
-        for (@NotNull String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList())) {
+        for (@NotNull String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).toList()) {
             @NotNull Consumer<Integer> action = slotList::add;
             if (term.startsWith("-")) {
                 action = slotList::remove;

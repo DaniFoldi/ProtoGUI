@@ -1,15 +1,13 @@
 package com.danifoldi.protogui.util;
 
-import com.danifoldi.protogui.main.BungeeGuiAPI;
+import com.danifoldi.protogui.main.ProtoGuiAPI;
+import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.electronwill.nightconfig.core.Config;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +58,7 @@ public enum Message {
     }
 
     private static final @NotNull Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
+    private static final @NotNull Pattern COLOR = Pattern.compile("(&(?<char>[0-9a-fA-Fk-oK-OrRxX]))");
 
     private final @NotNull String messageId;
     private final @NotNull String defaultValue;
@@ -67,6 +66,10 @@ public enum Message {
     Message(final @NotNull String messageId, final @NotNull String defaultValue) {
         this.messageId = messageId;
         this.defaultValue = defaultValue;
+    }
+
+    public static @NotNull Message find(String key) {
+        return Message.valueOf(key.toUpperCase(Locale.ROOT).replace("-", "_").replace(".", "_").trim());
     }
 
     public @NotNull String getDefaultValue() {
@@ -90,41 +93,50 @@ public enum Message {
     }
 
     public static @NotNull String colorCodes(String text) {
-        final @NotNull Matcher matcher = HEX.matcher(text);
+        final @NotNull Matcher hexMatcher = HEX.matcher(text);
 
-        while (matcher.find()) {
-            final @NotNull String color = matcher.group(1);
-            final @NotNull String value = ChatColor.COLOR_CHAR + "x" + color.replace("&#", "").chars().mapToObj(i -> (char)i).map(String::valueOf).map(s -> ChatColor.COLOR_CHAR + s).collect(Collectors.joining());
+        while (hexMatcher.find()) {
+            final @NotNull String color = hexMatcher.group(1);
+            final @NotNull String value = "§x" + color.replace("&#", "").chars().mapToObj(i -> (char)i).map(String::valueOf).map(s -> '§' + s).collect(Collectors.joining());
             text = text.replace(color, value);
         }
-        return ChatColor.translateAlternateColorCodes('&', text);
+
+        final @NotNull Matcher colorMatcher = COLOR.matcher(text);
+
+        while (colorMatcher.find()) {
+            final @NotNull String color = colorMatcher.group(1);
+            final @NotNull String value = colorMatcher.group("char");
+            text = text.replace(color, value);
+        }
+
+        return text;
     }
 
     @SafeVarargs
-    public final void send(final @NotNull ProxiedPlayer player, final @NotNull Pair<String, String>... replacements) {
+    public final void send(final @NotNull PlatformInteraction.ProtoSender sender, final @NotNull Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId).equals("")) {
-            send(player, defaultValue, replacements);
+            send(sender, defaultValue, replacements);
         }
 
-        send(player, Message.messages.get(messageId), replacements);
+        send(sender, Message.messages.get(messageId), replacements);
     }
 
     @SafeVarargs
-    public static void send(final @NotNull ProxiedPlayer player, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
-        player.sendMessage(toComponent(player, value, replacements));
+    public static void send(final @NotNull PlatformInteraction.ProtoSender sender, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
+        sender.send(process(sender, value, replacements));
     }
 
     @SafeVarargs
-    public final @NotNull BaseComponent[] toComponent(final @Nullable ProxiedPlayer player, final @NotNull Pair<String, String>... replacements) {
+    public final @NotNull String process(final @Nullable PlatformInteraction.ProtoSender sender, final @NotNull Pair<String, String>... replacements) {
         if (!Message.messages.containsKey(messageId) || Message.messages.get(messageId) == null || Message.messages.get(messageId).equals("")) {
-            toComponent(player, defaultValue, replacements);
+            process(sender, defaultValue, replacements);
         }
 
-        return toComponent(player, value(), replacements);
+        return process(sender, value(), replacements);
     }
 
     @SafeVarargs
-    public static @NotNull BaseComponent[] toComponent(final @Nullable ProxiedPlayer player, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
-        return new BaseComponent[] {new TextComponent(colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(player, replace(value, replacements))))};
+    public static @NotNull String process(final @Nullable PlatformInteraction.ProtoSender sender, final @NotNull String value, final @NotNull Pair<String, String>... replacements) {
+        return colorCodes(ProtoGuiAPI.getInstance().parsePlaceholders(sender != null ? sender.uniqueId() : null, replace(value, replacements)));
     }
 }

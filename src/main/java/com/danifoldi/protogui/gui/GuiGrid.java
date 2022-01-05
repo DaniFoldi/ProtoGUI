@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class GuiGrid {
     private final @NotNull Map<Integer, GuiItem> items;
     private final boolean isTargeted;
@@ -247,5 +248,44 @@ public class GuiGrid {
                     Objects.requireNonNull(notifyTarget)
             );
         }
+    }
+
+    @Override
+    public String toString() {
+        return "GuiGrid{" +
+                "items=" + items +
+                ", isTargeted=" + isTargeted +
+                ", commandAliases=" + commandAliases +
+                ", permission='" + permission + '\'' +
+                ", guiSize=" + guiSize +
+                ", title='" + title + '\'' +
+                ", selfTarget=" + selfTarget +
+                ", ignoreVanished=" + ignoreVanished +
+                ", requireOnlineTarget=" + requireOnlineTarget +
+                ", whitelistServers=" + whitelistServers +
+                ", blacklistServers=" + blacklistServers +
+                ", placeholdersTarget=" + placeholdersTarget +
+                ", openSound=" + openSound +
+                ", targetBypass=" + targetBypass +
+                ", closeable=" + closeable +
+                ", notifyTarget='" + notifyTarget + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuiGrid guiGrid = (GuiGrid) o;
+        return isTargeted == guiGrid.isTargeted && guiSize == guiGrid.guiSize && selfTarget == guiGrid.selfTarget && ignoreVanished == guiGrid.ignoreVanished && requireOnlineTarget == guiGrid.requireOnlineTarget && placeholdersTarget == guiGrid.placeholdersTarget && targetBypass == guiGrid.targetBypass && closeable == guiGrid.closeable && items.equals(guiGrid.items) && commandAliases.equals(guiGrid.commandAliases) && permission.equals(guiGrid.permission) && title.equals(guiGrid.title) && whitelistServers.equals(guiGrid.whitelistServers) && blacklistServers.equals(guiGrid.blacklistServers) && Objects.equals(openSound, guiGrid.openSound) && notifyTarget.equals(guiGrid.notifyTarget);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items, isTargeted, commandAliases, permission, guiSize, title, selfTarget, ignoreVanished, requireOnlineTarget, whitelistServers, blacklistServers, placeholdersTarget, openSound, targetBypass, closeable, notifyTarget);
+    }
+
+    public GuiGrid copy() {
+        return new GuiGrid(items, isTargeted, commandAliases, permission, guiSize, title, selfTarget, ignoreVanished, requireOnlineTarget, whitelistServers, blacklistServers, placeholdersTarget, openSound, targetBypass, closeable, notifyTarget);
     }
 }

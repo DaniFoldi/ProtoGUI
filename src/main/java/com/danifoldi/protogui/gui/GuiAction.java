@@ -3,8 +3,11 @@ package com.danifoldi.protogui.gui;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class GuiAction {
     private final @NotNull String server;
     private final int slot;
@@ -75,5 +78,32 @@ public class GuiAction {
                     requireNonNull(guiItem),
                     requireNonNull(gui));
         }
+    }
+
+    @Override
+    public String toString() {
+        return "GuiAction{" +
+                "server='" + server + '\'' +
+                ", slot=" + slot +
+                ", guiItem=" + guiItem +
+                ", gui='" + gui + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuiAction guiAction = (GuiAction) o;
+        return slot == guiAction.slot && server.equals(guiAction.server) && guiItem.equals(guiAction.guiItem) && gui.equals(guiAction.gui);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(server, slot, guiItem, gui);
+    }
+
+    public GuiAction copy() {
+        return new GuiAction(server, slot, guiItem, gui);
     }
 }

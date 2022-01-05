@@ -1,11 +1,11 @@
 package com.danifoldi.protogui.gui;
 
+import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.danifoldi.protogui.util.Message;
 import com.danifoldi.protogui.util.Pair;
 import com.danifoldi.protogui.util.StringUtil;
 import dev.simplix.protocolize.api.item.ItemStack;
 import dev.simplix.protocolize.data.ItemType;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.IntTag;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class GuiItem {
     private final @NotNull ItemType type;
     private final int amount;
@@ -94,12 +95,12 @@ public class GuiItem {
         return this.clickSound;
     }
 
-    public @NotNull ItemStack toItemStack(ProxiedPlayer placeholderTarget, String player, String target) {
+    public @NotNull ItemStack toItemStack(PlatformInteraction.ProtoPlayer placeholderTarget, String player, String target) {
         final @NotNull ItemStack item = new ItemStack(this.getType());
         item
                 .amount((byte)this.getAmount())
-                .displayName(Message.toComponent(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)))
-                .lore(this.getLore().stream().map(l -> Message.toComponent(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()), false);
+                .displayName(Message.process(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)))
+                .lore(this.getLore().stream().map(l -> Message.process(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()), false);
 
         if (item.itemType().equals(ItemType.PLAYER_HEAD)) {
             final Pair<String, String> data = StringUtil.get(this.getData());
@@ -147,39 +148,6 @@ public class GuiItem {
         tag.put("overrideMeta", new ByteTag((byte)1));
 
         return item;
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return "GuiItem{type=" + this.type
-                + ", amount=" + this.amount
-                + ", name=" + this.name
-                + ", lore=" + this.lore
-                + ", data=" + this.data
-                + ", commands=" + this.commands
-                + ", enchanted=" + this.enchanted
-                + ", clickSound=" + this.clickSound
-                + '}';
-    }
-
-    @Override
-    public boolean equals(final @Nullable Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final GuiItem guiItem = (GuiItem) o;
-        return this.amount == guiItem.amount
-                && this.type == guiItem.type
-                && Objects.equals(this.name, guiItem.name)
-                && Objects.equals(this.lore, guiItem.lore)
-                && Objects.equals(this.data, guiItem.data)
-                && Objects.equals(this.commands, guiItem.commands)
-                && this.enchanted == guiItem.enchanted
-                && Objects.equals(this.clickSound, guiItem.clickSound);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.type, this.amount, this.name, this.lore, this.data, this.commands, this.enchanted, this.clickSound);
     }
 
     public static @NotNull Builder builder() {
@@ -270,16 +238,36 @@ public class GuiItem {
         }
     }
 
+    @Override
+    public String toString() {
+        return "GuiItem{" +
+                "type=" + type +
+                ", amount=" + amount +
+                ", name='" + name + '\'' +
+                ", lore=" + lore +
+                ", data='" + data + '\'' +
+                ", commands=" + commands +
+                ", rightCommands=" + rightCommands +
+                ", leftCommands=" + leftCommands +
+                ", enchanted=" + enchanted +
+                ", clickSound=" + clickSound +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuiItem guiItem = (GuiItem) o;
+        return amount == guiItem.amount && enchanted == guiItem.enchanted && type == guiItem.type && name.equals(guiItem.name) && lore.equals(guiItem.lore) && data.equals(guiItem.data) && commands.equals(guiItem.commands) && rightCommands.equals(guiItem.rightCommands) && leftCommands.equals(guiItem.leftCommands) && Objects.equals(clickSound, guiItem.clickSound);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound);
+    }
+
     public @NotNull GuiItem copy() {
-        return new GuiItem(type,
-                amount,
-                name,
-                List.copyOf(lore),
-                data,
-                List.copyOf(commands),
-                List.copyOf(rightCommands),
-                List.copyOf(leftCommands),
-                enchanted,
-                clickSound == null ? null : clickSound.copy());
+        return new GuiItem(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound);
     }
 }

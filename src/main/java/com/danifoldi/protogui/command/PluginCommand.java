@@ -1,6 +1,7 @@
 package com.danifoldi.protogui.command;
 
-import com.danifoldi.protogui.main.BungeeGuiAPI;
+import com.danifoldi.protogui.main.ProtoGuiAPI;
+import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.danifoldi.protogui.util.Message;
 import com.danifoldi.protogui.util.Pair;
 import com.danifoldi.protogui.util.SoundUtil;
@@ -12,20 +13,13 @@ import grapefruit.command.parameter.modifier.OptParam;
 import grapefruit.command.parameter.modifier.Range;
 import grapefruit.command.parameter.modifier.Source;
 import grapefruit.command.parameter.modifier.string.Greedy;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("unused, ClassCanBeRecord")
 public class PluginCommand implements CommandContainer {
 
     private final @NotNull Logger logger;
@@ -35,109 +29,101 @@ public class PluginCommand implements CommandContainer {
         this.logger = logger;
     }
 
-    @Redirect(from = "bgui|bungeegui")
-    @CommandDefinition(route = "bgui|bungeegui help", permission = "bungeegui.command.help", runAsync = true)
-    public void onHelpCommand(@Source CommandSender sender) {
+    @Redirect(from = "bgui|bungeegui|pgui|protogui")
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui help", permission = "protogui.command.help", runAsync = true)
+    public void onHelpCommand(@Source PlatformInteraction.ProtoSender sender) {
 
-        sender.sendMessage(Message.COMMAND_HELP.toComponent(null));
-        sender.sendMessage(Message.COMMAND_ACTIONBAR.toComponent(null));
-        sender.sendMessage(Message.COMMAND_BROADCAST.toComponent(null));
-        sender.sendMessage(Message.COMMAND_CHAT.toComponent(null));
-        sender.sendMessage(Message.COMMAND_CLOSE.toComponent(null));
-        sender.sendMessage(Message.COMMAND_GUIS.toComponent(null));
-        sender.sendMessage(Message.COMMAND_LOG.toComponent(null));
-        sender.sendMessage(Message.COMMAND_OPEN.toComponent(null));
-        sender.sendMessage(Message.COMMAND_RELOAD.toComponent(null));
-        sender.sendMessage(Message.COMMAND_SEND.toComponent(null));
-        sender.sendMessage(Message.COMMAND_SOUND.toComponent(null));
-        sender.sendMessage(Message.COMMAND_TITLE.toComponent(null));
+        sender.send(Message.COMMAND_HELP);
+        sender.send(Message.COMMAND_ACTIONBAR);
+        sender.send(Message.COMMAND_BROADCAST);
+        sender.send(Message.COMMAND_CHAT);
+        sender.send(Message.COMMAND_CLOSE);
+        sender.send(Message.COMMAND_GUIS);
+        sender.send(Message.COMMAND_LOG);
+        sender.send(Message.COMMAND_OPEN);
+        sender.send(Message.COMMAND_RELOAD);
+        sender.send(Message.COMMAND_SEND);
+        sender.send(Message.COMMAND_SOUND);
+        sender.send(Message.COMMAND_TITLE);
     }
 
-    @CommandDefinition(route = "bgui|bungeegui actionbar", permission = "bungeegui.command.actionbar", runAsync = true)
-    public void onActionbarCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, @Greedy String content) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui actionbar", permission = "protogui.command.actionbar", runAsync = true)
+    public void onActionbarCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, @Greedy String content) {
 
-        targets.forEach(p -> p.sendMessage(ChatMessageType.ACTION_BAR, Message.toComponent(p, content)));
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        targets.forEach(p -> p.actionbar(Message.process(p, content)));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui broadcast", permission = "bungeegui.command.broadcast", runAsync = true)
-    public void onBroadcastCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, @Greedy String content) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui broadcast", permission = "protogui.command.broadcast", runAsync = true)
+    public void onBroadcastCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, @Greedy String content) {
 
-        targets.forEach(p -> p.sendMessage(Message.toComponent(p, content)));
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        targets.forEach(p -> p.send(Message.process(p, content)));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui chat", permission = "bungeegui.command.chat", runAsync = true)
-    public void onChatCommand(@Source CommandSender sender, ProxiedPlayer target, @Greedy String content) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui chat", permission = "protogui.command.chat", runAsync = true)
+    public void onChatCommand(@Source PlatformInteraction.ProtoSender sender, PlatformInteraction.ProtoPlayer target, @Greedy String content) {
 
-        target.chat(Message.colorCodes(BungeeGuiAPI.getInstance().parsePlaceholders(target, content)));
+        target.chat(Message.colorCodes(ProtoGuiAPI.getInstance().parsePlaceholders(target.uniqueId(), content)));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui close", permission = "bungeegui.command.close", runAsync = true)
-    public void onCloseCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui close", permission = "protogui.command.close", runAsync = true)
+    public void onCloseCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets) {
 
-        targets.forEach(BungeeGuiAPI.getInstance()::closeGui);
-
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        targets.stream().map(PlatformInteraction.ProtoPlayer::uniqueId).forEach(ProtoGuiAPI.getInstance()::closeGui);
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui list|guis", permission = "bungeegui.command.list", runAsync = true)
-    public void onListCommand(@Source CommandSender sender) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui list|guis", permission = "protogui.command.list", runAsync = true)
+    public void onListCommand(@Source PlatformInteraction.ProtoSender sender) {
 
-        sender.sendMessage(Message.GUI_LIST_TOP.toComponent(null, Pair.of("count", String.valueOf(BungeeGuiAPI.getInstance().getAvailableGuis().size()))));
-        for (final @NotNull String name: BungeeGuiAPI.getInstance().getAvailableGuis().stream().sorted().collect(Collectors.toList())) {
-            sender.sendMessage(Message.GUI_LIST_ITEM.toComponent(null, Pair.of("name", name)));
+        sender.send(Message.GUI_LIST_TOP.process(null, Pair.of("count", String.valueOf(ProtoGuiAPI.getInstance().getLoadedGuis().size()))));
+        for (final @NotNull String name: ProtoGuiAPI.getInstance().getLoadedGuis().stream().sorted().toList()) {
+            sender.send(Message.GUI_LIST_ITEM.process(null, Pair.of("name", name)));
         }
     }
 
-    @CommandDefinition(route = "bgui|bungeegui log", permission = "bungeegui.command.log", runAsync = true)
-    public void onLogCommand(@Source CommandSender sender, @Greedy String message) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui log", permission = "protogui.command.log", runAsync = true)
+    public void onLogCommand(@Source PlatformInteraction.ProtoSender sender, @Greedy String message) {
 
         logger.info("Command Log: %s".formatted(message));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui open", permission = "bungeegui.command.open", runAsync = true)
-    public void onOpenCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String guiName, @OptParam String target) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui open", permission = "protogui.command.open", runAsync = true)
+    public void onOpenCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String guiName, @OptParam String target) {
 
-        if (BungeeGuiAPI.getInstance().getGui(guiName) == null) {
-            sender.sendMessage(Message.GUI_NOT_FOUND.toComponent(null, Pair.of("name", guiName)));
+        if (ProtoGuiAPI.getInstance().getGui(guiName) == null) {
+            sender.send(Message.GUI_NOT_FOUND.process(null, Pair.of("name", guiName)));
             return;
         }
-        if (target == null && BungeeGuiAPI.getInstance().getGui(guiName).isTargeted()) {
-            sender.sendMessage(Message.GUI_TARGET_REQUIRED.toComponent(null));
+        if (target == null && ProtoGuiAPI.getInstance().getGui(guiName).isTargeted()) {
+            sender.send(Message.GUI_TARGET_REQUIRED.process(null));
             return;
         }
 
-        targets.forEach(p -> BungeeGuiAPI.getInstance().openGui(p, guiName, target == null ? "" : target));
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        targets.forEach(p -> ProtoGuiAPI.getInstance().openGui(p.uniqueId(), guiName, target == null ? "" : target));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui reload", permission = "bungeegui.command.reload", runAsync = true)
-    public void onReloadCommand(@Source CommandSender sender) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui reload", permission = "protogui.command.reload", runAsync = true)
+    public void onReloadCommand(@Source PlatformInteraction.ProtoSender sender) {
 
-        final long length = BungeeGuiAPI.getInstance().reloadGuis();
-        sender.sendMessage(Message.RELOAD_SUCCESS.toComponent(null, Pair.of("time", String.valueOf(length))));
+        final long length = ProtoGuiAPI.getInstance().reloadGuis();
+        sender.send(Message.RELOAD_SUCCESS.process(null, Pair.of("time", String.valueOf(length))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui send", permission = "bungeegui.command.send", runAsync = true)
-    public void onSendCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String serverName) {
-
-        final @Nullable ServerInfo server = ProxyServer.getInstance().getServerInfo(serverName);
-
-        if (server == null) {
-            sender.sendMessage(Message.SERVER_NOT_FOUND.toComponent(null, Pair.of("name", serverName)));
-            return;
-        }
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui send", permission = "protogui.command.send", runAsync = true)
+    public void onSendCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, PlatformInteraction.ProtoServer server) {
 
         targets.forEach(p -> p.connect(server));
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui sound", permission = "bungeegui.command.sound", runAsync = true)
-    public void onSoundCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String soundName, @OptParam String soundCategory, @OptParam @Range(min = 0.0, max = 1.0) Double volume, @OptParam @Range(min = 0.0, max = 2.0) Double pitch) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui sound", permission = "protogui.command.sound", runAsync = true)
+    public void onSoundCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String soundName, @OptParam String soundCategory, @OptParam @Range(min = 0.0, max = 1.0) Double volume, @OptParam @Range(min = 0.0, max = 2.0) Double pitch) {
 
         if (!SoundUtil.isValidSound(soundName)) {
-            sender.sendMessage(Message.INVALID_PROPERTY.toComponent(null));
+            sender.send(Message.INVALID_PROPERTY.process(null));
             return;
         }
 
@@ -151,21 +137,21 @@ public class PluginCommand implements CommandContainer {
         }
         @NotNull SoundCategory finalCategory = category;
 
-        targets.forEach(p -> SoundUtil.playSound(p, soundName, finalCategory, volume == null ? 1.0f : volume.floatValue(), pitch == null ? 1.0f : pitch.floatValue()));
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        targets.forEach(p -> SoundUtil.playSound(p.uniqueId(), soundName, finalCategory, volume == null ? 1.0f : volume.floatValue(), pitch == null ? 1.0f : pitch.floatValue()));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
-    @CommandDefinition(route = "bgui|bungeegui title", permission = "bungeegui.command.title", runAsync = true)
-    public void onTitleCommand(@Source CommandSender sender, Collection<ProxiedPlayer> targets, String mode, int fadeIn, int stay, int fadeOut, String message) {
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui title", permission = "protogui.command.title", runAsync = true)
+    public void onTitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String mode, int fadeIn, int stay, int fadeOut, String message) {
 
-        for (final @NotNull ProxiedPlayer p: targets) {
+        for (final @NotNull PlatformInteraction.ProtoPlayer p: targets) {
             if (mode.equalsIgnoreCase("subtitle")) {
-                ProxyServer.getInstance().createTitle().subTitle(Message.toComponent(p, message)).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(p);
+                p.subtitle(Message.process(p, message), fadeIn, stay, fadeOut);
             } else {
-                ProxyServer.getInstance().createTitle().title(Message.toComponent(p, message)).fadeIn(fadeIn).stay(stay).fadeOut(fadeOut).send(p);
+                p.title(Message.process(p, message), fadeIn, stay, fadeOut);
             }
         }
 
-        sender.sendMessage(Message.ACTION_COMPLETE.toComponent(null, Pair.of("count", String.valueOf(targets.size()))));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 }

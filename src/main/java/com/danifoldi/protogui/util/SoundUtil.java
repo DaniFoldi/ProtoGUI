@@ -5,13 +5,13 @@ import dev.simplix.protocolize.api.Protocolize;
 import dev.simplix.protocolize.api.SoundCategory;
 import dev.simplix.protocolize.data.Sound;
 import dev.simplix.protocolize.data.packets.NamedSoundEffect;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class SoundUtil {
-    public static void playSound(final @NotNull ProxiedPlayer player,
+    public static void playSound(final @NotNull UUID uuid,
                                  final @NotNull String soundName,
                                  final @NotNull SoundCategory category,
                                  final float volume,
@@ -22,11 +22,11 @@ public class SoundUtil {
         soundEffect.volume(volume);
         final @NotNull Pair<String, String> name = StringUtil.get(soundName);
         soundEffect.sound(name.getFirst().equalsIgnoreCase("custom") ? name.getSecond() : correct(name.getSecond()));
-        final @NotNull Location location = Protocolize.playerProvider().player(player.getUniqueId()).location();
+        final @NotNull Location location = Protocolize.playerProvider().player(uuid).location();
         soundEffect.x(location.x());
         soundEffect.y(location.y());
         soundEffect.z(location.z());
-        Protocolize.playerProvider().player(player.getUniqueId()).sendPacket(soundEffect);
+        Protocolize.playerProvider().player(uuid).sendPacket(soundEffect);
     }
 
     public static boolean isValidSound(final @NotNull String soundName) {
