@@ -115,7 +115,12 @@ public enum Message {
 
         while (hexMatcher.find()) {
             final @NotNull String color = hexMatcher.group(1);
-            final @NotNull String value = "§x" + color.replace("&#", "").chars().mapToObj(i -> (char)i).map(String::valueOf).map(s -> '§' + s).collect(Collectors.joining());
+            final @NotNull String value = "§x" + color.replace("&#", "")
+                    .chars()
+                    .mapToObj(i -> (char)i)
+                    .map(String::valueOf)
+                    .map(s -> "§" + s)
+                    .collect(Collectors.joining());
             text = text.replace(color, value);
         }
 

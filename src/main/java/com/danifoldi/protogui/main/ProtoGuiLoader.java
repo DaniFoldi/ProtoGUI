@@ -59,8 +59,8 @@ public class ProtoGuiLoader {
     public void load() {
         StringUtil.blockPrint(logger::info, "Loading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
 
-        commandManager.setup();
         ProtoGuiAPI.setInstance(new ProtoGuiAPI(guiHandler, this, placeholderHandler));
+        commandManager.setup();
         placeholderHandler.registerBuiltins();
 
         try {
