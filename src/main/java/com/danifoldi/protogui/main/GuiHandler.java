@@ -5,6 +5,7 @@ import com.danifoldi.protogui.gui.GuiGrid;
 import com.danifoldi.protogui.gui.GuiItem;
 import com.danifoldi.protogui.gui.GuiSound;
 import com.danifoldi.protogui.platform.PlatformInteraction;
+import com.danifoldi.protogui.util.ConditionUtil;
 import com.danifoldi.protogui.util.ListUtil;
 import com.danifoldi.protogui.util.Message;
 import com.danifoldi.protogui.util.Pair;
@@ -238,6 +239,8 @@ public class GuiHandler {
                 .leftCommands(item.getOrElse("leftCommands", Collections.emptyList()))
                 .enchanted(item.getOrElse("enchanted", false))
                 .clickSound(loadClickSound(item))
+                .clickableIf(item.getOrElse("clickableIf", null))
+                .shownIf(item.getOrElse("shownIf", null))
                 .build();
     }
 
@@ -322,6 +325,10 @@ public class GuiHandler {
                 continue;
             }
 
+            if (guiItem.getValue().getShownIf() != null && !ConditionUtil.holds(Message.process(placeholderPlayer, guiItem.getValue().getShownIf()), placeholderPlayer)) {
+                continue;
+            }
+
             inventory.item(guiItem.getKey(), guiItem.getValue().toItemStack(placeholderPlayer, player.name(), target));
         }
 
@@ -344,6 +351,12 @@ public class GuiHandler {
                 return;
             }
 
+            GuiItem guiItem = openGui.getItems().get(slot);
+
+            if (guiItem.getClickableIf() != null && !ConditionUtil.holds(Message.process(placeholderPlayer, guiItem.getClickableIf()), placeholderPlayer)) {
+                return;
+            }
+
             GuiSound clickSound = openGui.getItems().get(slot).getClickSound();
             if (clickSound != null) {
                 if (SoundUtil.isValidSound(clickSound.getSoundName())) {
@@ -352,7 +365,7 @@ public class GuiHandler {
                 clickSound.playFor(uuid);
             }
 
-            if (openGui.getItems().get(slot).getCommands().isEmpty()) {
+            if (guiItem.getCommands().isEmpty()) {
                 return;
             }
 
@@ -364,9 +377,6 @@ public class GuiHandler {
         Protocolize.playerProvider().player(uuid).openInventory(inventory);
         openGuis.put(uuid, Pair.of(name, target));
     }
-
-    private final Pattern permissionPattern = Pattern.compile("^perm<(?<node>[\\w.]+)>");
-    private final Pattern noPermissionPattern = Pattern.compile("^noperm<(?<node>[\\w.]+)>");
 
     void runCommand(final @NotNull UUID uuid, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {
         logger.info("Running " + clickType.name() + " commands for player " + uuid + " slot " + slot + " with target " + target);
@@ -387,22 +397,6 @@ public class GuiHandler {
 
             @NotNull Pair<String, String> commandData = StringUtil.get(command);
             PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
-
-            if (permissionPattern.matcher(commandData.getFirst()).matches()) {
-                String node = permissionPattern.matcher(commandData.getFirst()).group("node");
-                if (!player.hasPermission(node)) {
-                    continue;
-                }
-
-                commandData = StringUtil.get(commandData.getSecond());
-            } else if (noPermissionPattern.matcher(commandData.getFirst()).matches()) {
-                String node = noPermissionPattern.matcher(commandData.getFirst()).group("node");
-                if (player.hasPermission(node)) {
-                    continue;
-                }
-
-                commandData = StringUtil.get(commandData.getSecond());
-            }
 
             if (commandData.getFirst().equalsIgnoreCase("console")) {
                 ProtoGuiAPI.getInstance().getPlatform().runConsoleCommand(Message.replace(command, Pair.of("player", player.name()), Pair.of("target", target)));

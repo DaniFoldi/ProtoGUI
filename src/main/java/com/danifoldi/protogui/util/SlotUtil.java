@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -14,12 +15,18 @@ public class SlotUtil {
 
     public static @NotNull Set<Integer> getSlots(final @NotNull String slots, final int size) {
         final @NotNull Set<Integer> slotList = new HashSet<>();
-
-        for (@NotNull String term: Arrays.stream(slots.split(",")).map(String::trim).map(s -> s.toLowerCase(Locale.ROOT)).toList()) {
+        List<String> terms = Arrays
+                .stream(slots.replace("-", "-$").split("\\+"))
+                .map(s -> s.split("-"))
+                .flatMap(Arrays::stream)
+                .map(String::trim)
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .toList();
+        for (@NotNull String term: terms) {
             @NotNull Consumer<Integer> action = slotList::add;
-            if (term.startsWith("-")) {
+            if (term.startsWith("$")) {
                 action = slotList::remove;
-                term = term.replace("-", "");
+                term = term.replace("$", "");
             }
 
             if (term.startsWith("row")) {
@@ -99,22 +106,16 @@ public class SlotUtil {
     }
 
     public static int getInventorySize(final @NotNull InventoryType inventoryType) {
-        switch (inventoryType) {
-            case GENERIC_9X1:
-                return 9;
-            case GENERIC_9X2:
-                return 18;
-            case GENERIC_9X3:
-                return 27;
-            case GENERIC_9X4:
-                return 36;
-            case GENERIC_9X5:
-                return 45;
-            case GENERIC_9X6:
-                return 54;
-        }
+        return switch (inventoryType) {
+            case GENERIC_9X1 -> 9;
+            case GENERIC_9X2 -> 18;
+            case GENERIC_9X3 -> 27;
+            case GENERIC_9X4 -> 36;
+            case GENERIC_9X5 -> 45;
+            case GENERIC_9X6 -> 54;
+            default -> 0;
+        };
 
-        return 0;
     }
 
     private SlotUtil() {

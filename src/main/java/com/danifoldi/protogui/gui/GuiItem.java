@@ -33,6 +33,8 @@ public class GuiItem {
     private final @NotNull List<String> leftCommands;
     private final boolean enchanted;
     private final @Nullable GuiSound clickSound;
+    private final @Nullable String clickableIf;
+    private final @Nullable String shownIf;
 
     private GuiItem(final @NotNull ItemType type,
                     final int amount,
@@ -43,7 +45,9 @@ public class GuiItem {
                     final @NotNull List<String> rightCommands,
                     final @NotNull List<String> leftCommands,
                     final boolean enchanted,
-                    final @Nullable GuiSound clickSound) {
+                    final @Nullable GuiSound clickSound,
+                    final @Nullable String clickableIf,
+                    final @Nullable String shownIf) {
         this.type = type;
         this.amount = amount;
         this.name = name;
@@ -54,6 +58,8 @@ public class GuiItem {
         this.leftCommands = leftCommands;
         this.enchanted = enchanted;
         this.clickSound = clickSound;
+        this.clickableIf = clickableIf;
+        this.shownIf = shownIf;
     }
 
     public @NotNull ItemType getType() {
@@ -93,6 +99,14 @@ public class GuiItem {
 
     public @Nullable GuiSound getClickSound() {
         return this.clickSound;
+    }
+
+    public @Nullable String getClickableIf() {
+        return this.clickableIf;
+    }
+
+    public @Nullable String getShownIf() {
+        return this.shownIf;
     }
 
     public @NotNull ItemStack toItemStack(PlatformInteraction.ProtoPlayer placeholderTarget, String player, String target) {
@@ -165,6 +179,8 @@ public class GuiItem {
         private @Nullable List<String> leftCommands;
         private boolean enchanted;
         private @Nullable GuiSound clickSound;
+        private @Nullable String clickableIf;
+        private @Nullable String shownIf;
 
         private Builder() {}
 
@@ -218,6 +234,16 @@ public class GuiItem {
             return this;
         }
 
+        public @NotNull Builder clickableIf(final @Nullable String clickableIf) {
+            this.clickableIf = clickableIf;
+            return this;
+        }
+
+        public @NotNull Builder shownIf(final @Nullable String shownIf) {
+            this.shownIf = shownIf;
+            return this;
+        }
+
         public @NotNull GuiItem build() {
             if (this.amount < 0) {
                 throw new IllegalArgumentException("Item amount must be greater than or equal to 0");
@@ -233,7 +259,9 @@ public class GuiItem {
                     requireNonNull(this.rightCommands),
                     requireNonNull(this.leftCommands),
                     this.enchanted,
-                    clickSound
+                    clickSound,
+                    clickableIf,
+                    shownIf
             );
         }
     }
@@ -251,6 +279,8 @@ public class GuiItem {
                 ", leftCommands=" + leftCommands +
                 ", enchanted=" + enchanted +
                 ", clickSound=" + clickSound +
+                ", clickableIf='" + clickableIf + '\'' +
+                ", shownIf='" + shownIf + '\'' +
                 '}';
     }
 
@@ -259,15 +289,15 @@ public class GuiItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GuiItem guiItem = (GuiItem) o;
-        return amount == guiItem.amount && enchanted == guiItem.enchanted && type == guiItem.type && name.equals(guiItem.name) && lore.equals(guiItem.lore) && data.equals(guiItem.data) && commands.equals(guiItem.commands) && rightCommands.equals(guiItem.rightCommands) && leftCommands.equals(guiItem.leftCommands) && Objects.equals(clickSound, guiItem.clickSound);
+        return amount == guiItem.amount && enchanted == guiItem.enchanted && type == guiItem.type && name.equals(guiItem.name) && lore.equals(guiItem.lore) && data.equals(guiItem.data) && commands.equals(guiItem.commands) && rightCommands.equals(guiItem.rightCommands) && leftCommands.equals(guiItem.leftCommands) && Objects.equals(clickSound, guiItem.clickSound) && Objects.equals(clickableIf, guiItem.clickableIf) && Objects.equals(shownIf, guiItem.shownIf);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound);
+        return Objects.hash(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound, clickableIf, shownIf);
     }
 
     public @NotNull GuiItem copy() {
-        return new GuiItem(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound);
+        return new GuiItem(type, amount, name, lore, data, commands, rightCommands, leftCommands, enchanted, clickSound, clickableIf, shownIf);
     }
 }

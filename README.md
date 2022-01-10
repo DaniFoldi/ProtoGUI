@@ -1,4 +1,4 @@
-# ProtoGUI Plugin for BungeeCord
+# ProtoGUI Plugin for BungeeCord and Velocity
 
 ## Features
 
@@ -14,7 +14,7 @@
 
 ## Setup tutorial
 
-Dependencies: [**Protocolize**](https://www.spigotmc.org/resources/protocolize-protocollib-for-bungeecord-waterfall-aegis.63778/) is required. Please make sure you have it installed, or the plugin will fail to load.
+Dependencies: [**Protocolize**](https://www.spigotmc.org/resources/63778/) is required. Please make sure you have it installed, or the plugin will fail to load.
 Download the latest version from either GitHub or Spigot, put it into the `plugins` folder of your Bungee, and you're done.
 
 Of course, you will probably want to customize the GUIs of the plugin. For that, see the example `config.yml` [here](https://github.com/DaniFoldi/ProtoGUI/blob/main/src/main/resources/config.yml), and below for explanations.
@@ -25,60 +25,61 @@ Optional dependencies: *PremiumVanish*, *LuckPerms*.
 
 ## Plugin configuration
 
-All data of the plugin is saved in the `config.yml` file of the plugin's folder. You can apply any changes and then `/bgui reload` for the plugin to reload the config.
+Basic configuration of the plugin is saved in the `config.yml` file of the plugin's folder. You can apply any changes and then `/protogui reload` for the plugin to reload the config.
 
 
 **messages**
 
-All player-visible messages of the plugin are translatable in the `messages` section.
+All player-visible messages of the plugin are translatable in `messages.yml`.
 
 **guis**
 
+_File: test.yml, where test becomes the internal id of the GUI_
+
 ```yaml
-test: # the name of the gui, used internally and in the API
-    targeted: true # default: false; do the commands require a target attribute
-    aliases: # default: []; the commands that open the GUI
-      - test
-      - testcommand
-    permission: 'somepermission.test' # default: protogui.gui.<guiname>; overrides the permission required to execute the commands
-    size: 27 # default: 54; the size of the GUI
-    title: '&2Test {target}' # default: GUI <guiname>; the title of the GUI displayed on top
-    selfTarget: false # default: true; can the executing player and the target be the same player
-    requireOnlineTarget: true # default: false; does the target have to be an online player
-    ignoreVanished: false # default: true; are vanished players ignored from the target list. NOTE: supports PremiumVanish on Bungee side, and only works if requireOnlineTarget is true
-    whitelistServers: # default: [*]; the commands will only work on the servers specified below. NOTE: omit or set the first element to `*` to enable on all servers
-      - server1
-      - server2
-    blacklistServers: # default: []; the commands will not work on the servers specified below. NOTE: overrides whitelisted servers
-      - server3
-      - server4
-    placeholdersTarget: true # default: false; if the placeholders should target the {target} or the {player}. NOTE: only works with requireOnlineTarget: true
-    openSound: # omit to play no sound
-      sound: entity_piglin_jealous # default: ENTITY_VILLAGER_NO; the sound to play when opening the gui NOTE: see link below for valid sounds
-      soundCategory: blocks # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcategories
+targeted: true # default: false; do the commands require a target attribute
+aliases: # default: []; the commands that open the GUI
+  - test
+  - testcommand
+permission: 'somepermission.test' # default: protogui.gui.<guiname>; overrides the permission required to execute the commands
+size: 27 # default: 54; the size of the GUI
+title: '&2Test {target}' # default: GUI <guiname>; the title of the GUI displayed on top
+selfTarget: false # default: true; can the executing player and the target be the same player
+requireOnlineTarget: true # default: false; does the target have to be an online player
+ignoreVanished: false # default: true; are vanished players ignored from the target list. NOTE: supports PremiumVanish on Bungee side, and only works if requireOnlineTarget is true
+whitelistServers: # default: [*]; the commands will only work on the servers specified below. NOTE: omit or set the first element to `*` to enable on all servers
+  - server1
+  - server2
+blacklistServers: # default: []; the commands will not work on the servers specified below. NOTE: overrides whitelisted servers
+  - server3
+  - server4
+placeholdersTarget: true # default: false; if the placeholders should target the {target} or the {player}. NOTE: only works with requireOnlineTarget: true
+openSound: # omit to play no sound
+  sound: entity_piglin_jealous # default: ENTITY_VILLAGER_NO; the sound to play when opening the gui NOTE: see link below for valid sounds
+  soundCategory: blocks # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcategories
+  volume: 0.6 # default: 1.0; the volume to play the sound at
+  pitch: 1.2 # default 1.0; the pitch to play the sound at
+targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
+closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
+notifyTarget: '{player} targeted you with a GUI' # default: ''; the message that will be sent to the target, if they are online. NOTE: omit to send no message
+items: # default: []; the items in the GUI
+  '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0
+    type: 'cobblestone' # default: stone; the material of the item
+    count: 10 # default: 1; the amount of the item
+    name: '&5some item' # default: <item name>; the name of the item
+    lore: # default: []; the lore of the item
+      - '&5&litem'
+      - '&5lore'
+    enchanted: true # default: false; whether the item is glowing as enchanted
+    data: '' # default: ''; set to owner:<UUID/name> or texture:<texture> to display custom heads. NOTE: only supports `player_head`
+    commands: # default: []; the commands to be executed. NOTE: prefix a command with `console:` to run it as the Bungee console instead of the player
+      - 'console:broadcast {target}'
+      - 'list'
+    clickSound: # omit to play no sound
+      sound: entity_parrot_imitate_ghast # default: ENTITY_VILLAGER_NO; the sound to play when opening the gui NOTE: see link below for valid sounds
+      soundCategory: hostile # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcatetories
       volume: 0.6 # default: 1.0; the volume to play the sound at
       pitch: 1.2 # default 1.0; the pitch to play the sound at
-    targetBypass: true # default false; whether players with the permission <guiPermission>.bypass can not be targeted
-    closeable: false # default: true; whether players can press Esc to close the gui, or a command has to be executed. NOTE: see below for how to create a "close" button
-    notifyTarget: '{player} targeted you with a GUI' # default: ''; the message that will be sent to the target, if they are online. NOTE: omit to send no message
-    items: # default: []; the items in the GUI
-      '13': # the slot this item will be displayed in. NOTE: see below for advanced options. Has to be a 'string', eg. '1'. The first slot is indexed 0
-        type: 'cobblestone' # default: stone; the material of the item
-        count: 10 # default: 1; the amount of the item
-        name: '&5some item' # default: <item name>; the name of the item
-        lore: # default: []; the lore of the item
-          - '&5&litem'
-          - '&5lore'
-        enchanted: true # default: false; whether the item is glowing as enchanted
-        data: '' # default: ''; set to owner:<UUID/name> or texture:<texture> to display custom heads. NOTE: only supports `player_head`
-        commands: # default: []; the commands to be executed. NOTE: prefix a command with `console:` to run it as the Bungee console instead of the player
-          - 'console:broadcast {target}'
-          - 'list'
-        clickSound: # omit to play no sound
-          sound: entity_parrot_imitate_ghast # default: ENTITY_VILLAGER_NO; the sound to play when opening the gui NOTE: see link below for valid sounds
-          soundCategory: hostile # default: MASTER; the sound channel to play the sound on. NOTE: see link below for valid soundcatetories
-          volume: 0.6 # default: 1.0; the volume to play the sound at
-          pitch: 1.2 # default 1.0; the pitch to play the sound at
 ```
 
 _Tips:_
@@ -97,13 +98,14 @@ See the example `config.yml` that is auto-generated or in the repository for som
 
 You can specify multiple slots with one item, and they will be cloned.
 
-- Formatting examples: `row1`, `row4even`, `row6odd`, `row2,-9,-17`, `column0, column8`, `row3odd,row4even,row5odd`
+- Formatting examples: `row1`, `row4even`, `row6odd`, `row2-9-17`, `column0+column8`, `row3odd+row4even+row5odd`
 - You can chain multiple expressions together with commas.
 - You can select a row, a column, or a slot.
     - You can select only odd or only even slots from a row/column, or all.
 - You can add or remove a slot from the list.
 
 Valid sound list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/Sound.java)
+_Note: some sounds are mapped incorrectly, see SoundUtil.java for the fix by this plugin_
 
 Valid soundcategory list: [here](https://github.com/Exceptionflug/protocolize/blob/master/protocolize-world/src/main/java/de/exceptionflug/protocolize/world/SoundCategory.java)
 
@@ -113,7 +115,7 @@ ___Expressions are evaluated in order___
 
 **configVersion**
 
-This should say `3`. If there are any config changes, the value will be incremented. The conversion process should be automatic, unless the release notes say otherwise.
+This should say `5`. If there are any config changes, the value will be incremented. The conversion process should be automatic, unless the release notes say otherwise.
 
 ---
 

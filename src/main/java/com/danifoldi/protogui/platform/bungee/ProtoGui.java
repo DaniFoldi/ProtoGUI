@@ -55,6 +55,10 @@ public class ProtoGui extends Plugin implements Listener {
     @Override
     public void onLoad() {
         try {
+            if (!Files.exists(getDataFolder().toPath().resolve("compat"))) {
+                return;
+            }
+
             Files.move(getDataFolder().toPath().getParent().resolve("BungeeGUI"), getDataFolder().toPath());
             getLogger().info("Moved datafolder to new location");
         } catch (IOException ignored) {
@@ -139,7 +143,7 @@ public class ProtoGui extends Plugin implements Listener {
             if (commandSender instanceof ProxiedPlayer player) {
                 return player.getUniqueId();
             }
-            return UUID.fromString("ffffffff-ffff-ffff-ffff-fffffffffff");
+            return UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
         }
     };
 

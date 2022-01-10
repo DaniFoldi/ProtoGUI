@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class UpdateUtil {
 
-    private static final @NotNull String GITHUB_URL = "https://api.github.com/repos/DaniFoldi/BungeeGui/releases/latest";
+    private static final @NotNull String GITHUB_URL = "https://api.github.com/repos/DaniFoldi/ProtoGui/releases/latest";
     private static final @NotNull String SPIGET_URL = "https://api.spiget.org/v2/resources/92209/versions/latest";
 
     public static CompletableFuture<String> getNewest(ExecutorService threadPool) {
