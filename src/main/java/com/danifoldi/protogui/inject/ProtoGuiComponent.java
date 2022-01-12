@@ -24,9 +24,6 @@ public interface ProtoGuiComponent {
     interface Builder {
 
         @BindsInstance
-        Builder plugin(final @NotNull ProtoGui plugin);
-
-        @BindsInstance
         Builder logger(final @NotNull Logger logger);
 
         @BindsInstance

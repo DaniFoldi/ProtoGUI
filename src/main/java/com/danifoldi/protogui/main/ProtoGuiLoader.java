@@ -65,24 +65,29 @@ public class ProtoGuiLoader {
 
         try {
             FileUtil.ensureFolder(datafolder);
-            final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
-            final @NotNull FileConfig messages = FileUtil.ensureConfigFile(datafolder, "messages.yml");
             FileUtil.ensureFolder(datafolder.resolve("actions"));
             FileUtil.ensureFolder(datafolder.resolve("templates"));
             FileUtil.ensureFolder(datafolder.resolve("guis"));
+            final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
-            messages.load();
 
-            logger.setFilter(record -> config.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
-
-            Message.setMessageProvider(messages);
             if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
-                StringUtil.blockPrint(logger::warning, "%s config is built with an older version. Please see the plugin page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(platform.pluginName(), ConfigUtil.backupAndUpgrade(config)));
+                StringUtil.blockPrint(logger::warning, "%s config is built with an older version. Please see the https://github.com/DaniFoldi/ProtoGUI/releases page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(platform.pluginName(), ConfigUtil.backupAndUpgrade(datafolder, config.getIntOrElse("configVersion", 0))));
             }
 
             if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
                 StringUtil.blockPrint(logger::warning, "%s config is built with a newer version. Compatibility is not guaranteed.".formatted(platform.pluginName()));
             }
+
+            config.close();
+            final @NotNull FileConfig newConfig = FileUtil.ensureConfigFile(datafolder, "config.yml");
+            newConfig.load();
+
+            final @NotNull FileConfig messages = FileUtil.ensureConfigFile(datafolder, "messages.yml");
+            messages.load();
+            Message.setMessageProvider(messages);
+
+            logger.setFilter(record -> newConfig.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
 
             guiHandler.load(datafolder);
             platform.setup();

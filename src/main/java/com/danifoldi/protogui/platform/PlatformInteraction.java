@@ -68,7 +68,7 @@ public interface PlatformInteraction {
     int maxPlayerCount();
     void setup();
     void teardown();
-    void registerCommand(String command, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest);
+    void registerCommand(List<String> commandAliases, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest);
     void unregisterCommand(String command);
     void runConsoleCommand(String command);
     List<ProtoPlugin> getPlugins();

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -17,11 +18,11 @@ public class CommandWrapper extends Command implements TabExecutor {
     private final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch;
     private final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest;
 
-    CommandWrapper(final @NotNull String name,
+    CommandWrapper(final @NotNull List<String> aliases,
                    final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch,
                    final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest,
                    final @NotNull ProtoGui protoGui) {
-        super(name, null);
+        super(aliases.stream().findFirst().orElseThrow(), null, aliases.stream().skip(1).toArray(String[]::new));
         this.dispatch = dispatch;
         this.suggest = suggest;
         this.protoGui = protoGui;

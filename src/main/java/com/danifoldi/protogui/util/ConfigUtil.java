@@ -10,21 +10,20 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 public class ConfigUtil {
-    public static final int LATEST = 5;
+    public static final int LATEST = 6;
 
-    public static @NotNull String backupAndUpgrade(final @NotNull FileConfig config) throws IOException {
-        final @NotNull Path folder = config.getFile().toPath().getParent();
-        final @NotNull String backup = getBackupFilename(folder);
+    public static @NotNull String backupAndUpgrade(final @NotNull Path datafolder, int oldVersion) throws IOException {
+        final @NotNull Path backup = getBackupFolder(datafolder.getParent(), oldVersion);
 
-        Files.copy(folder.resolve(config.getFile().getName()), folder.resolve(backup));
+        Files.copy(datafolder, backup);
 
-        final int currentVersion = config.getIntOrElse("configVersion", 0);
-        ConfigUtil.upgrade(config, currentVersion, LATEST);
+        ConfigUtil.upgrade(datafolder, oldVersion, LATEST);
 
-        return backup;
+        return backup.getFileName().toString();
     }
 
-    private static void upgrade(FileConfig config, int oldVersion, int newVersion) {
+    private static void upgrade(Path datafolder, int oldVersion, int newVersion) {
+        FileConfig config = FileConfig.of(datafolder.resolve("config.yml"));
         if (oldVersion >= newVersion) {
             return;
         }
@@ -79,8 +78,73 @@ public class ConfigUtil {
             config.remove("debugLevel");
         }
 
+        if (oldVersion <= 5 && newVersion >= 6) {
+            FileConfig messages = FileConfig.of(datafolder.resolve("messages.yml"));
+            ensureValue(messages, "commandHelp", config.getOrElse("messages.commandHelp", Message.COMMAND_HELP.getDefaultValue()));
+            ensureValue(messages, "commandReload", config.getOrElse("messages.commandReload", Message.COMMAND_RELOAD.getDefaultValue()));
+            ensureValue(messages, "commandGuis", config.getOrElse("messages.commandGuis", Message.COMMAND_GUIS.getDefaultValue()));
+            ensureValue(messages, "commandBroadcast", config.getOrElse("messages.commandBroadcast", Message.COMMAND_BROADCAST.getDefaultValue()));
+            ensureValue(messages, "commandLog", config.getOrElse("messages.commandLog", Message.COMMAND_LOG.getDefaultValue()));
+            ensureValue(messages, "commandSend", config.getOrElse("messages.commandSend", Message.COMMAND_SEND.getDefaultValue()));
+            ensureValue(messages, "commandChat", config.getOrElse("messages.commandChat", Message.COMMAND_CHAT.getDefaultValue()));
+            ensureValue(messages, "commandActionbar", config.getOrElse("messages.commandActionbar", Message.COMMAND_ACTIONBAR.getDefaultValue()));
+            ensureValue(messages, "commandTitle", config.getOrElse("messages.commandTitle", Message.COMMAND_TITLE.getDefaultValue()));
+            ensureValue(messages, "commandSound", config.getOrElse("messages.commandSound", Message.COMMAND_SOUND.getDefaultValue()));
+            ensureValue(messages, "commandOpen", config.getOrElse("messages.commandOpen", Message.COMMAND_OPEN.getDefaultValue()));
+            ensureValue(messages, "commandClose", config.getOrElse("messages.commandClose", Message.COMMAND_CLOSE.getDefaultValue()));
+            ensureValue(messages, "guiListTop", config.getOrElse("messages.guiListTop", Message.GUI_LIST_TOP.getDefaultValue()));
+            ensureValue(messages, "guiListItem", config.getOrElse("messages.guiListItem", Message.GUI_LIST_ITEM.getDefaultValue()));
+            ensureValue(messages, "guiNotFound", config.getOrElse("messages.guiNotFound", Message.GUI_NOT_FOUND.getDefaultValue()));
+            ensureValue(messages, "guiTargetRequired", config.getOrElse("messages.guiTargetRequired", Message.GUI_TARGET_REQUIRED.getDefaultValue()));
+            ensureValue(messages, "invalidProperty", config.getOrElse("messages.invalidProperty", Message.INVALID_PROPERTY.getDefaultValue()));
+            ensureValue(messages, "serverNotFound", config.getOrElse("messages.serverNotFound", Message.SERVER_NOT_FOUND.getDefaultValue()));
+            ensureValue(messages, "emptyMessage", config.getOrElse("messages.emptyMessage", Message.EMPTY_MESSAGE.getDefaultValue()));
+            ensureValue(messages, "noPermission", config.getOrElse("messages.noPermission", Message.NO_PERMISSION.getDefaultValue()));
+            ensureValue(messages, "targetRequired", config.getOrElse("messages.targetRequired", Message.TARGET_REQUIRED.getDefaultValue()));
+            ensureValue(messages, "conditionFailed", Message.CONDITION_FAILED.getDefaultValue());
+            ensureValue(messages, "noPermission", Message.DISPATCHER_AUTHORIZATION_ERROR.getDefaultValue());
+            ensureValue(messages, "dispatcherFailedToExecuteCommand", Message.DISPATCHER_FAILED_TO_EXECUTE_COMMAND.getDefaultValue());
+            ensureValue(messages, "dispatcherNoSuchCommand", Message.DISPATCHER_NO_SUCH_COMMAND.getDefaultValue());
+            ensureValue(messages, "dispatcherTooFewArguments", Message.DISPATCHER_TOO_FEW_ARGUMENTS.getDefaultValue());
+            ensureValue(messages, "dispatcherTooManyArguments", Message.DISPATCHER_TOO_MANY_ARGUMENTS.getDefaultValue());
+            ensureValue(messages, "dispatcherIllegalCommandSource", Message.DISPATCHER_ILLEGAL_COMMAND_SOURCE.getDefaultValue());
+            ensureValue(messages, "dispatcherInvalidBooleanValue", Message.DISPATCHER_INVALID_BOOLEAN_VALUE.getDefaultValue());
+            ensureValue(messages, "dispatcherInvalidNumberValue", Message.DISPATCHER_INVALID_NUMBER_VALUE.getDefaultValue());
+            ensureValue(messages, "dispatcherInvalidCharacterValue", Message.DISPATCHER_INVALID_CHARACTER_VALUE.getDefaultValue());
+            ensureValue(messages, "dispatcherNumberOutOfRange", Message.DISPATCHER_NUMBER_OUT_OF_RANGE.getDefaultValue());
+            ensureValue(messages, "parameterQuotedStringInvalidTrailingCharacter", Message.PARAMETER_QUOTED_STRING_INVALID_TRAILING_CHARACTER.getDefaultValue());
+            ensureValue(messages, "parameterStringRegexError", Message.PARAMETER_STRING_REGEX_ERROR.getDefaultValue());
+            ensureValue(messages, "parameterMissingFlagValue", Message.PARAMETER_MISSING_FLAG_VALUE.getDefaultValue());
+            ensureValue(messages, "parameterMissingFlag", Message.PARAMETER_MISSING_FLAG.getDefaultValue());
+            ensureValue(messages, "parameterDuplicateFlag", Message.PARAMETER_DUPLICATE_FLAG.getDefaultValue());
+            ensureValue(messages, "parameterUnrecognizedCommandFlag", Message.PARAMETER_UNRECOGNIZED_COMMAND_FLAG.getDefaultValue());
+
+            config.remove("messages");
+            Config actions = config.get("actions");
+            if (actions != null) {
+                for (Config.Entry action : actions.entrySet()) {
+                    FileConfig actionFile = FileConfig.of(datafolder.resolve("actions").resolve(action.getKey() + ".yml"));
+                    actionFile.putAll(((Config) action.getValue()).unmodifiable());
+                    actionFile.save();
+                    actionFile.close();
+                }
+                config.remove("actions");
+            }
+            Config guis = config.get("guis");
+            if (guis != null) {
+                for (Config.Entry gui : guis.entrySet()) {
+                    FileConfig actionFile = FileConfig.of(datafolder.resolve("actions").resolve(gui.getKey() + ".yml"));
+                    actionFile.putAll(((Config) gui.getValue()).unmodifiable());
+                    actionFile.save();
+                    actionFile.close();
+                }
+                config.remove("guis");
+            }
+        }
+
         config.set("configVersion", newVersion);
         config.save();
+        config.close();
     }
 
     private static void ensureValue(final @NotNull Config config, final @NotNull String path, final @NotNull Object value) {
@@ -89,17 +153,20 @@ public class ConfigUtil {
         }
     }
 
-    private static @NotNull String getBackupFilename(final @NotNull Path folder) {
-        if (!Files.exists(folder.resolve("config_backup.yml"))) {
-            return "config_backup.yml";
+    private static @NotNull Path getBackupFolder(final @NotNull Path folder, final int oldVersion) {
+        if (!Files.exists(folder.resolve("ProtoGUI_backup_%d".formatted(oldVersion)))) {
+            return folder.resolve("ProtoGUI_backup_%d".formatted(oldVersion));
         }
 
         int backup = 1;
-        while (Files.exists(folder.resolve("config_backup" + backup + ".yml"))) {
+        while (Files.exists(folder.resolve("ProtoGUI_backup_%d_%d".formatted(oldVersion, backup))) && backup < 100) {
             backup += 1;
         }
+        if (backup >= 100) {
+            throw new RuntimeException("Failed to find backup location");
+        }
 
-        return "config_backup" + backup + ".yml";
+        return folder.resolve("ProtoGUI_backup_%d_%d".formatted(oldVersion, backup));
     }
 
     private ConfigUtil() {

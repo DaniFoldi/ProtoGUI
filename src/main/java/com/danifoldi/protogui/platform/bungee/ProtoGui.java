@@ -87,7 +87,6 @@ public class ProtoGui extends Plugin implements Listener {
             return;
         }
         final @NotNull ProtoGuiComponent component = DaggerProtoGuiComponent.builder()
-                .plugin(this)
                 .logger(getLogger())
                 .datafolder(getDataFolder().toPath())
                 .threadPool(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
@@ -395,9 +394,9 @@ public class ProtoGui extends Plugin implements Listener {
         }
 
         @Override
-        public void registerCommand(String command, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest) {
-            CommandWrapper commandWrapper = new CommandWrapper(command, dispatch, suggest, ProtoGui.this);
-            registeredCommands.put(command, commandWrapper);
+        public void registerCommand(List<String> commandAliases, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest) {
+            CommandWrapper commandWrapper = new CommandWrapper(commandAliases, dispatch, suggest, ProtoGui.this);
+            commandAliases.forEach(command -> registeredCommands.put(command, commandWrapper));
             ProxyServer.getInstance().getPluginManager().registerCommand(ProtoGui.this, commandWrapper);
         }
 

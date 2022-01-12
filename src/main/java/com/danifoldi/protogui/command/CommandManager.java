@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
@@ -52,9 +53,7 @@ public final class CommandManager {
                         throw new IllegalArgumentException("No aliases...");
                     }
 
-                    for (String alias: rootAliases) {
-                        ProtoGuiAPI.getInstance().getPlatform().registerCommand(alias, getDispatcher()::dispatchCommand, getDispatcher()::listSuggestions);
-                    }
+                    ProtoGuiAPI.getInstance().getPlatform().registerCommand(List.of(rootAliases), getDispatcher()::dispatchCommand, getDispatcher()::listSuggestions);
                 })
                 .build();
         this.dispatcher.mappers().registerMapper(new ProtoPlayerMapper());

@@ -259,10 +259,8 @@ public class GuiHandler {
         }
         menus.put(name, gui);
         if (!gui.getCommandAliases().isEmpty()) {
-            gui.getCommandAliases().forEach(alias -> {
-                CommandHandler commandHandler = new CommandHandler(name, gui);
-                ProtoGuiAPI.getInstance().getPlatform().registerCommand(alias, commandHandler::dispatch, commandHandler::suggest);
-            });
+            CommandHandler commandHandler = new CommandHandler(name, gui);
+            ProtoGuiAPI.getInstance().getPlatform().registerCommand(gui.getCommandAliases(), commandHandler::dispatch, commandHandler::suggest);
         }
     }
 
