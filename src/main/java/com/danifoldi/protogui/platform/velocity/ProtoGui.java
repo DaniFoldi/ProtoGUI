@@ -27,10 +27,14 @@ import com.velocitypowered.api.scheduler.ScheduledTask;
 import dev.simplix.protocolize.api.Protocolize;
 import dev.simplix.protocolize.api.inventory.PlayerInventory;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -221,12 +225,32 @@ public class ProtoGui {
 
         @Override
         public void title(String message, int fadeIn, int stay, int fadeOut) {
-            // todo send title
+            Title.Times times = Title.Times.of(
+                    Duration.ofSeconds(fadeIn),
+                    Duration.ofSeconds(stay),
+                    Duration.ofSeconds(fadeOut)
+            );
+            Title title = Title.title(
+                    LegacyComponentSerializer.legacySection().deserialize(message),
+                    Component.empty(),
+                    times
+            );
+            player.showTitle(title);
         }
 
         @Override
         public void subtitle(String message, int fadeIn, int stay, int fadeOut) {
-            // todo send subtitle
+            Title.Times times = Title.Times.of(
+                    Duration.ofSeconds(fadeIn),
+                    Duration.ofSeconds(stay),
+                    Duration.ofSeconds(fadeOut)
+            );
+            Title title = Title.title(
+                    Component.empty(),
+                    LegacyComponentSerializer.legacySection().deserialize(message),
+                    times
+            );
+            player.showTitle(title);
         }
 
         @Override
@@ -269,8 +293,10 @@ public class ProtoGui {
 
         @Override
         public String main() {
-            // todo implement
-            return plugin.getDescription().getSource().toString();
+            return plugin.getInstance().map(Object::getClass)
+                    .map(Class::getName)
+                    .orElseThrow();
+            //return plugin.getDescription().getSource().toString();
         }
 
         @Override
