@@ -54,6 +54,36 @@ public class UpdateUtil {
         }, threadPool);
     }
 
+    public static boolean isNewer(String current, String available) {
+        String[] currentS = current.split("-")[0].split("\\.");
+        String[] availableS = available.split("-")[0].split("\\.");
+        int[] currentI = new int[currentS.length];
+        int[] availableI = new int[availableS.length];
+        for (int i = 0; i < currentS.length; i++) {
+            try {
+                currentI[i] = Integer.parseInt(currentS[i]);
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+        for (int i = 0; i < availableS.length; i++) {
+            try {
+                availableI[i] = Integer.parseInt(availableS[i]);
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+        final int maxLength = Math.max(currentI.length, availableI.length);
+        for (int i = 0; i < maxLength; i++) {
+            final int left = i < currentI.length ? currentI[i] : 0;
+            final int right = i < availableI.length ? availableI[i] : 0;
+            if (left != right) {
+                return left >= right;
+            }
+        }
+        return false;
+    }
+
     private UpdateUtil() {
         throw new UnsupportedOperationException();
     }

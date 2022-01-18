@@ -70,16 +70,17 @@ public class ProtoGuiLoader {
             FileUtil.ensureFolder(datafolder.resolve("guis"));
             final @NotNull FileConfig config = FileUtil.ensureConfigFile(datafolder, "config.yml");
             config.load();
+            int configVersion = config.getIntOrElse("configVersion", 0);
+            config.close();
 
-            if (config.getIntOrElse("configVersion", 0) < ConfigUtil.LATEST) {
-                StringUtil.blockPrint(logger::warning, "%s config is built with an older version. Please see the https://github.com/DaniFoldi/ProtoGUI/releases page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(platform.pluginName(), ConfigUtil.backupAndUpgrade(datafolder, config.getIntOrElse("configVersion", 0))));
+            if (configVersion < ConfigUtil.LATEST) {
+                StringUtil.blockPrint(logger::warning, "%s config is built with an older version. Please see the https://github.com/DaniFoldi/ProtoGUI/releases page for changes. Attempting automatic upgrade (backup saved as %s)".formatted(platform.pluginName(), ConfigUtil.backupAndUpgrade(datafolder, configVersion)));
             }
 
-            if (config.getIntOrElse("configVersion", 0) > ConfigUtil.LATEST) {
+            if (configVersion > ConfigUtil.LATEST) {
                 StringUtil.blockPrint(logger::warning, "%s config is built with a newer version. Compatibility is not guaranteed.".formatted(platform.pluginName()));
             }
 
-            config.close();
             final @NotNull FileConfig newConfig = FileUtil.ensureConfigFile(datafolder, "config.yml");
             newConfig.load();
 
@@ -87,7 +88,7 @@ public class ProtoGuiLoader {
             messages.load();
             Message.setMessageProvider(messages);
 
-            logger.setFilter(record -> newConfig.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() >= record.getLevel().intValue());
+            logger.setFilter(record -> newConfig.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() <= record.getLevel().intValue());
 
             guiHandler.load(datafolder);
             platform.setup();
@@ -101,7 +102,7 @@ public class ProtoGuiLoader {
            if (newest.equals("")) {
                logger.warning("Could not check for updates");
            }
-           if (!newest.equals(platform.pluginVersion())) {
+           if (!UpdateUtil.isNewer(platform.pluginVersion(), newest)) {
                StringUtil.blockPrint(logger::warning, "A new release is available for %s. Please update for bugfixes and new features.".formatted(platform.pluginName()));
                logger.warning("Your current version: %s, newest: %s".formatted(platform.pluginVersion(), newest));
            }

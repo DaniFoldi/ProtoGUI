@@ -2,7 +2,6 @@ package com.danifoldi.protogui.inject;
 
 import com.danifoldi.protogui.main.ProtoGuiLoader;
 import com.danifoldi.protogui.platform.PlatformInteraction;
-import com.danifoldi.protogui.platform.bungee.ProtoGui;
 import dagger.BindsInstance;
 import dagger.Component;
 import org.jetbrains.annotations.NotNull;

@@ -4,18 +4,33 @@ import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ConfigUtil {
     public static final int LATEST = 6;
 
     public static @NotNull String backupAndUpgrade(final @NotNull Path datafolder, int oldVersion) throws IOException {
-        final @NotNull Path backup = getBackupFolder(datafolder.getParent(), oldVersion);
+        final @NotNull Path backup = getBackupLocation(datafolder.getParent(), oldVersion);
 
-        Files.copy(datafolder, backup);
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(backup))) {
+            Files.walkFileTree(datafolder, new SimpleFileVisitor<>() {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    zos.putNextEntry(new ZipEntry(datafolder.relativize(file).toString()));
+                    Files.copy(file, zos);
+                    zos.closeEntry();
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
 
         ConfigUtil.upgrade(datafolder, oldVersion, LATEST);
 
@@ -24,6 +39,7 @@ public class ConfigUtil {
 
     private static void upgrade(Path datafolder, int oldVersion, int newVersion) {
         FileConfig config = FileConfig.of(datafolder.resolve("config.yml"));
+        config.load();
         if (oldVersion >= newVersion) {
             return;
         }
@@ -124,7 +140,7 @@ public class ConfigUtil {
             if (actions != null) {
                 for (Config.Entry action : actions.entrySet()) {
                     FileConfig actionFile = FileConfig.of(datafolder.resolve("actions").resolve(action.getKey() + ".yml"));
-                    actionFile.putAll(((Config) action.getValue()).unmodifiable());
+                    actionFile.putAll(((Config)action.getValue()).unmodifiable());
                     actionFile.save();
                     actionFile.close();
                 }
@@ -133,10 +149,10 @@ public class ConfigUtil {
             Config guis = config.get("guis");
             if (guis != null) {
                 for (Config.Entry gui : guis.entrySet()) {
-                    FileConfig actionFile = FileConfig.of(datafolder.resolve("actions").resolve(gui.getKey() + ".yml"));
-                    actionFile.putAll(((Config) gui.getValue()).unmodifiable());
-                    actionFile.save();
-                    actionFile.close();
+                    FileConfig guiFile = FileConfig.of(datafolder.resolve("guis").resolve(gui.getKey() + ".yml"));
+                    guiFile.putAll(((Config)gui.getValue()).unmodifiable());
+                    guiFile.save();
+                    guiFile.close();
                 }
                 config.remove("guis");
             }
@@ -153,20 +169,20 @@ public class ConfigUtil {
         }
     }
 
-    private static @NotNull Path getBackupFolder(final @NotNull Path folder, final int oldVersion) {
-        if (!Files.exists(folder.resolve("ProtoGUI_backup_%d".formatted(oldVersion)))) {
-            return folder.resolve("ProtoGUI_backup_%d".formatted(oldVersion));
+    private static @NotNull Path getBackupLocation(final @NotNull Path folder, final int oldVersion) {
+        if (!Files.exists(folder.resolve("ProtoGUI_backup_%d.zip".formatted(oldVersion)))) {
+            return folder.resolve("ProtoGUI_backup_%d.zip".formatted(oldVersion));
         }
 
         int backup = 1;
-        while (Files.exists(folder.resolve("ProtoGUI_backup_%d_%d".formatted(oldVersion, backup))) && backup < 100) {
+        while (Files.exists(folder.resolve("ProtoGUI_backup_%d_%d.zip".formatted(oldVersion, backup))) && backup < 100) {
             backup += 1;
         }
         if (backup >= 100) {
             throw new RuntimeException("Failed to find backup location");
         }
 
-        return folder.resolve("ProtoGUI_backup_%d_%d".formatted(oldVersion, backup));
+        return folder.resolve("ProtoGUI_backup_%d_%d.zip".formatted(oldVersion, backup));
     }
 
     private ConfigUtil() {

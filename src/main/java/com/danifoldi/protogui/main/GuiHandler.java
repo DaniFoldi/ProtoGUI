@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,7 +63,7 @@ public class GuiHandler {
         try (Stream<Path> stream = Files.list(datafolder.resolve("actions"))) {
             stream
                     .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> p.getFileName().endsWith(".yml"))
+                    .filter(p -> p.getFileName().toString().endsWith(".yml"))
                     .forEach(p -> {
                         try {
                             FileConfig f = FileConfig.of(p);
@@ -81,7 +80,7 @@ public class GuiHandler {
         try (Stream<Path> stream = Files.list(datafolder.resolve("templates"))) {
             stream
                     .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> p.getFileName().endsWith(".yml"))
+                    .filter(p -> p.getFileName().toString().endsWith(".yml"))
                     .forEach(p -> {
                         try {
                             FileConfig f = FileConfig.of(p);
@@ -98,7 +97,7 @@ public class GuiHandler {
         try (Stream<Path> stream = Files.list(datafolder.resolve("guis"))) {
             stream
                     .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> p.getFileName().endsWith(".yml"))
+                    .filter(p -> p.getFileName().toString().endsWith(".yml"))
                     .forEach(p -> {
                         try {
                             FileConfig f = FileConfig.of(p);
@@ -109,6 +108,7 @@ public class GuiHandler {
                             addGui(guiName, templateGui == null ? loadGuiGrid(f, guiName) : loadGuiGrid(f, guiName, templateGui));
                         } catch (Exception e) {
                             logger.warning("Failed to load gui %s".formatted(p.getFileName()));
+                            e.printStackTrace();
                         }
                     });
         }
@@ -153,7 +153,7 @@ public class GuiHandler {
                 .items(loadItemMap(gui.getOrElse("items", Config.inMemory()), size))
                 .targeted(gui.getOrElse("targeted", false))
                 .commands(gui.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
-                .permission(gui.getOrElse("permission", "bungeegui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                .permission(gui.getOrElse("permission", "protogui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
                 .size(size)
                 .title(gui.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
                 .selfTarget(gui.getOrElse("selfTarget", true))

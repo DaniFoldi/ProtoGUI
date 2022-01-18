@@ -87,7 +87,7 @@ public class PlaceholderHandler {
 
         registerBuiltin("proxyname", uuid -> platform.platformName());
         registerBuiltin("proxyversion", uuid -> platform.platformVersion());
-        registerBuiltin("bungeegui", uuid -> platform.pluginName() + " " + platform.pluginVersion());
+        registerBuiltin("protogui", uuid -> platform.pluginName() + " " + platform.pluginVersion());
         registerBuiltin("version", uuid -> {
             if (uuid == null) {
                 return "";
