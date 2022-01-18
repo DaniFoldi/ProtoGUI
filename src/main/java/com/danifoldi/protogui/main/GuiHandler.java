@@ -239,8 +239,8 @@ public class GuiHandler {
                 .leftCommands(item.getOrElse("leftCommands", Collections.emptyList()))
                 .enchanted(item.getOrElse("enchanted", false))
                 .clickSound(loadClickSound(item))
-                .clickableIf(item.getOrElse("clickableIf", null))
-                .shownIf(item.getOrElse("shownIf", null))
+                .clickableIf(item.getOrElse("clickableIf", ""))
+                .shownIf(item.getOrElse("shownIf", ""))
                 .build();
     }
 

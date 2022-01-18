@@ -1,5 +1,6 @@
 package com.danifoldi.protogui.util;
 
+import com.danifoldi.protogui.gui.GuiItem;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -140,7 +142,7 @@ public class ConfigUtil {
             if (actions != null) {
                 for (Config.Entry action : actions.entrySet()) {
                     FileConfig actionFile = FileConfig.of(datafolder.resolve("actions").resolve(action.getKey() + ".yml"));
-                    actionFile.putAll(((Config)action.getValue()).unmodifiable());
+                    actionFile.putAll(action.getValue());
                     actionFile.save();
                     actionFile.close();
                 }
@@ -150,7 +152,15 @@ public class ConfigUtil {
             if (guis != null) {
                 for (Config.Entry gui : guis.entrySet()) {
                     FileConfig guiFile = FileConfig.of(datafolder.resolve("guis").resolve(gui.getKey() + ".yml"));
-                    guiFile.putAll(((Config)gui.getValue()).unmodifiable());
+                    guiFile.putAll(gui.getValue());
+                    Config oldItems = ((Config)gui.getValue()).getOrElse("items", Config.inMemory());
+                    Config items = Config.inMemory();
+
+                    for (final @NotNull Config.Entry guiItem : oldItems.entrySet()) {
+                        items.set(guiItem.getKey().replace(",-", "-").replace(",", "+"), guiItem.getValue());
+                    }
+                    guiFile.set("items", items);
+
                     guiFile.save();
                     guiFile.close();
                 }

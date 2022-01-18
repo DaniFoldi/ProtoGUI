@@ -13,6 +13,9 @@ public class ConditionUtil {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean holds(String condition, PlatformInteraction.ProtoSender sender) {
+        if (condition.isBlank()) {
+            return true;
+        }
         if (!condition.contains(":")) {
             try {
                 return Integer.parseInt(condition) != 0;
