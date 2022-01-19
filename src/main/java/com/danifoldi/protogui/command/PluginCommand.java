@@ -141,17 +141,24 @@ public class PluginCommand implements CommandContainer {
         sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui sudo", permission = "protogui.command.sudo", runAsync = true)
+    public void onSudoCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, @Greedy String command) {
+
+        targets.forEach(p -> p.run(command));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
     @CommandDefinition(route = "bgui|bungeegui|pgui|protogui title", permission = "protogui.command.title", runAsync = true)
     public void onTitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String mode, int fadeIn, int stay, int fadeOut, String message) {
 
-        for (final @NotNull PlatformInteraction.ProtoPlayer p: targets) {
-            if (mode.equalsIgnoreCase("subtitle")) {
-                p.subtitle(Message.process(p, message), fadeIn, stay, fadeOut);
-            } else {
-                p.title(Message.process(p, message), fadeIn, stay, fadeOut);
-            }
-        }
+        targets.forEach(p -> p.title(Message.process(p, message), fadeIn, stay, fadeOut));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
 
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui subtitle", permission = "protogui.command.subtitle", runAsync = true)
+    public void onSubtitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, int fadeIn, int stay, int fadeOut, String message) {
+
+        targets.forEach(p -> p.subtitle(Message.process(p, message), fadeIn, stay, fadeOut));
         sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 }

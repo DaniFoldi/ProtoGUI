@@ -2,6 +2,7 @@ package com.danifoldi.protogui.platform.bungee;
 
 import com.danifoldi.protogui.platform.PlatformInteraction;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -30,12 +31,20 @@ public class CommandWrapper extends Command implements TabExecutor {
 
     @Override
     public void execute(final @NotNull CommandSender sender, @NotNull final String[] args) {
-        dispatch.accept(protoGui.senderGenerator.apply(sender), buildArguments(args));
+        PlatformInteraction.ProtoSender protoSender = protoGui.senderGenerator.apply(sender);
+        if (sender instanceof ProxiedPlayer player) {
+            protoSender = protoGui.playerGenerator.apply(player);
+        }
+        dispatch.accept(protoSender, buildArguments(args));
     }
 
     @Override
     public @NotNull Iterable<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull String[] args) {
-        return suggest.apply(protoGui.senderGenerator.apply(sender), buildArguments(args));
+        PlatformInteraction.ProtoSender protoSender = protoGui.senderGenerator.apply(sender);
+        if (sender instanceof ProxiedPlayer player) {
+            protoSender = protoGui.playerGenerator.apply(player);
+        }
+        return suggest.apply(protoSender, buildArguments(args));
     }
 
     private @NotNull String buildArguments(final @NotNull String[] args) {

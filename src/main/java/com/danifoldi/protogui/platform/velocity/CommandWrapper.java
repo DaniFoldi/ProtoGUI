@@ -2,6 +2,7 @@ package com.danifoldi.protogui.platform.velocity;
 
 import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.velocitypowered.api.command.RawCommand;
+import com.velocitypowered.api.proxy.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -40,12 +41,20 @@ public class CommandWrapper implements RawCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        dispatch.accept(protoGui.senderGenerator.apply(invocation.source()), buildArguments(invocation.arguments()));
+        PlatformInteraction.ProtoSender protoSender = protoGui.senderGenerator.apply(invocation.source());
+        if (invocation.source() instanceof Player player) {
+            protoSender = protoGui.playerGenerator.apply(player);
+        }
+        dispatch.accept(protoSender, buildArguments(invocation.arguments()));
     }
 
     @Override
     public List<String> suggest(Invocation invocation) {
-        return suggest.apply(protoGui.senderGenerator.apply(invocation.source()), buildArguments(invocation.arguments())).stream().toList();
+        PlatformInteraction.ProtoSender protoSender = protoGui.senderGenerator.apply(invocation.source());
+        if (invocation.source() instanceof Player player) {
+            protoSender = protoGui.playerGenerator.apply(player);
+        }
+        return suggest.apply(protoSender, buildArguments(invocation.arguments())).stream().toList();
     }
 
     @Override

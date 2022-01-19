@@ -44,6 +44,6 @@ public class GuiMapper extends AbstractParameterMapper<PlatformInteraction.Proto
                 .stream()
                 .filter(g -> g.toLowerCase(Locale.ROOT).startsWith(currentArg.toLowerCase(Locale.ROOT)))
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
     }
 }

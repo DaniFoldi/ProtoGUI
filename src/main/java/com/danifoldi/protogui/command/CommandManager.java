@@ -45,7 +45,10 @@ public final class CommandManager {
         this.dispatcher = CommandDispatcher.builder(TypeToken.of(PlatformInteraction.ProtoSender.class))
                 .withAsyncExecutor(threadPool)
                 .withAuthorizer(PlatformInteraction.ProtoSender::hasPermission)
-                .withMessageProvider(key -> Message.find(key.key()).value())
+                .withMessageProvider(key -> {
+                    Message value = Message.find(key.key());
+                    return value != null ? value.value() : "missingKey:" + key.key();
+                })
                 .withMessenger(PlatformInteraction.ProtoSender::send)
                 .withRegistrationHandler(context -> {
                     final String[] rootAliases = context.route().get(0).split("\\|");

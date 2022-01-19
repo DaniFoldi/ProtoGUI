@@ -86,8 +86,12 @@ public enum Message {
         this.defaultValue = defaultValue;
     }
 
-    public static @NotNull Message find(String key) {
-        return Message.valueOf(key.toUpperCase(Locale.ROOT).replace("-", "_").replace(".", "_").trim());
+    public static @Nullable Message find(String key) {
+        try {
+            return Message.valueOf(key.toUpperCase(Locale.ROOT).replace("-", "_").replace(".", "_").trim());
+        } catch (EnumConstantNotPresentException e) {
+            return null;
+        }
     }
 
     public @NotNull String getDefaultValue() {

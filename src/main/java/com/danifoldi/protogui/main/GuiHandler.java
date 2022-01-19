@@ -370,7 +370,7 @@ public class GuiHandler {
             runCommand(uuid,openGui, slot, target, event.clickType());
             close(uuid, true);
         });
-        inventory.onClose(event -> close(event.player().handle(), false));
+        inventory.onClose(event -> close(event.player().uniqueId(), false));
 
         Protocolize.playerProvider().player(uuid).openInventory(inventory);
         openGuis.put(uuid, Pair.of(name, target));

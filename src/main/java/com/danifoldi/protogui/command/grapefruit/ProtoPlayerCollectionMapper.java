@@ -58,14 +58,16 @@ public class ProtoPlayerCollectionMapper extends AbstractParameterMapper<Platfor
         return Stream.concat(Stream.concat(
                 Stream.of("all"),
                 ProtoGuiAPI.getInstance().getPlatform().getPlayers()
-                .stream()
-                .filter(player -> !player.vanished())
-                .map(PlatformInteraction.ProtoPlayer::name)
-                .map(v -> "p:" + v)),
+                    .stream()
+                    .filter(player -> !player.vanished())
+                    .map(PlatformInteraction.ProtoPlayer::name)
+                    .map(v -> "p:" + v)
+                    .sorted()),
                 Map.copyOf(ProtoGuiAPI.getInstance().getPlatform().getServers())
-                .keySet()
-                .stream()
-                .map(v -> "s:" + v)
+                    .keySet()
+                    .stream()
+                    .map(v -> "s:" + v)
+                    .sorted()
                 )
                 .filter(s -> s.toLowerCase(Locale.ROOT).startsWith(currentArg.toLowerCase(Locale.ROOT)))
                 .toList();

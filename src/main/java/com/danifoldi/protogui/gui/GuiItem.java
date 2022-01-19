@@ -114,7 +114,7 @@ public class GuiItem {
         item
                 .amount((byte)this.getAmount())
                 .displayName(Message.process(placeholderTarget, this.getName(), Pair.of("player", player), Pair.of("target", target)))
-                .lore(this.getLore().stream().map(l -> Message.process(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()), false);
+                .lore(this.getLore().stream().map(l -> Message.process(placeholderTarget, l, Pair.of("player", player), Pair.of("target", target))).collect(Collectors.toList()), true);
 
         if (item.itemType().equals(ItemType.PLAYER_HEAD)) {
             final Pair<String, String> data = StringUtil.get(this.getData());
