@@ -26,7 +26,12 @@ public class CommandHandler {
 
     public void dispatch(PlatformInteraction.ProtoSender sender, String args) {
         if (!(sender instanceof final @NotNull PlatformInteraction.ProtoPlayer player)) {
-            sender.send(Message.PLAYER_ONLY);
+            Message.PLAYER_ONLY.send(sender);
+            return;
+        }
+
+        if (!sender.hasPermission(gui.getPermission())) {
+            Message.NO_PERMISSION.send(sender);
             return;
         }
 
