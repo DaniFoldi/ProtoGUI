@@ -31,7 +31,7 @@ public enum Message {
     COMMAND_SEND("commandSend", "&0- &6/bgui &lsend&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<server> &0- &7Send a player to a server"),
     COMMAND_CHAT("commandChat", "&0- &6/bgui &lchat&r &6<player> &6<message> &0- &7Send a message to chat as a player"),
     COMMAND_ACTIONBAR("commandActionbar", "&0- &6/bgui &lactionbar&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<text> &0- &7Show a player a message in their action bar"),
-    COMMAND_TITLE("commandTitle", "&0- &6/bgui &ltitle&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &7title&f|&7subtitle &6<fadeIn> &6<stay> &6<fadeOut> &6<message> &0- &7Send title to players"),
+    COMMAND_TITLE("commandTitle", "&0- &6/bgui &ltitle&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<fadeIn> &6<stay> &6<fadeOut> &6<message> &0- &7Send title to players"),
     COMMAND_SOUND("commandSound", "&0- &6/bgui &lsound&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<sound> &6[category] &6[volume] &6[pitch] &0- &7Play a sound for players"),
     COMMAND_OPEN("commandOpen", "&0- &6/bgui &lopen&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<gui> &6[target] &0- &7Open a GUI for players"),
     COMMAND_CLOSE("commandClose", "&0- &6/bgui &lclose&r &6<player> &0- &7Close the GUI for players"),
@@ -61,7 +61,9 @@ public enum Message {
     PARAMETER_MISSING_FLAG_VALUE("parameterMissingFlagValue", "&cMissing flag value: {input}"),
     PARAMETER_MISSING_FLAG("parameterMissingFlag", "&cMissing flag: {syntax}"),
     PARAMETER_DUPLICATE_FLAG("parameterDuplicateFlag", "&cDuplicate flag: {flag}"),
-    PARAMETER_UNRECOGNIZED_COMMAND_FLAG("parameterUnrecognizedCommandFlag", "&cUnrecognized flag: {input}");
+    PARAMETER_UNRECOGNIZED_COMMAND_FLAG("parameterUnrecognizedCommandFlag", "&cUnrecognized flag: {input}"),
+    COMMAND_SUBTITLE("commandSubtitle", "&0- &6/bgui &lsubtitle&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<fadeIn> &6<stay> &6<fadeOut> &6<message> &0- &7Send subtitle to players"),
+    COMMAND_SUDO("commandSudo", "&0- &6/bgui &lsudo&r &7all&f|&7s:&6<server>&f|&7p:&6<player> &6<command> &0- &7Force players to execute a command");
 
 
     private static final @NotNull Map<String, String> messages = new HashMap<>();

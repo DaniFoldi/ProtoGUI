@@ -136,6 +136,8 @@ public class ConfigUtil {
             ensureValue(messages, "parameterMissingFlag", Message.PARAMETER_MISSING_FLAG.getDefaultValue());
             ensureValue(messages, "parameterDuplicateFlag", Message.PARAMETER_DUPLICATE_FLAG.getDefaultValue());
             ensureValue(messages, "parameterUnrecognizedCommandFlag", Message.PARAMETER_UNRECOGNIZED_COMMAND_FLAG.getDefaultValue());
+            ensureValue(messages, "commandSudo", Message.COMMAND_SUDO.getDefaultValue());
+            ensureValue(messages, "commandSubtitle", Message.COMMAND_SUBTITLE.getDefaultValue());
 
             config.remove("messages");
             Config actions = config.get("actions");

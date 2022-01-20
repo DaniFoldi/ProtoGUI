@@ -45,6 +45,8 @@ public class PluginCommand implements CommandContainer {
         sender.send(Message.COMMAND_RELOAD);
         sender.send(Message.COMMAND_SEND);
         sender.send(Message.COMMAND_SOUND);
+        sender.send(Message.COMMAND_SUBTITLE);
+        sender.send(Message.COMMAND_SUDO);
         sender.send(Message.COMMAND_TITLE);
     }
 

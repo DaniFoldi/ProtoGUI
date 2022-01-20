@@ -30,10 +30,12 @@ public class FileUtil {
         return config;
     }
 
-    public static void ensureFolder(final @NotNull Path folder) throws IOException {
+    public static boolean ensureFolder(final @NotNull Path folder) throws IOException {
         if (Files.notExists(folder)) {
             Files.createDirectories(folder);
+            return true;
         }
+        return false;
     }
 
     private FileUtil() {

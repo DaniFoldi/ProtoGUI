@@ -1,0 +1,64 @@
+aliases:
+  - stats
+size: 45
+title: '&4&lStatistics'
+openSound:
+  sound: block_beacon_activate
+  volume: 0.4
+closeable: false
+items:
+  row0,row4,column0,column8:
+    type: red_stained_glass_pane
+    enchanted: true
+    clickSound:
+      sound: entity_villager_no
+  '13':
+    type: player_head
+    data: texture:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzI3NDA3NjFkYmQ0MmY3NmU0ZjEyYzQ4ZWMwOTlhY2RjMWM2OTI3MmFiNTc2MzU3OWJiZTkxYzVmNTg2NTZkNyJ9fX0=
+    name: '%bungeegui%'
+    lore:
+      - 'Guis loaded: %guicount%'
+      - 'Description: %plugin_description@BungeeGUI%'
+      - 'Version: %plugin_version@BungeeGUI%'
+      - 'Author: %plugin_author@BungeeGUI%'
+      - 'Main class: %plugin_main@BungeeGUI%'
+      - 'Depends: %plugin_depends@BungeeGUI%'
+      - 'Softdepends: %plugin_softdepends@BungeeGUI%'
+  '21':
+    type: player_head
+    data: owner:{player}
+    name: '%name%'
+    lore:
+      - '&4Ping: %ping%'
+      - '&5Server: %servername%'
+      - '&7Vanished: %vanished%'
+      - 'Version: %version%'
+      - 'Client locale: %locale%'
+      - 'Luckperms group: %luckperms_group%'
+      - 'Luckperms name: %luckperms_prefix%%displayname%%luckperms_suffix%'
+  '23':
+    type: player_head
+    data: texture:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQxOWM2ODQ2MTY2NmFhY2Q3NjI4ZTM0YTFlMmFkMzlmZTRmMmJkZTMyZTIzMTk2M2VmM2IzNTUzMyJ9fX0=
+    name: '%proxyname%'
+    lore:
+      - 'Version: %proxyversion%'
+      - '&4Memory: %ram_used% / %ram_total% MB'
+      - '&5Players: %online_visible% / %max%'
+      - '&6Plugins: %plugincount%'
+      - 'Servers: %servercount%'
+  '31':
+    type: player_head
+    data: texture:eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjYwYjAwNGYzNjBlMjg4NTVjY2YxMjM1YzJiZGVhMGEyOTk3YjBiYzAzMjU4ZTJkYzI0YWI4YTI1NzBhZWE2In19fQ==
+    name: '%servername%'
+    lore:
+      - 'MOTD: %motd@%servername%%'
+      - 'Players: %online_visible@%servername%% / %max@%servername%%'
+      - 'Version: %version@%servername%%'
+  '16':
+    type: barrier
+    clickSound:
+      sound: block_beacon_deactivate
+      volume: 0.4
+    name: '&cClose'
+    commands:
+      - ''

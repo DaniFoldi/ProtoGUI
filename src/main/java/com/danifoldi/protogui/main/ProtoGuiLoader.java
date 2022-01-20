@@ -64,7 +64,7 @@ public class ProtoGuiLoader {
         placeholderHandler.registerBuiltins();
 
         try {
-            FileUtil.ensureFolder(datafolder);
+            boolean newInstall = FileUtil.ensureFolder(datafolder);
             FileUtil.ensureFolder(datafolder.resolve("actions"));
             FileUtil.ensureFolder(datafolder.resolve("templates"));
             FileUtil.ensureFolder(datafolder.resolve("guis"));
@@ -89,6 +89,13 @@ public class ProtoGuiLoader {
             Message.setMessageProvider(messages);
 
             logger.setFilter(record -> newConfig.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() <= record.getLevel().intValue());
+
+            if (newInstall) {
+                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("authors.yml"), "authors.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("servermenu.yml"), "servermenu.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("sounds.yml"), "sounds.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("stats.yml"), "stats.yml");
+            }
 
             guiHandler.load(datafolder);
             platform.setup();

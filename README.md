@@ -115,7 +115,7 @@ ___Expressions are evaluated in order___
 
 **configVersion**
 
-This should say `5`. If there are any config changes, the value will be incremented. The conversion process should be automatic, unless the release notes say otherwise.
+This should say `6`. If there are any config changes, the value will be incremented. The conversion process should be automatic, unless the release notes say otherwise.
 
 ---
 
