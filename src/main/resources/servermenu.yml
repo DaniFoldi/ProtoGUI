@@ -4,7 +4,7 @@ aliases:
 size: 54
 title: '&d&lExampleCraft &dserver menu'
 items:
-  'row0,row5,column0,column8':
+  'row0+row5+column0+column8':
     type: white_stained_glass_pane
   '20':
     type: player_head

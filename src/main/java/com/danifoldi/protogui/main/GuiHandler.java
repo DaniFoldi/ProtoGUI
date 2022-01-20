@@ -368,7 +368,7 @@ public class GuiHandler {
                 return;
             }
 
-            runCommand(uuid,openGui, slot, target, event.clickType());
+            runCommand(uuid, openGui, slot, target, event.clickType());
             close(uuid, true);
         });
         inventory.onClose(event -> close(event.player().uniqueId(), false));

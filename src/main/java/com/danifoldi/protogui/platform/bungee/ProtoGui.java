@@ -16,6 +16,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ProxyReloadEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -97,7 +98,7 @@ public class ProtoGui extends Plugin implements Listener {
                 .build();
 
         this.loader = component.loader();
-        this.loader.load();
+        this.loader.load(false);
     }
 
     @Override
@@ -110,7 +111,7 @@ public class ProtoGui extends Plugin implements Listener {
         if (this.loader == null) {
             return;
         }
-        this.loader.unload();
+        this.loader.unload(false);
     }
 
     final @NotNull Function<CommandSender, PlatformInteraction.ProtoSender> senderGenerator = commandSender -> new PlatformInteraction.ProtoSender() {
@@ -424,6 +425,16 @@ public class ProtoGui extends Plugin implements Listener {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> serverGenerator.apply(e.getValue())));
         }
     };
+
+    @EventHandler
+    @SuppressWarnings("unused")
+    public void onReload(final @NotNull ProxyReloadEvent event) {
+        if (this.loader == null) {
+            return;
+        }
+        this.loader.unload(true);
+        this.loader.load(true);
+    }
 
     @EventHandler
     @SuppressWarnings("unused")

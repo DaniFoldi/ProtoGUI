@@ -1,0 +1,19 @@
+size: 45
+openSound:
+  sound: block_beacon_activate
+  volume: 0.4
+closeable: false
+items:
+  row0+row4+column0+column8:
+    type: red_stained_glass_pane
+    enchanted: true
+    clickSound:
+      sound: entity_villager_no
+  '16':
+    type: barrier
+    clickSound:
+      sound: block_beacon_deactivate
+      volume: 0.4
+    name: '&cClose'
+    commands:
+      - ''

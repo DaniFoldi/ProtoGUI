@@ -56,8 +56,12 @@ public class ProtoGuiLoader {
         this.threadPool = threadPool;
     }
 
-    public void load() {
-        StringUtil.blockPrint(logger::info, "Loading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
+    public void load(boolean reload) {
+        if (reload) {
+            StringUtil.blockPrint(logger::info, "Reloading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
+        } else {
+            StringUtil.blockPrint(logger::info, "Loading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
+        }
 
         ProtoGuiAPI.setInstance(new ProtoGuiAPI(guiHandler, this, placeholderHandler));
         commandManager.setup();
@@ -91,10 +95,12 @@ public class ProtoGuiLoader {
             logger.setFilter(record -> newConfig.getEnumOrElse("logLevel", LogLevel.ALL, EnumGetMethod.NAME_IGNORECASE).level.intValue() <= record.getLevel().intValue());
 
             if (newInstall) {
-                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("authors.yml"), "authors.yml");
-                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("servermenu.yml"), "servermenu.yml");
-                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("sounds.yml"), "sounds.yml");
-                FileUtil.ensureConfigFile(datafolder.resolve("guis").resolve("stats.yml"), "stats.yml");
+                logger.info("Fresh install, copying example files");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis"), "authors.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis"), "servermenu.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis"), "sounds.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("guis"), "stats.yml");
+                FileUtil.ensureConfigFile(datafolder.resolve("templates"), "test.yml");
             }
 
             guiHandler.load(datafolder);
@@ -116,8 +122,10 @@ public class ProtoGuiLoader {
         });
     }
 
-    public void unload() {
-        StringUtil.blockPrint(logger::info, "Unloading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
+    public void unload(boolean reload) {
+        if (!reload) {
+            StringUtil.blockPrint(logger::info, "Unloading %s version %s".formatted(platform.pluginName(), platform.pluginVersion()));
+        }
 
         guiHandler.unload();
         placeholderHandler.unregisterAll();

@@ -147,8 +147,8 @@ public class ProtoGuiAPI {
     public long reloadGuis() {
         final @NotNull Instant loadStart = Instant.now();
 
-        loader.unload();
-        loader.load();
+        loader.unload(true);
+        loader.load(true);
 
         final @NotNull Instant loadEnd = Instant.now();
         return Duration.between(loadStart, loadEnd).toMillis();

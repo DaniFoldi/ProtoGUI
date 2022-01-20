@@ -3,7 +3,7 @@ aliases:
 size: 45
 title: '&6BungeeGui Authors'
 items:
-  '0,8,36,44':
+  '0+8+36+44':
     type: nether_star
   '21':
     type: player_head

@@ -12,6 +12,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
@@ -90,7 +91,16 @@ public class ProtoGui {
                 .build();
 
         this.loader = component.loader();
-        this.loader.load();
+        this.loader.load(false);
+    }
+
+    @Subscribe
+    public void onShutdown(ProxyReloadEvent event) {
+        if (this.loader == null) {
+            return;
+        }
+        this.loader.unload(true);
+        this.loader.load(true);
     }
 
     @Subscribe
@@ -98,7 +108,7 @@ public class ProtoGui {
         if (this.loader == null) {
             return;
         }
-        this.loader.unload();
+        this.loader.unload(false);
     }
 
     final @NotNull Function<CommandSource, PlatformInteraction.ProtoSender> senderGenerator = commandSource -> new PlatformInteraction.ProtoSender() {

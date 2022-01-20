@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 
 public class ConditionUtil {
 
-    private static final Pattern permissionPattern = Pattern.compile("^(?<mode>(no)?perm)<(?<node>[\\w.]+)>");
-    private static final Pattern relationPattern = Pattern.compile("^(?<relation>le|lq|eq|ne|ge|gq):(?<left>[\\w\\d.]+):(?<right>[\\w\\d.]+)");
+    private static final Pattern permissionPattern = Pattern.compile("^(?<mode>(no)?perm):(?<node>[\\w.]+)");
+    private static final Pattern relationPattern = Pattern.compile("^(?<left>[\\w\\d.]+):(?<relation>le|lq|eq|ne|ge|gq):(?<right>[\\w\\d.]+)");
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean holds(String condition, PlatformInteraction.ProtoSender sender) {
@@ -30,15 +30,23 @@ public class ConditionUtil {
 
         Matcher relationMatcher = relationPattern.matcher(condition);
         if (relationMatcher.matches()) {
-            String mode = permissionMatcher.group("mode");
+            String mode = permissionMatcher.group("relation");
             String left = permissionMatcher.group("left");
             String right = permissionMatcher.group("right");
             try {
                 switch (mode) {
                     case "le": return Integer.parseInt(left) <= Integer.parseInt(right);
                     case "lq": return Integer.parseInt(left) < Integer.parseInt(right);
-                    case "eq": return left.equalsIgnoreCase(right);
-                    case "ne": return !left.equalsIgnoreCase(right);
+                    case "eq": try {
+                        return Integer.parseInt(left) == Integer.parseInt(right);
+                    } catch (NumberFormatException ignored) {
+                        return left.equalsIgnoreCase(right);
+                    }
+                    case "ne": try {
+                        return Integer.parseInt(left) != Integer.parseInt(right);
+                    } catch (NumberFormatException ignored) {
+                        return !left.equalsIgnoreCase(right);
+                    }
                     case "ge": return Integer.parseInt(left) >= Integer.parseInt(right);
                     case "gq": return Integer.parseInt(left) > Integer.parseInt(right);
                 }
