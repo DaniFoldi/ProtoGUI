@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -152,10 +153,10 @@ public class GuiHandler {
         return GuiGrid.builder()
                 .items(loadItemMap(gui.getOrElse("items", Config.inMemory()), size))
                 .targeted(gui.getOrElse("targeted", false))
-                .commands(gui.getOrElse("aliases", List.of(name.toLowerCase(Locale.ROOT))).stream().map(String::toLowerCase).collect(Collectors.toList()))
-                .permission(gui.getOrElse("permission", "protogui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "")))
+                .commands(gui.getOrElse("aliases", Collections.singletonList("<<#TEMPLATE#>>")))
+                .permission(gui.getOrElse("permission", "<<#TEMPLATE#>>"))
                 .size(size)
-                .title(gui.getOrElse("title", "GUI " + name.toLowerCase(Locale.ROOT)))
+                .title(gui.getOrElse("title", "<<#TEMPLATE#>>"))
                 .selfTarget(gui.getOrElse("selfTarget", true))
                 .ignoreVanished(gui.getOrElse("ignoreVanished", true))
                 .requireOnlineTarget(gui.getOrElse("requireOnlineTarget", false))
@@ -175,10 +176,10 @@ public class GuiHandler {
         return GuiGrid.builder()
                 .items(loadItemMap(gui.get("items"), size, template.getItems()))
                 .targeted(gui.getOrElse("targeted", template.isTargeted()))
-                .commands(gui.getOrElse("aliases", template.getCommandAliases()))
-                .permission(gui.getOrElse("permission", template.getPermission()))
+                .commands(gui.getOrElse("aliases", template.getCommandAliases().size() > 0 && Objects.equals(template.getCommandAliases().get(0), "<<#TEMPLATE#>>") ? Collections.singletonList(name.toLowerCase(Locale.ROOT)) : template.getCommandAliases()))
+                .permission(gui.getOrElse("permission", template.getPermission().equals("<<#TEMPLATE#>>") ? "protogui.gui." + name.toLowerCase(Locale.ROOT).replace("{", "").replace("}", "").replace(" ", "") : template.getPermission()))
                 .size(size)
-                .title(gui.getOrElse("title", template.getTitle()))
+                .title(gui.getOrElse("title", template.getTitle().equals("<<#TEMPLATE#>>") ? "GUI " + name.toLowerCase(Locale.ROOT) : template.getTitle()))
                 .selfTarget(gui.getOrElse("selfTarget", template.isSelfTarget()))
                 .ignoreVanished(gui.getOrElse("ignoreVanished", template.isIgnoreVanished()))
                 .requireOnlineTarget(gui.getOrElse("requireOnlineTarget", template.isRequireOnlineTarget()))
@@ -293,17 +294,17 @@ public class GuiHandler {
                     if (guiAction.getGuiItem().getClickSound() != null) {
                         guiAction.getGuiItem().getClickSound().playFor(uuid);
                     }
-                  open(guiAction.getGui(), uuid, null);
+                  open(guiAction.getGui(), uuid, "");
         });
     }
 
-    void open(final @NotNull String name, final @NotNull UUID uuid, final @NotNull String target) {
+    void open(final @NotNull GuiGrid gui, final @NotNull UUID uuid, final @NotNull String target) {
+        String name = getGuiName(gui);
         logger.info("Opening gui " + name + " for player " + uuid + " (target: " + target + ")");
 
         final PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
         final PlatformInteraction.ProtoPlayer targetPlayer = ProtoGuiAPI.getInstance().getPlatform().getPlayer(target);
         final PlatformInteraction.ProtoPlayer placeholderPlayer = menus.get(name).isRequireOnlineTarget() && menus.get(name).isPlaceholdersTarget() && targetPlayer != null ? targetPlayer : player;
-        final GuiGrid gui = menus.get(name);
         final Inventory inventory = new Inventory(SlotUtil.getInventoryType(gui.getGuiSize())).title(Message.process(placeholderPlayer, gui.getTitle(), Pair.of("player", player.name()), Pair.of("target", targetPlayer != null ? targetPlayer.name() : target)));
 
         if (gui.getOpenSound() != null) {
@@ -374,6 +375,10 @@ public class GuiHandler {
 
         Protocolize.playerProvider().player(uuid).openInventory(inventory);
         openGuis.put(uuid, Pair.of(name, target));
+    }
+
+    void open(final @NotNull String name, final @NotNull UUID uuid, final @NotNull String target) {
+        open(getGui(name), uuid, target);
     }
 
     void runCommand(final @NotNull UUID uuid, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {

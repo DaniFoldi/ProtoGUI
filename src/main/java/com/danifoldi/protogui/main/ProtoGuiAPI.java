@@ -19,7 +19,11 @@ import java.util.function.Function;
 public class ProtoGuiAPI {
 
     private static @Nullable ProtoGuiAPI apiInstance;
-    public static @Nullable ProtoGuiAPI getInstance() {
+    public static @NotNull ProtoGuiAPI getInstance() {
+        if (apiInstance == null) {
+            throw new RuntimeException("Cannot access API while plugin is not loaded");
+        }
+
         return apiInstance;
     }
     static void setInstance(final @Nullable ProtoGuiAPI apiInstance) {
@@ -60,6 +64,17 @@ public class ProtoGuiAPI {
      */
     public void openGui(final @NotNull UUID uuid, final @NotNull String guiName, final @NotNull String target) {
         guiHandler.open(guiName, uuid, target);
+    }
+
+    /**
+     * Opens a GUI for a player
+     *
+     * @param uuid - the user that the GUI will open for
+     * @param gui - the name GUI to open
+     * @param target - target value for the GUI, pass any {@link String} for untargeted GUIs
+     */
+    public void openGui(final @NotNull UUID uuid, final @NotNull GuiGrid gui, final @NotNull String target) {
+        guiHandler.open(gui, uuid, target);
     }
 
     /**

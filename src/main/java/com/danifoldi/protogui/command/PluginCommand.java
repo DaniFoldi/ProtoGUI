@@ -1,5 +1,6 @@
 package com.danifoldi.protogui.command;
 
+import com.danifoldi.protogui.gui.GuiGrid;
 import com.danifoldi.protogui.main.ProtoGuiAPI;
 import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.danifoldi.protogui.util.Message;
@@ -90,18 +91,14 @@ public class PluginCommand implements CommandContainer {
     }
 
     @CommandDefinition(route = "bgui|bungeegui|pgui|protogui open", permission = "protogui.command.open", runAsync = true)
-    public void onOpenCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String guiName, @OptParam String target) {
+    public void onOpenCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, GuiGrid gui, @OptParam String target) {
 
-        if (ProtoGuiAPI.getInstance().getGui(guiName) == null) {
-            sender.send(Message.GUI_NOT_FOUND.process(null, Pair.of("name", guiName)));
-            return;
-        }
-        if (target == null && ProtoGuiAPI.getInstance().getGui(guiName).isTargeted()) {
+        if (target == null && gui.isTargeted()) {
             sender.send(Message.GUI_TARGET_REQUIRED.process(null));
             return;
         }
 
-        targets.forEach(p -> ProtoGuiAPI.getInstance().openGui(p.uniqueId(), guiName, target == null ? "" : target));
+        targets.forEach(p -> ProtoGuiAPI.getInstance().openGui(p.uniqueId(), gui, target == null ? "" : target));
         sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
@@ -141,6 +138,13 @@ public class PluginCommand implements CommandContainer {
         sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 
+    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui subtitle", permission = "protogui.command.subtitle", runAsync = true)
+    public void onSubtitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, int fadeIn, int stay, int fadeOut, String message) {
+
+        targets.forEach(p -> p.subtitle(Message.process(p, message), fadeIn, stay, fadeOut));
+        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
+    }
+
     @CommandDefinition(route = "bgui|bungeegui|pgui|protogui sudo", permission = "protogui.command.sudo", runAsync = true)
     public void onSudoCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, @Greedy String command) {
 
@@ -152,13 +156,6 @@ public class PluginCommand implements CommandContainer {
     public void onTitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, String mode, int fadeIn, int stay, int fadeOut, String message) {
 
         targets.forEach(p -> p.title(Message.process(p, message), fadeIn, stay, fadeOut));
-        sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
-    }
-
-    @CommandDefinition(route = "bgui|bungeegui|pgui|protogui subtitle", permission = "protogui.command.subtitle", runAsync = true)
-    public void onSubtitleCommand(@Source PlatformInteraction.ProtoSender sender, Collection<PlatformInteraction.ProtoPlayer> targets, int fadeIn, int stay, int fadeOut, String message) {
-
-        targets.forEach(p -> p.subtitle(Message.process(p, message), fadeIn, stay, fadeOut));
         sender.send(Message.ACTION_COMPLETE.process(null, Pair.of("count", String.valueOf(targets.size()))));
     }
 }
