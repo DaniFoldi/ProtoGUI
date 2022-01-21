@@ -184,7 +184,14 @@ ProtoGUI provides an API which you can use to open and close GUIs for players an
 
 All available methods have JavaDocs provided in `ProtoGuiAPI.java`. [Click here](https://github.com/DaniFoldi/ProtoGUI/blob/main/src/main/java/com/danifoldi/protogui/main/ProtoGuiAPI.java) to see the available methods and how to use them.
 
-NOTE: the placeholder registry is currently in beta, and the API will likely be changed.
+Usage with Gradle:
+```groovy
+maven { url 'https://repo.danifoldi.com/maven-releases/' }
+
+implementation 'com.danifoldi:ProtoGUI:2.4.1'
+```
+
+Usage with Maven: use Gradle.
 
 ## Notes
 
