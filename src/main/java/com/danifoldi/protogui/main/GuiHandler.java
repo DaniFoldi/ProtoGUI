@@ -140,7 +140,17 @@ public class GuiHandler {
     }
 
     Map<Integer, GuiItem> loadItemMap(Config guiItems, int size, Map<Integer, GuiItem> fallback) {
-        Map<Integer, GuiItem> itemMap = loadItemMap(guiItems, size);
+        Map<Integer, GuiItem> itemMap = new ConcurrentHashMap<>();
+
+        for (final @NotNull Config.Entry guiItem : guiItems.entrySet()) {
+            final @NotNull Set<Integer> slots = SlotUtil.getSlots(guiItem.getKey(), SlotUtil.getInventorySize(SlotUtil.getInventoryType(size)));
+            final @NotNull Config itemData = guiItem.getValue();
+
+            for (final int slot : slots) {
+                GuiItem item = loadItem(itemData, fallback.get(slot));
+                itemMap.put(slot, item.copy());
+            }
+        }
 
         fallback.forEach(itemMap::putIfAbsent);
 
@@ -228,6 +238,19 @@ public class GuiHandler {
         return clickSound;
     }
 
+    GuiSound loadClickSound(Config item, GuiSound fallback) {
+        if (item.contains("clickSound")) {
+            return GuiSound.builder()
+                    .soundName(item.getOrElse("clickSound.sound", fallback.getSoundName()))
+                    .soundCategory(item.getEnumOrElse("clickSound.soundCategory", fallback.getSoundCategory(), EnumGetMethod.NAME_IGNORECASE))
+                    .volume(item.getOrElse("clickSound.volume", fallback.getVolume()))
+                    .pitch(item.getOrElse("clickSound.pitch", fallback.getPitch()))
+                    .build();
+        } else {
+            return fallback;
+        }
+    }
+
     GuiItem loadItem(Config item) {
         return GuiItem.builder()
                 .type(item.getEnumOrElse("type", ItemType.STONE, EnumGetMethod.NAME_IGNORECASE))
@@ -242,6 +265,27 @@ public class GuiHandler {
                 .clickSound(loadClickSound(item))
                 .clickableIf(item.getOrElse("clickableIf", ""))
                 .shownIf(item.getOrElse("shownIf", ""))
+                .build();
+    }
+
+    GuiItem loadItem(Config item, GuiItem fallback) {
+        if (fallback == null) {
+            return loadItem(item);
+        }
+
+        return GuiItem.builder()
+                .type(item.getEnumOrElse("type", fallback.getType(), EnumGetMethod.NAME_IGNORECASE))
+                .amount(item.getOrElse("count", fallback.getAmount()))
+                .title(item.getOrElse("name", fallback.getName()))
+                .lore(item.getOrElse("lore", fallback.getLore()))
+                .data(item.getOrElse("data", fallback.getData()))
+                .commands(item.getOrElse("commands", fallback.getCommands()))
+                .rightCommands(item.getOrElse("rightCommands", fallback.getRightCommands()))
+                .leftCommands(item.getOrElse("leftCommands", fallback.getLeftCommands()))
+                .enchanted(item.getOrElse("enchanted", fallback.isEnchanted()))
+                .clickSound(loadClickSound(item, fallback.getClickSound()))
+                .clickableIf(item.getOrElse("clickableIf", fallback.getClickableIf()))
+                .shownIf(item.getOrElse("shownIf", fallback.getShownIf()))
                 .build();
     }
 
@@ -402,7 +446,7 @@ public class GuiHandler {
             PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(uuid);
 
             if (commandData.getFirst().equalsIgnoreCase("console")) {
-                ProtoGuiAPI.getInstance().getPlatform().runConsoleCommand(Message.replace(command, Pair.of("player", player.name()), Pair.of("target", target)));
+                ProtoGuiAPI.getInstance().getPlatform().runConsoleCommand(Message.replace(commandData.getSecond(), Pair.of("player", player.name()), Pair.of("target", target)));
                 continue;
             }
 
