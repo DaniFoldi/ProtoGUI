@@ -261,7 +261,7 @@ public class GuiHandler {
         menus.put(name, gui);
         if (!gui.getCommandAliases().isEmpty()) {
             CommandHandler commandHandler = new CommandHandler(name, gui);
-            ProtoGuiAPI.getInstance().getPlatform().registerCommand(gui.getCommandAliases(), commandHandler::dispatch, commandHandler::suggest);
+            ProtoGuiAPI.getInstance().getPlatform().registerCommand(gui.getCommandAliases(), gui.getPermission(), commandHandler::dispatch, commandHandler::suggest);
         }
     }
 

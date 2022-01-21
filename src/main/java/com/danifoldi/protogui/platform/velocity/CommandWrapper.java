@@ -4,6 +4,7 @@ import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.velocitypowered.api.command.RawCommand;
 import com.velocitypowered.api.proxy.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,9 +15,10 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 public class CommandWrapper implements RawCommand {
-    private final @NotNull ProtoGui protoGui;
+    private final @Nullable String permission;
     private final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch;
     private final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest;
+    private final @NotNull ProtoGui protoGui;
     private final @NotNull ExecutorService threadPool;
     private final @NotNull String name;
 
@@ -25,6 +27,21 @@ public class CommandWrapper implements RawCommand {
                    final @NotNull ProtoGui protoGui,
                    final @NotNull ExecutorService threadPool,
                    final @NotNull String name) {
+        this.permission = null;
+        this.dispatch = dispatch;
+        this.suggest = suggest;
+        this.protoGui = protoGui;
+        this.threadPool = threadPool;
+        this.name = name;
+    }
+
+    CommandWrapper(final @NotNull String permission,
+                   final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch,
+                   final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest,
+                   final @NotNull ProtoGui protoGui,
+                   final @NotNull ExecutorService threadPool,
+                   final @NotNull String name) {
+        this.permission = permission;
         this.dispatch = dispatch;
         this.suggest = suggest;
         this.protoGui = protoGui;
@@ -64,6 +81,6 @@ public class CommandWrapper implements RawCommand {
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return true;
+        return invocation.source().hasPermission(permission);
     }
 }

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class ConditionUtil {
 
     private static final Pattern permissionPattern = Pattern.compile("^(?<mode>(no)?perm):(?<node>[\\w.]+)");
-    private static final Pattern relationPattern = Pattern.compile("^(?<left>[\\w\\d.]+):(?<relation>le|lq|eq|ne|ge|gq):(?<right>[\\w\\d.]+)");
+    private static final Pattern relationPattern = Pattern.compile("^(?<left>[\\w\\d.]+):(?<relation>le|lt|eq|ne|ge|gt):(?<right>[\\w\\d.]+)");
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean holds(String condition, PlatformInteraction.ProtoSender sender) {
@@ -20,7 +20,7 @@ public class ConditionUtil {
             try {
                 return Integer.parseInt(condition) != 0;
             } catch (NumberFormatException ignored) {
-                return condition.toLowerCase(Locale.ROOT).equals("yes") || condition.toLowerCase(Locale.ROOT).equals("online");
+                return condition.toLowerCase(Locale.ROOT).equals("yes") || condition.toLowerCase(Locale.ROOT).equals("online") || condition.toLowerCase(Locale.ROOT).equals("true");
             }
         }
         Matcher permissionMatcher = permissionPattern.matcher(condition);
@@ -30,13 +30,13 @@ public class ConditionUtil {
 
         Matcher relationMatcher = relationPattern.matcher(condition);
         if (relationMatcher.matches()) {
-            String mode = permissionMatcher.group("relation");
+            String relation = permissionMatcher.group("relation");
             String left = permissionMatcher.group("left");
             String right = permissionMatcher.group("right");
             try {
-                switch (mode) {
+                switch (relation) {
                     case "le": return Integer.parseInt(left) <= Integer.parseInt(right);
-                    case "lq": return Integer.parseInt(left) < Integer.parseInt(right);
+                    case "lt": return Integer.parseInt(left) < Integer.parseInt(right);
                     case "eq": try {
                         return Integer.parseInt(left) == Integer.parseInt(right);
                     } catch (NumberFormatException ignored) {
@@ -48,7 +48,7 @@ public class ConditionUtil {
                         return !left.equalsIgnoreCase(right);
                     }
                     case "ge": return Integer.parseInt(left) >= Integer.parseInt(right);
-                    case "gq": return Integer.parseInt(left) > Integer.parseInt(right);
+                    case "gt": return Integer.parseInt(left) > Integer.parseInt(right);
                 }
             } catch (NumberFormatException ignored) {
                 return false;

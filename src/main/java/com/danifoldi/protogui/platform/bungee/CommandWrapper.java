@@ -29,6 +29,17 @@ public class CommandWrapper extends Command implements TabExecutor {
         this.protoGui = protoGui;
     }
 
+    CommandWrapper(final @NotNull List<String> aliases,
+                   final @NotNull String permission,
+                   final @NotNull BiConsumer<PlatformInteraction.ProtoSender, String> dispatch,
+                   final @NotNull BiFunction<PlatformInteraction.ProtoSender, String, Collection<String>> suggest,
+                   final @NotNull ProtoGui protoGui) {
+        super(aliases.stream().findFirst().orElseThrow(), permission, aliases.stream().skip(1).toArray(String[]::new));
+        this.dispatch = dispatch;
+        this.suggest = suggest;
+        this.protoGui = protoGui;
+    }
+
     @Override
     public void execute(final @NotNull CommandSender sender, @NotNull final String[] args) {
         PlatformInteraction.ProtoSender protoSender = protoGui.senderGenerator.apply(sender);

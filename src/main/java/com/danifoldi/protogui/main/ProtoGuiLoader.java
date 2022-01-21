@@ -115,7 +115,7 @@ public class ProtoGuiLoader {
            if (newest.equals("")) {
                logger.warning("Could not check for updates");
            }
-           if (!UpdateUtil.isNewer(platform.pluginVersion(), newest)) {
+           if (UpdateUtil.isNewer(newest, platform.pluginVersion())) {
                StringUtil.blockPrint(logger::warning, "A new release is available for %s. Please update for bugfixes and new features.".formatted(platform.pluginName()));
                logger.warning("Your current version: %s, newest: %s".formatted(platform.pluginVersion(), newest));
            }

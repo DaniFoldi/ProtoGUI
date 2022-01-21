@@ -41,7 +41,7 @@ public class ProtoPlayerCollectionMapper extends AbstractParameterMapper<Platfor
         final @NotNull Pair<String, String> target = StringUtil.get(input);
         switch (target.getFirst().toLowerCase(Locale.ROOT)) {
             case "p":
-                PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(input);
+                PlatformInteraction.ProtoPlayer player = ProtoGuiAPI.getInstance().getPlatform().getPlayer(target.getSecond());
                 return player != null ? List.of(player) : Collections.emptyList();
             case "s":
                 PlatformInteraction.ProtoServer server = Map.copyOf(ProtoGuiAPI.getInstance().getPlatform().getServers()).get(target.getSecond());

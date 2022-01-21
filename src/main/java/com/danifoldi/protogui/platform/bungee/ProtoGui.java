@@ -114,7 +114,7 @@ public class ProtoGui extends Plugin implements Listener {
         this.loader.unload(false);
     }
 
-    final @NotNull Function<CommandSender, PlatformInteraction.ProtoSender> senderGenerator = commandSender -> new PlatformInteraction.ProtoSender() {
+    final @NotNull Function<CommandSender, PlatformInteraction.ProtoSender> senderGenerator = commandSender -> commandSender == null ? null : new PlatformInteraction.ProtoSender() {
         @Override
         public boolean hasPermission(String permission) {
             return commandSender.hasPermission(permission);
@@ -147,7 +147,7 @@ public class ProtoGui extends Plugin implements Listener {
         }
     };
 
-    final @NotNull Function<ServerInfo, PlatformInteraction.ProtoServer> serverGenerator = serverInfo -> new PlatformInteraction.ProtoServer() {
+    final @NotNull Function<ServerInfo, PlatformInteraction.ProtoServer> serverGenerator = serverInfo -> serverInfo == null ? null : new PlatformInteraction.ProtoServer() {
         @Override
         public String name() {
             return serverInfo.getName();
@@ -184,7 +184,7 @@ public class ProtoGui extends Plugin implements Listener {
         }
     };
 
-    final @NotNull Function<ProxiedPlayer, PlatformInteraction.ProtoPlayer> playerGenerator = proxiedPlayer -> new PlatformInteraction.ProtoPlayer() {
+    final @NotNull Function<ProxiedPlayer, PlatformInteraction.ProtoPlayer> playerGenerator = proxiedPlayer -> proxiedPlayer == null ? null : new PlatformInteraction.ProtoPlayer() {
         @Override
         public boolean vanished() {
             final @Nullable Plugin premiumvanishPlugin = ProxyServer.getInstance().getPluginManager().getPlugin("PremiumVanish");
@@ -271,7 +271,7 @@ public class ProtoGui extends Plugin implements Listener {
         }
     };
 
-    final @NotNull Function<Plugin, PlatformInteraction.ProtoPlugin> pluginGenerator = plugin -> new PlatformInteraction.ProtoPlugin() {
+    final @NotNull Function<Plugin, PlatformInteraction.ProtoPlugin> pluginGenerator = plugin -> plugin == null ? null : new PlatformInteraction.ProtoPlugin() {
         @Override
         public String name() {
             return plugin.getDescription().getName();
@@ -397,6 +397,13 @@ public class ProtoGui extends Plugin implements Listener {
         @Override
         public void registerCommand(List<String> commandAliases, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest) {
             CommandWrapper commandWrapper = new CommandWrapper(commandAliases, dispatch, suggest, ProtoGui.this);
+            commandAliases.forEach(command -> registeredCommands.put(command, commandWrapper));
+            ProxyServer.getInstance().getPluginManager().registerCommand(ProtoGui.this, commandWrapper);
+        }
+
+        @Override
+        public void registerCommand(List<String> commandAliases, String permission, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest) {
+            CommandWrapper commandWrapper = new CommandWrapper(commandAliases, permission, dispatch, suggest, ProtoGui.this);
             commandAliases.forEach(command -> registeredCommands.put(command, commandWrapper));
             ProxyServer.getInstance().getPluginManager().registerCommand(ProtoGui.this, commandWrapper);
         }

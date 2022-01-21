@@ -420,6 +420,13 @@ public class ProtoGui {
         }
 
         @Override
+        public void registerCommand(List<String> commandAliases, String permission, BiConsumer<ProtoSender, String> dispatch, BiFunction<ProtoSender, String, Collection<String>> suggest) {
+            CommandWrapper commandWrapper = new CommandWrapper(permission, dispatch, suggest, ProtoGui.this, threadPool, commandAliases.stream().findFirst().orElseThrow());
+            registeredCommands.put(commandAliases.stream().findFirst().orElseThrow(), commandWrapper);
+            server.getCommandManager().register(commandAliases.stream().findFirst().orElseThrow(), commandWrapper, commandAliases.stream().skip(1).toArray(String[]::new));
+        }
+
+        @Override
         public void unregisterCommand(String command) {
             registeredCommands.remove(command);
             server.getCommandManager().unregister(command);
