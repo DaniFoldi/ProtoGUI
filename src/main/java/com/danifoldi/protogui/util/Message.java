@@ -79,6 +79,7 @@ public enum Message {
 
     private static final @NotNull Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
     private static final @NotNull Pattern COLOR = Pattern.compile("(&(?<char>[0-9a-fA-Fk-oK-OrRxX]))");
+    private static final @NotNull String ALL_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
 
     private final @NotNull String messageId;
     private final @NotNull String defaultValue;
@@ -130,15 +131,17 @@ public enum Message {
             text = text.replace(color, value);
         }
 
-        final @NotNull Matcher colorMatcher = COLOR.matcher(text);
-
-        while (colorMatcher.find()) {
-            final @NotNull String color = colorMatcher.group(1);
-            final @NotNull String value = colorMatcher.group("char");
-            text = text.replace(color, "§" + value);
+        // bungee's ChatColor.translateAlternateColorCodes, except not requiring bungee
+        char[] b = text.toCharArray();
+        for ( int i = 0; i < b.length - 1; i++ )
+        {
+            if ( b[i] == '&' && ALL_CODES.indexOf( b[i + 1] ) > -1 )
+            {
+                b[i] = '§';
+                b[i + 1] = Character.toLowerCase( b[i + 1] );
+            }
         }
-
-        return text;
+        return new String(b);
     }
 
     @SafeVarargs
