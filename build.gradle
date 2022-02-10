@@ -31,7 +31,7 @@ dependencies {
     }
     compileOnly 'dev.simplix:protocolize-api:2.1.0'
 
-    compileOnly 'net.luckperms:api:5.3'
+    compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.3'
     compileOnly 'dev.simplix.plugins:punishcontrol-api:2.0.1'
 
