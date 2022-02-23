@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
@@ -338,7 +337,7 @@ public class GuiHandler {
                     if (guiAction.getGuiItem().getClickSound() != null) {
                         guiAction.getGuiItem().getClickSound().playFor(uuid);
                     }
-                  open(guiAction.getGui(), uuid, "");
+                  open(getGui(guiAction.getGui()), uuid, "");
         });
     }
 
@@ -421,10 +420,6 @@ public class GuiHandler {
         openGuis.put(uuid, Pair.of(name, target));
     }
 
-    void open(final @NotNull String name, final @NotNull UUID uuid, final @NotNull String target) {
-        open(getGui(name), uuid, target);
-    }
-
     void runCommand(final @NotNull UUID uuid, final @NotNull GuiGrid openGui, final int slot, final @NotNull String target, final @NotNull ClickType clickType) {
         logger.info("Running " + clickType.name() + " commands for player " + uuid + " slot " + slot + " with target " + target);
 
@@ -460,7 +455,7 @@ public class GuiHandler {
         }
 
         if (!menus.get(openGuis.get(uuid).getFirst()).isCloseable() && !didClick) {
-            open(openGuis.get(uuid).getFirst(), uuid, openGuis.get(uuid).getSecond());
+            open(getGui(openGuis.get(uuid).getFirst()), uuid, openGuis.get(uuid).getSecond());
             return;
         }
 

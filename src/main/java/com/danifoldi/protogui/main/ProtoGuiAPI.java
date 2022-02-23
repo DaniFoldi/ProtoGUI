@@ -63,7 +63,7 @@ public class ProtoGuiAPI {
      * @param target - target value for the GUI, pass any {@link String} for untargeted GUIs
      */
     public void openGui(final @NotNull UUID uuid, final @NotNull String guiName, final @NotNull String target) {
-        guiHandler.open(guiName, uuid, target);
+        guiHandler.open(getGui(guiName), uuid, target);
     }
 
     /**

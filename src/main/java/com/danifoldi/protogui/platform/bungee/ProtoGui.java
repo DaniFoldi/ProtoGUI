@@ -51,42 +51,8 @@ public class ProtoGui extends Plugin implements Listener {
     private final @NotNull Map<String, CommandWrapper> registeredCommands = new ConcurrentHashMap<>();
     private final @NotNull Map<ServerInfo, ServerPing> lastResponse = new ConcurrentHashMap<>();
 
-    // Everything in onLoad is only needed for compatibility with older versions, so only on Bungee
-    private boolean enabled = false;
-    @Override
-    public void onLoad() {
-        try {
-            if (!Files.exists(getDataFolder().toPath().resolve("compat"))) {
-                return;
-            }
-
-            Files.move(getDataFolder().toPath().getParent().resolve("BungeeGUI"), getDataFolder().toPath());
-            getLogger().info("Moved datafolder to new location");
-        } catch (IOException ignored) {
-
-        }
-        try {
-            PluginManager pluginManager = ProxyServer.getInstance().getPluginManager();
-            Field pluginsField = pluginManager.getClass().getDeclaredField("plugins");
-            pluginsField.setAccessible(true);
-            if (pluginsField.get(pluginManager) instanceof Map pluginMap) {
-                //noinspection unchecked
-                pluginMap.put("BungeeGUI", this);
-            }
-            getLogger().info("Registering plugin as BungeeGUI, double loading message is normal");
-        } catch (ReflectiveOperationException e) {
-            getLogger().warning("Could not force-add old plugin name");
-            getLogger().info(e.getMessage());
-        }
-    }
-
     @Override
     public void onEnable() {
-        if (!enabled) {
-            enabled = true;
-        } else {
-            return;
-        }
         final @NotNull ProtoGuiComponent component = DaggerProtoGuiComponent.builder()
                 .logger(getLogger())
                 .datafolder(getDataFolder().toPath())
@@ -103,11 +69,6 @@ public class ProtoGui extends Plugin implements Listener {
 
     @Override
     public void onDisable() {
-        if (enabled) {
-            enabled = false;
-        } else {
-            return;
-        }
         if (this.loader == null) {
             return;
         }

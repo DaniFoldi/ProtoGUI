@@ -78,7 +78,6 @@ public enum Message {
     }
 
     private static final @NotNull Pattern HEX = Pattern.compile("(&#[a-fA-F0-9]{6})");
-    private static final @NotNull Pattern COLOR = Pattern.compile("(&(?<char>[0-9a-fA-Fk-oK-OrRxX]))");
     private static final @NotNull String ALL_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
 
     private final @NotNull String messageId;
