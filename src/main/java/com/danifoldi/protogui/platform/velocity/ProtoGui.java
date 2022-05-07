@@ -6,6 +6,7 @@ import com.danifoldi.protogui.main.ProtoGuiAPI;
 import com.danifoldi.protogui.main.ProtoGuiLoader;
 import com.danifoldi.protogui.platform.PlatformInteraction;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.EventTask;
 import com.velocitypowered.api.event.Subscribe;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
 
 @Plugin(authors = {"DaniFoldi", "HgeX"},
 dependencies = {
-        @Dependency(id = "Protocolize"),
+        @Dependency(id = "protocolize"),
         @Dependency(id = "LuckPerms", optional = true),
         @Dependency(id = "PremiumVanish", optional = true)
 },
@@ -76,6 +77,7 @@ public class ProtoGui {
     private final @NotNull Map<String, CommandWrapper> registeredCommands = new ConcurrentHashMap<>();
     private final @NotNull Map<RegisteredServer, ServerPing> lastResponse = new ConcurrentHashMap<>();
 
+    @Inject
     public ProtoGui(final @NotNull ProxyServer server, @DataDirectory Path datafolder) {
         this.server = server;
         this.datafolder = datafolder;
