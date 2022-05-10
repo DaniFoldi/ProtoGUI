@@ -81,6 +81,6 @@ public class CommandWrapper implements RawCommand {
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return invocation.source().hasPermission(permission);
+        return permission == null || invocation.source().hasPermission(permission);
     }
 }
