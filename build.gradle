@@ -29,7 +29,7 @@ dependencies {
         exclude module: 'annotation'
         exclude module: 'guava'
     }
-    compileOnly 'dev.simplix:protocolize-api:2.1.2'
+    compileOnly 'dev.simplix:protocolize-api:2.2.0'
 
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
