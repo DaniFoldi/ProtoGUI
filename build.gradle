@@ -35,7 +35,7 @@ dependencies {
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
     compileOnly 'dev.simplix.plugins:punishcontrol-api:2.0.1'
 
-    implementation ('com.electronwill.night-config:yaml:3.6.5') {
+    implementation ('com.electronwill.night-config:yaml:3.6.6') {
         exclude module: 'snakeyaml'
     }
 
