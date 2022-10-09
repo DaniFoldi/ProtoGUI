@@ -1,13 +1,13 @@
 plugins {
     id 'java'
-    id 'net.kyori.blossom' version '1.3.0'
+    id 'net.kyori.blossom' version '1.3.1'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group 'com.danifoldi'
-version '2.4.3'
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+version '3.0.0'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -29,20 +29,20 @@ dependencies {
         exclude module: 'annotation'
         exclude module: 'guava'
     }
-    compileOnly 'dev.simplix:protocolize-api:2.2.1'
+    compileOnly 'dev.simplix:protocolize-api:2.2.2'
 
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
     compileOnly 'dev.simplix.plugins:punishcontrol-api:2.0.1'
 
-    implementation ('com.electronwill.night-config:yaml:3.6.5') {
+    implementation ('com.electronwill.night-config:yaml:3.6.6') {
         exclude module: 'snakeyaml'
     }
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
     implementation 'javax.inject:javax.inject:1'
-    implementation 'com.google.dagger:dagger:2.42'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.42'
+    implementation 'com.google.dagger:dagger:2.44'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.44'
 }
 
 processResources {
